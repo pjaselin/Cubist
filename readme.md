@@ -1,13 +1,15 @@
-![](https://img.shields.io/github/last-commit/apachaves/Cubist)
+![Credits to: https://voniart.weebly.com/cubist-animals.html](https://img.shields.io/github/last-commit/apachaves/Cubist)
 ![](https://img.shields.io/github/languages/code-size/apachaves/Cubist)
 
-# Cubist
+<img src='https://voniart.weebly.com/uploads/1/2/3/9/12399176/7832674_orig.jpg' width=125 height=125 align="right">
 
-A Python package for fitting Quinlan's Cubist regression model
+# PyCubist
 
-Inspired by the R wrapper for cubist https://github.com/topepo/Cubist
+A Python package for fitting Quinlan's Cubist regression model.
 
-## architecture
+Inspired by the R wrapper for cubist: https://github.com/topepo/Cubist
+
+## Architecture
 Taking inspiration from the R wrapper this is what needs to be done
 1. Get cubist compiled on own machine so we have binary available
 1. Understand the inputs the binary require. The training dataset needs to
