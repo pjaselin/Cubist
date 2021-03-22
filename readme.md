@@ -1,3 +1,4 @@
+![](https://img.shields.io/github/last-commit/apachaves/Cubist)
 ![](https://img.shields.io/github/languages/code-size/apachaves/Cubist)
 
 # Cubist
