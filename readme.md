@@ -1,3 +1,5 @@
+![](https://img.shields.io/github/languages/code-size/apachaves/Cubist)
+
 # Cubist
 
 A Python package for fitting Quinlan's Cubist regression model
