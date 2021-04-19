@@ -1,0 +1,129 @@
+#! /bin/csh
+#---------------------------------------------------------------------
+# Multi F-fold cross-validation script
+#---------------------------------------------------------------------
+#
+# Invocation:
+#   xval [Cubist options] [F=folds] [R=repeats] [+label] [+d]
+#
+# Carries out R F-fold cross-validations
+#
+# If +d is used, individual results from each block are left in
+#     <filestem>.o<cross-validation no>[+label]
+# Summary of cross-validations is written to
+#     <filestem>.res[+label]
+#---------------------------------------------------------------------
+
+
+#	Sort the options into those applying to Cubist and the rest
+
+set opts	=
+set folds	= 10
+set repeats	= 1
+set label	=
+set filestem	= undefined
+
+set i = 1
+while ( $i <= $#argv )
+    set opt = $argv[$i]
+
+    switch ( $opt )
+    case "F=*":
+	set folds = `echo $opt | sed s/F=//`
+	breaksw
+    case "R=*":
+	set repeats = `echo $opt | sed s/R=//`
+	breaksw
+    case "+d":
+	set details
+	breaksw
+    case "+*":
+	set label = $opt
+	breaksw
+    case "-f":
+	@ i++
+	set filestem = $argv[$i]
+	breaksw
+    case "-f*":
+	set filestem = `echo $opt | sed s/-f//`
+	breaksw
+    case "-r":
+    case "-n":
+    case "-e":
+    case "-S":
+    case "-I":
+    case "-C":
+	@ i++
+	set opts = ( $opts ${opt}$argv[$i] )
+	breaksw
+    case "-r*":
+    case "-n*":
+    case "-e*":
+    case "-S*":
+    case "-I*":
+    case "-C*":
+	set opts = ( $opts $opt )
+	breaksw
+    case "-i":
+    case "-a":
+    case "-u":
+	set opts = ( $opts $opt )
+	breaksw
+    case "-X":
+	@ i++
+	set folds = $argv[$i]
+	breaksw
+    case "-X*":
+	set folds = `echo $opt | sed s/-X//`
+	breaksw
+    default:
+	echo "Unrecognised or inappropriate option" $opt
+    case "-h":
+	echo ""
+	echo "Summary of options for xval:"
+	echo ""
+	echo "    F=<f>          set f folds"
+	echo "    R=<r>          repeat r times"
+	echo "    +d             retain detailed files"
+	echo "    +s             label all output files with suffix +s"
+	echo "    -f <filestem>  set application name"
+	echo "    -r <rules>     set maximum number of rules"
+	echo "    -e <percent>   set maximum extrapolation"
+	echo "    -i             use instances and rules"
+	echo "    -a             allow use of instances with rules"
+	echo "    -n <neighbors> set number of nearest neighbors (1-9)"
+	echo "    -S <percent>   set training sample percentage"
+	echo "    -I <integer>   set random seed [ignored]"
+	echo "    -X <folds>     cross-validate"
+	echo "    -C <members>   committee model"
+	echo "    -h             print this message"
+	exit 1
+    endsw
+
+    @ i++
+end
+
+#	Clear the predictions file
+
+cp /dev/null $filestem-tmp.pred
+
+
+#	Repeat cross-validations, incrementing the random seed
+
+set r = 0
+while ( $r < $repeats )
+
+    set outf = $filestem.o$r$label
+    cubist -f $filestem $opts -X $folds -I $r >$outf
+    cat $filestem.pred >> $filestem-tmp.pred
+
+    @ r++
+end
+
+
+#	Remove the temporary files and summarize results
+
+mv $filestem-tmp.pred $filestem.pred
+summary -f $filestem -n >$filestem.res$label
+
+if ( ! $?details ) rm -f $filestem.o[0-9]*$label
