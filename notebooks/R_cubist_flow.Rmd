@@ -68,6 +68,7 @@ cubistControl <- function(
 committees = 1
 control <- cubistControl()
 weights <- NULL
+test = "hello"
 ```
 
 
@@ -94,12 +95,51 @@ dataString <- makeDataFile(x, y, weights)
 ```
 
 
+
+```{r}
+    if (is.numeric(y)) {
+      outcomeInfo <- ": continuous."
+    } else {
+      lvls <- escapes(levels(y))
+      prefix <- if (is.ordered(y))
+        "[ordered] "
+      else
+        ""
+      outcomeInfo <- paste(": ",
+                           prefix,
+                           paste(lvls, collapse = ","),
+                           ".", sep = "")
+    }
+outcomeInfo
+```
+```{r}
+starwars
+```
+
+
+```{r}
+sw <- starwars[, c(1:11)]
+```
+
+
+
+```{r}
+test <- QuinlanAttributes(sw)
+test
+```
+
+
+
 ```{r}
 namesString
 ```
 
 ```{r}
 dataString
+```
+
+```{r}
+c("test"="yes", "hello", "what", "x"="y")
 ```
 
 
@@ -138,6 +178,8 @@ escapes(c("1:|", "4|:;", "asd ", "a:"))
 ```{r}
 grep("([^[:alnum:]^[:space:]])", c("1\\:\\|", "4\\|\\:\\;",  "asd "), value=TRUE, useBytes = TRUE)
 ```
+
+
 ```{r}
 grep("^sample", c("test", "sample_", "sample"))
 ```

@@ -3,7 +3,7 @@ import sys
 from datetime import datetime
 import pandas as pd
 import numpy as np
-from .QuinlanAttributes import QuinlanAttributes
+from .QuinlanAttributes import quinlan_attributes
 
 
 def is_sorted(l):
@@ -26,15 +26,16 @@ def make_names_file(x, y, w=None, label="outcome", comments=True):
     else:
         out = ""
 
-    if not isinstance(y, (list, pd.Series, np.ndarray)):
-        outcome_info = ": continuous."
-    else:
-        lvls = escapes(list(set(y)))
-        prefix = "[ordered]" if is_sorted(y) else ""
-        outcome_info = f': {prefix} {",".join(lvls)} .'
+    outcome_info = ": continuous."
+    # if not isinstance(y, (list, pd.Series, np.ndarray)):
+    #     outcome_info = ": continuous."
+    # else:
+    #     lvls = escapes(list(set(y)))
+    #     prefix = "[ordered]" if is_sorted(y) else ""
+    #     outcome_info = f': {prefix} {",".join(lvls)} .'
 
-    out = f'{out} \n {label} .\n {label} {outcome_info}'
-    var_data = QuinlanAttributes(x)
+    out = f'{out}\n{label}.\n{label}{outcome_info}'
+    var_data = quinlan_attributes(x)
 
     if w is None:
         var_data = [var_data]
