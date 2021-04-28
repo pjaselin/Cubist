@@ -3,7 +3,7 @@ import sys
 from datetime import datetime
 import pandas as pd
 import numpy as np
-from .QuinlanAttributes import quinlan_attributes
+from .quinlan_attributes import quinlan_attributes
 
 
 def is_sorted(l):
@@ -54,4 +54,4 @@ def escapes(x, chars=None):
     # return [re.sub('[^0-9a-zA-Z]', '\\\\\\1', c) for c in x]
 
 
-escapes(["1:|", "4|:;", "asd ", "a:"])
+# escapes(["1:|", "4|:;", "asd ", "a:"])

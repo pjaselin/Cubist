@@ -1,8 +1,8 @@
 from random import randint
 import numpy as np
 import pandas as pd
-from .makeNamesFile import make_names_file
-from .makeDataFile import make_data_file
+from .make_names_file import make_names_file
+from .make_data_file import make_data_file
 
 
 def cubist_control(unbiased: bool = False,
