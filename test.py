@@ -9,4 +9,3 @@ X, y = load_boston(return_X_y=True)
 # model = Cubist(X, y)
 
 print(quinlan_attributes(iris))
-print(quinlan_attributes(5.0))
