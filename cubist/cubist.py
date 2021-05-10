@@ -1,6 +1,7 @@
 from random import randint
 import numpy as np
 import pandas as pd
+import warnings
 from .make_names_file import make_names_file
 from .make_data_file import make_data_file
 
@@ -42,10 +43,16 @@ class Cubist:
         if not isinstance(x, (pd.DataFrame, np.ndarray)):
             raise ValueError("x must be a Numpy Array or a Pandas DataFrame")
         if isinstance(x, np.ndarray):
-            x = pd.DataFrame(x)
+            if len(x.shape) > 2:
+                raise ValueError("Input NumPy array has more than two dimensions, "
+                                 "only a two dimensional matrix may be passed.")
+            else:
+                warnings.warn("Input data is a NumPy Array, setting column names to default `var0, var1,...`.")
+                x = pd.DataFrame(x, columns=[f'var{i}' for i in range(x.shape[1])])
         if weights is not None and not isinstance(weights, (list, np.ndarray)):
             raise ValueError("case weights must be numeric")
 
+        # check_names(x)
         names_string = make_names_file(x, y, w=weights, label=control["label"], comments=True)
         data_string = make_data_file(x, y, w=weights)
 

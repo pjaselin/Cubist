@@ -1,16 +1,14 @@
 import re
 import sys
 from datetime import datetime
-import pandas as pd
-import numpy as np
 from .quinlan_attributes import quinlan_attributes
 
 
-def is_sorted(l):
-    if all(l[i] <= l[i+1] for i in range(len(l)-1)):
-        return True
-    else:
-        return False
+# def is_sorted(l):
+#     if all(l[i] <= l[i+1] for i in range(len(l)-1)):
+#         return True
+#     else:
+#         return False
 
 
 def make_names_file(x, y, w=None, label="outcome", comments=True):
@@ -27,18 +25,19 @@ def make_names_file(x, y, w=None, label="outcome", comments=True):
         out = ""
 
     outcome_info = ": continuous."
-    # if not isinstance(y, (list, pd.Series, np.ndarray)):
-    #     outcome_info = ": continuous."
-    # else:
-    #     lvls = escapes(list(set(y)))
-    #     prefix = "[ordered]" if is_sorted(y) else ""
-    #     outcome_info = f': {prefix} {",".join(lvls)} .'
 
     out = f'{out}\n{label}.\n{label}{outcome_info}'
+
     var_data = quinlan_attributes(x)
 
     if w is None:
-        var_data = [var_data]
+        var_data["case weight"] = "continuous."
+
+    var_data = [f'{escapes(key)}: {value}' for key, value in var_data.items()]
+    var_data = '\n'.join(var_data)
+
+    out = f'{out}\n{var_data}\n'
+    return out
 
 
 def escapes(x, chars=None):
