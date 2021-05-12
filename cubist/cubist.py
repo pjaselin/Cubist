@@ -2,8 +2,9 @@ from random import randint
 import numpy as np
 import pandas as pd
 import warnings
-from .make_names_file import make_names_file
-from .make_data_file import make_data_file
+from ._make_names_file import make_names_file
+from ._make_data_file import make_data_file
+# from . import _cubist as cubist
 
 
 def cubist_control(unbiased: bool = False,
@@ -52,10 +53,21 @@ class Cubist:
         if weights is not None and not isinstance(weights, (list, np.ndarray)):
             raise ValueError("case weights must be numeric")
 
-        # check_names(x)
         names_string = make_names_file(x, y, w=weights, label=control["label"], comments=True)
         data_string = make_data_file(x, y, w=weights)
 
+        # z = cubist(names_string,
+        #            data_string,
+        #            control["unbiased"],
+        #            "yes",
+        #            1,
+        #            committees,
+        #            control["sample"],
+        #            control["seed"],
+        #            control["rules"],
+        #            control["extrapolation"],
+        #            model="1",
+        #            output="1")
         # Z < -.C("cubist",
         #     as.character(namesString),
         #     as.character(dataString),

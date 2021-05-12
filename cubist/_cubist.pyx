@@ -1,1 +1,1 @@
-cdef extern from
+include "_cubist.pxi"

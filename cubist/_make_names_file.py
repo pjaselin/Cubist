@@ -1,18 +1,11 @@
 import re
 import sys
 from datetime import datetime
-from .quinlan_attributes import quinlan_attributes
-
-
-# def is_sorted(l):
-#     if all(l[i] <= l[i+1] for i in range(len(l)-1)):
-#         return True
-#     else:
-#         return False
+from ._quinlan_attributes import quinlan_attributes
 
 
 def make_names_file(x, y, w=None, label="outcome", comments=True):
-    has_sample = [i for i, c in x.columns if bool(re.search('^sample', c))]
+    has_sample = [i for i, c in enumerate(x.columns) if bool(re.search('^sample', c))]
     if has_sample:
         x.columns = [re.sub('^sample', '_Sample', c) for c in x.columns]
 
@@ -30,10 +23,10 @@ def make_names_file(x, y, w=None, label="outcome", comments=True):
 
     var_data = quinlan_attributes(x)
 
-    if w is None:
+    if w is not None:
         var_data["case weight"] = "continuous."
 
-    var_data = [f'{escapes(key)}: {value}' for key, value in var_data.items()]
+    var_data = [f'{escapes([key])[0]}: {value}' for key, value in var_data.items()]
     var_data = '\n'.join(var_data)
 
     out = f'{out}\n{var_data}\n'
@@ -45,12 +38,19 @@ def escapes(x, chars=None):
         chars = [':', ';', '|']
     for i in chars:
         x = [c.replace(i, f'\\{i}') for c in x]
-    print(x)
-    for c in x:
-        # print(re.sub(r'[^A-Za-z0-9 ]+', r'\\\\\\1', c))
-        print(re.match(b'[^0-9a-zA-Z]+', c))
-        # print(re.sub(r'[^0-9a-zA-Z ]', r'\\\\\\1', c))
-    # return [re.sub('[^0-9a-zA-Z]', '\\\\\\1', c) for c in x]
+    x = [_re_escape(c) for c in x]
+    return x
 
 
-# escapes(["1:|", "4|:;", "asd ", "a:"])
+_special_chars_map = {i: '\\' + chr(i) for i in b'()[]{}?*+-|:;^$\\.&~#\t\n\r\v\f'}
+
+
+def _re_escape(pattern):
+    """
+    Escape special characters in a string. Sourced from 're' Python package.
+    """
+    if isinstance(pattern, str):
+        return pattern.translate(_special_chars_map)
+    else:
+        pattern = str(pattern, 'latin1')
+        return pattern.translate(_special_chars_map).encode('latin1')
