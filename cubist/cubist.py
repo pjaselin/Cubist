@@ -39,6 +39,8 @@ class Cubist:
             control = cubist_control()
         if not isinstance(y, (list, pd.Series, np.ndarray)):
             raise ValueError("cubist models require a numeric outcome")
+        if isinstance(y, (list, np.ndarray)):
+            y = pd.Series(y)
         if committees < 1 or committees > 100:
             raise ValueError("number of committees must be between 1 and 100")
         if not isinstance(x, (pd.DataFrame, np.ndarray)):
@@ -84,6 +86,5 @@ class Cubist:
         #     output = character(1),             # pass back cubist output as a string
         #     PACKAGE = "Cubist"
         #     )
-
-
-
+# import cubist.devtest
+# devtest(5)

@@ -22,11 +22,20 @@ library(dplyr)
 ## Data Imports
 
 ```{r}
-x <- Boston %>%
-  select(-"medv")
-y <- Boston %>%
-  select("medv") %>%
+#x <- as.data.frame(starwars[, c(1:11)]) %>%
+#  select(-'height')
+#y <- as.data.frame(starwars[, c(1:11)]) %>%
+#  pull('height')
+x <- iris %>%
+  select(-"Petal.Width")
+y <- iris %>%
+  select("Petal.Width") %>%
   pull()
+#x <- Boston %>%
+#  select(-"medv")
+#y <- Boston %>%
+#  select("medv") %>%
+#  pull()
 ```
 
 ## Cubist Model Training Scripts (cubist.R)
@@ -112,8 +121,32 @@ dataString <- makeDataFile(x, y, weights)
     }
 outcomeInfo
 ```
+
+
 ```{r}
-starwars
+sam <- x %>% mutate(test = rm > 5) %>% select(test)
+```
+
+
+
+
+
+
+
+```{r}
+escapes <- function(x, chars = c(":", ";", "|")) {
+  for (i in chars)
+    x <- gsub(i, paste("\\", i, sep = ""), x, fixed = TRUE)
+  gsub("([^[:alnum:]^[:space:]])", "\\\\\\1", x, useBytes = TRUE)
+}
+varData <- QuinlanAttributes(x)
+varData <-
+      paste(escapes(names(varData)),
+            ": ",
+            varData,
+            sep = "",
+            collapse = "\n")
+varData
 ```
 
 
@@ -121,17 +154,33 @@ starwars
 sw <- starwars[, c(1:11)]
 ```
 
-
-
 ```{r}
-test <- QuinlanAttributes(sw)
-test
+QuinlanAttributes(starwars[,c(1)])
 ```
 
 
 
 ```{r}
-namesString
+x <- c("06/23/2013", "06/30/2013", "07/12/2014")
+library(lubridate)
+x.date <- mdy(x)
+class(x.date)
+```
+
+```{r}
+QuinlanAttributes(x.date)
+```
+```{r}
+format(x.date)
+```
+
+
+
+
+
+
+```{r}
+print(namesString)
 ```
 
 ```{r}
@@ -199,5 +248,32 @@ gsub("([^[:alnum:]^[:space:]])", "\\\\\\1", c("a\\:", "sfsfg\\|aasdf\\:"), useBy
 
 
 
+```{r}
+test<-c("a", 1)
+```
 
+
+```{r}
+convert <-
+    unlist(lapply(x, function(x)
+      is.factor(x) | is.character(x)))
+```
+
+```{r}
+convert
+```
+```{r}
+is.null(c(NULL, NULL))
+```
+
+```{r}
+NA_real_
+```
+
+
+```{r}
+for (i in names(test)[test]){
+  print(i)
+}
+```
 

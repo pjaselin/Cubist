@@ -1,1 +1,1 @@
-cdef extern from "top.c"
+// cdef extern from "top.c"
