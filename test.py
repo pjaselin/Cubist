@@ -1,3 +1,5 @@
+import pyximport
+pyximport.install()
 import pandas as pd
 from sklearn.datasets import load_boston
 from cubist import Cubist
@@ -9,7 +11,10 @@ X = iris.drop(["petal_width"], axis=1)
 X.columns = ["sepal.length", "sepal.width", "petal.length", "species"]
 # X, y = load_boston(return_X_y=True)
 
-model = Cubist(X, y)
+model = Cubist()
+
+model.fit(X, y)
 
 test = make_data_file(X, y)
 print(test)
+

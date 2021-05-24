@@ -7,56 +7,37 @@ from ._make_data_file import make_data_file
 # from . import _cubist as cubist
 
 
-def cubist_control(unbiased: bool = False,
-                   rules: int = 100,
-                   extrapolation: int = 100,
-                   sample: float = 0.0,
-                   seed=randint(0, 4095),
-                   label: str = "outcome"):
-    if rules is not None and (rules < 1 or rules > 1000000):
-        raise ValueError("number of rules must be between 1 and 1000000")
-    if extrapolation < 0 or extrapolation > 100:
-        raise ValueError("percent extrapolation must be between 0 and 100")
-    if sample < 0.0 or sample > 99.9:
-        raise ValueError("sampling percentage must be between 0.0 and 99")
-    return dict(
-        unbiased=unbiased,
-        rules=rules,
-        extrapolation=extrapolation / 100,
-        sample=sample / 100,
-        label=label,
-        seed=seed % 4095  # TODO: this isn't right
-    )
-
-
 class Cubist:
-    def __init__(self, x, y,
-                 committees=1,
-                 control=None,
+    def __init__(self,
+                 committees: int = 1,
+                 unbiased: bool = False,
+                 rules: int = 100,
+                 extrapolation: int = 100,
+                 sample: float = 0.0,
+                 seed=randint(0, 4095), # TODO fix this since its different from R
+                 label: str = "outcome",
                  weights=None,
                  **kwargs):
-        if control is None:
-            control = cubist_control()
-        if not isinstance(y, (list, pd.Series, np.ndarray)):
-            raise ValueError("cubist models require a numeric outcome")
-        if isinstance(y, (list, np.ndarray)):
-            y = pd.Series(y)
-        if committees < 1 or committees > 100:
-            raise ValueError("number of committees must be between 1 and 100")
-        if not isinstance(x, (pd.DataFrame, np.ndarray)):
-            raise ValueError("x must be a Numpy Array or a Pandas DataFrame")
-        if isinstance(x, np.ndarray):
-            if len(x.shape) > 2:
-                raise ValueError("Input NumPy array has more than two dimensions, "
-                                 "only a two dimensional matrix may be passed.")
-            else:
-                warnings.warn("Input data is a NumPy Array, setting column names to default `var0, var1,...`.")
-                x = pd.DataFrame(x, columns=[f'var{i}' for i in range(x.shape[1])])
-        if weights is not None and not isinstance(weights, (list, np.ndarray)):
-            raise ValueError("case weights must be numeric")
+        assert committees > 1 or committees < 100, "number of committees must be between 1 and 100"
+        self.committees = committees
 
-        names_string = make_names_file(x, y, w=weights, label=control["label"], comments=True)
-        data_string = make_data_file(x, y, w=weights)
+        self.unbiased = unbiased
+
+        assert rules is not None and (rules > 1 or rules < 1000000), "number of rules must be between 1 and 1000000"
+        self.rules = rules
+
+        assert extrapolation > 0 or extrapolation < 100, "percent extrapolation must be between 0 and 100"
+        self.extrapolation = extrapolation / 100
+
+        assert sample > 0.0 or sample < 99.9, "sampling percentage must be between 0.0 and 99"
+        self.sample = sample / 100
+
+        self.seed = seed % 4095
+
+        self.label = label
+
+        assert weights is None or isinstance(weights, (list, np.ndarray)), "case weights must be numeric"
+        self.weights = weights
 
         # z = cubist(names_string,
         #            data_string,
@@ -86,5 +67,26 @@ class Cubist:
         #     output = character(1),             # pass back cubist output as a string
         #     PACKAGE = "Cubist"
         #     )
-# import cubist.devtest
-# devtest(5)
+
+    def __repr__(self):
+        return f'{self.__class__.__name__}(x, y, committees={self.committees}, unbiased={self.unbiased}, ' \
+               f'rules={self.rules}, extrapolation={self.extrapolation}, sample={self.sample}, seed={self.seed}, ' \
+               f'label={self.label}, weights)'
+
+    def fit(self, x, y):
+        assert isinstance(y, (list, pd.Series, np.ndarray)), "cubist models require a numeric outcome"
+        if not isinstance(y, pd.Series):
+            y = pd.Series(y)
+
+        assert isinstance(x, (pd.DataFrame, np.ndarray)), "x must be a Numpy Array or a Pandas DataFrame"
+        if isinstance(x, np.ndarray):
+            assert len(x.shape) > 2, "Input NumPy array has more than two dimensions, only a two dimensional matrix " \
+                                     "may be passed."
+            warnings.warn("Input data is a NumPy Array, setting column names to default `var0, var1,...`.")
+            x = pd.DataFrame(x, columns=[f'var{i}' for i in range(x.shape[1])])
+
+        x = x.reset_index(drop=True)
+        y = y.reset_index(drop=True)
+
+        names_string = make_names_file(x, y, w=self.weights, label=self.label, comments=True)
+        data_string = make_data_file(x, y, w=self.weights)
