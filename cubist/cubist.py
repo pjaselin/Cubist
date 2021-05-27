@@ -4,7 +4,7 @@ import pandas as pd
 import warnings
 from ._make_names_file import make_names_file
 from ._make_data_file import make_data_file
-# from . import _cubist as cubist
+# from . import _cubist
 
 
 class Cubist:
@@ -14,7 +14,7 @@ class Cubist:
                  rules: int = 100,
                  extrapolation: int = 100,
                  sample: float = 0.0,
-                 seed=randint(0, 4095), # TODO fix this since its different from R
+                 seed: int = randint(0, 4095),  # TODO fix this since its different from R
                  label: str = "outcome",
                  weights=None,
                  **kwargs):
@@ -80,8 +80,8 @@ class Cubist:
 
         assert isinstance(x, (pd.DataFrame, np.ndarray)), "x must be a Numpy Array or a Pandas DataFrame"
         if isinstance(x, np.ndarray):
-            assert len(x.shape) > 2, "Input NumPy array has more than two dimensions, only a two dimensional matrix " \
-                                     "may be passed."
+            assert len(x.shape) == 2, "Input NumPy array has more than two dimensions, only a two dimensional matrix " \
+                                      "may be passed."
             warnings.warn("Input data is a NumPy Array, setting column names to default `var0, var1,...`.")
             x = pd.DataFrame(x, columns=[f'var{i}' for i in range(x.shape[1])])
 
@@ -90,3 +90,4 @@ class Cubist:
 
         names_string = make_names_file(x, y, w=self.weights, label=self.label, comments=True)
         data_string = make_data_file(x, y, w=self.weights)
+        print(data_string)

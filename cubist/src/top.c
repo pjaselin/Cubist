@@ -1,6 +1,3 @@
-#include <R.h>
-#include <R_ext/Rdynload.h>
-#include <Rinternals.h>
 #include <setjmp.h>
 
 #include "redefine.h"
@@ -145,49 +142,49 @@ static void predictions(char **casev, char **namesv, char **datav,
 }
 
 // Declare the type of each of the arguments to the cubist function
-static R_NativePrimitiveArgType cubist_t[] = {
-    STRSXP,  // namesv
-    STRSXP,  // datav
-    LGLSXP,  // unbiased
-    STRSXP,  // compositev
-    INTSXP,  // neighbors
-    INTSXP,  // committees
-    REALSXP, // sample
-    INTSXP,  // seed
-    INTSXP,  // rules
-    REALSXP, // extrapolation
-    STRSXP,  // modelv
-    STRSXP   // outputv
-};
+//static R_NativePrimitiveArgType cubist_t[] = {
+//    STRSXP,  // namesv
+//    STRSXP,  // datav
+//    LGLSXP,  // unbiased
+//    STRSXP,  // compositev
+//    INTSXP,  // neighbors
+//    INTSXP,  // committees
+//    REALSXP, // sample
+//    INTSXP,  // seed
+//    INTSXP,  // rules
+//    REALSXP, // extrapolation
+//    STRSXP,  // modelv
+//    STRSXP   // outputv
+//};
 
 // Declare the type of each of the arguments to the cubist function
-static R_NativePrimitiveArgType predictions_t[] = {
-    STRSXP,  // casev
-    STRSXP,  // namesv
-    STRSXP,  // datav
-    STRSXP,  // modelv
-    REALSXP, // predv
-    STRSXP   // outputv
-};
+//static R_NativePrimitiveArgType predictions_t[] = {
+//    STRSXP,  // casev
+//    STRSXP,  // namesv
+//    STRSXP,  // datav
+//    STRSXP,  // modelv
+//    REALSXP, // predv
+//    STRSXP   // outputv
+//};
 
 // Declare the cubist function
-static const R_CMethodDef cEntries[] = {
-    {"cubist", (DL_FUNC)&cubist, 12, cubist_t},
-    {"predictions", (DL_FUNC)&predictions, 6, predictions_t},
-    {NULL, NULL, 0}};
+//static const R_CMethodDef cEntries[] = {
+//    {"cubist", (DL_FUNC)&cubist, 12, cubist_t},
+//    {"predictions", (DL_FUNC)&predictions, 6, predictions_t},
+//    {NULL, NULL, 0}};
 
 // Initialization function for this shared object
-void R_init_Cubist(DllInfo *dll) {
-  // Announce ourselves for testing
-  // Rprintf("R_init_Cubist called\n");
-
-  // Register the functions "cubist" and "predictions"
-  R_registerRoutines(dll, cEntries, NULL, NULL, NULL);
-
-  // This should help prevent people from accidentally accessing
-  // any of our global variables, or any functions that are not
-  // intended to be called from R.  Only the functions "cubist"
-  // and predictions  can be accessed, since they're the only ones
-  // we registered.
-  R_useDynamicSymbols(dll, FALSE);
-}
+//void R_init_Cubist(DllInfo *dll) {
+//  // Announce ourselves for testing
+//  // Rprintf("R_init_Cubist called\n");
+//
+//  // Register the functions "cubist" and "predictions"
+//  R_registerRoutines(dll, cEntries, NULL, NULL, NULL);
+//
+//  // This should help prevent people from accidentally accessing
+//  // any of our global variables, or any functions that are not
+//  // intended to be called from R.  Only the functions "cubist"
+//  // and predictions  can be accessed, since they're the only ones
+//  // we registered.
+//  R_useDynamicSymbols(dll, FALSE);
+//}
