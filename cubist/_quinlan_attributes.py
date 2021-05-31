@@ -8,6 +8,8 @@ def _get_data_format(x: pd.Series):
     :param x: Input Pandas Series
     :return: Formatting information about the Series
     """
+    # remove NAs from series
+    x = x.dropna()
     # for numeric columns
     if is_numeric_dtype(x):
         return "continuous."

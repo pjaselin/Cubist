@@ -90,4 +90,3 @@ class Cubist:
 
         names_string = make_names_file(x, y, w=self.weights, label=self.label, comments=True)
         data_string = make_data_file(x, y, w=self.weights)
-        print(data_string)

@@ -4,6 +4,8 @@ from pandas.api.types import is_string_dtype, is_numeric_dtype, is_datetime64_an
 
 
 def _format(x, digits=15):
+    if pd.isna(x):
+        return x
     num_whole_nums = len(str(int(x)))
     # case where there are decimal places that need to be rounded
     if num_whole_nums < digits:
@@ -21,13 +23,16 @@ def make_data_file(x, y, w=None):
         for col, value in convert.items():
             if value:
                 x[col] = escapes(x[col].astype(str))
+
     # unclear if this needs to be implemented in Python:
     # if y.isnull().all():
     #     y = escapes()
     # if (is.null(y))
     #     y < - rep(NA_real_, nrow(x))
+
     y = pd.Series(escapes(y.astype(str)))
     x["y"] = y
+
     if w is not None:
         column_names = list(x.columns) + [f"w{i}" for i in range(w.shape[1])]
         x = pd.concat([x, w], axis=1, ignore_index=True)
@@ -36,9 +41,9 @@ def make_data_file(x, y, w=None):
     # convert all columns to strings
     for col in x:
         if is_string_dtype(x[col]):
-            continue
+            x[col] = x[col].astype(str)
         if is_numeric_dtype(x[col]):
-            x[col] = [_format(i) for i in x[col]]
+            x[col] = x[col].apply(_format)
             x[col] = x[col].astype(str)
         if is_datetime64_any_dtype(x[col]):
             x[col] = x[col].astype(str)
@@ -46,13 +51,9 @@ def make_data_file(x, y, w=None):
     # remove leading whitespace
     x = x.applymap(lambda a: a.lstrip())
 
-    # Determine the locations of missing values
-    na_index = {col: x[x[col].isnull()].index.tolist() for col in x}
-
     # reset missing values
-    if any(len(l) > 0 for l in na_index.values()):
-        for i, col in enumerate(na_index):
-            print(i)
+    x = x.fillna("?")
+    x = x.replace("nan", "?")
 
     return x
 
