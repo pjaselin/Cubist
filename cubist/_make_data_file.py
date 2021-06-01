@@ -1,6 +1,6 @@
 import pandas as pd
 from ._make_names_file import escapes
-from pandas.api.types import is_string_dtype, is_numeric_dtype, is_datetime64_any_dtype
+from pandas.api.types import is_string_dtype, is_numeric_dtype
 
 
 def _format(x, digits=15):
@@ -31,7 +31,7 @@ def make_data_file(x, y, w=None):
     #     y < - rep(NA_real_, nrow(x))
 
     y = pd.Series(escapes(y.astype(str)))
-    x["y"] = y
+    x.insert(0, "y", y)
 
     if w is not None:
         column_names = list(x.columns) + [f"w{i}" for i in range(w.shape[1])]
@@ -40,20 +40,24 @@ def make_data_file(x, y, w=None):
 
     # convert all columns to strings
     for col in x:
-        if is_string_dtype(x[col]):
-            x[col] = x[col].astype(str)
         if is_numeric_dtype(x[col]):
             x[col] = x[col].apply(_format)
             x[col] = x[col].astype(str)
-        if is_datetime64_any_dtype(x[col]):
+        else:
             x[col] = x[col].astype(str)
 
-    # remove leading whitespace
+    # remove leading whitespace from all elements
     x = x.applymap(lambda a: a.lstrip())
 
-    # reset missing values
+    # replace missing values with ?
     x = x.fillna("?")
     x = x.replace("nan", "?")
 
+    # convert dataframe to list of lists
+    x = x.to_numpy().tolist()
+    # join each row as comma separated entries
+    x = [','.join(row) for row in x]
+    # join all rows separated by \n
+    x = "\n".join(x)
     return x
 
