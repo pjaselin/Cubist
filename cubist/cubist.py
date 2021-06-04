@@ -1,3 +1,5 @@
+# import pyximport
+# pyximport.install()
 from random import randint
 import numpy as np
 import pandas as pd
@@ -5,6 +7,7 @@ import warnings
 from ._make_names_file import make_names_file
 from ._make_data_file import make_data_file
 # from . import _cubist
+import _cubist
 
 
 class Cubist:

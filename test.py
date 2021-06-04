@@ -5,6 +5,7 @@ from sklearn.datasets import load_boston
 from cubist import Cubist
 from cubist._make_data_file import make_data_file
 # iris = pd.read_csv('https://raw.githubusercontent.com/mwaskom/seaborn-data/master/iris.csv')
+from cubist import _cubist
 
 titanic = pd.read_csv("sample_data/titanic.csv")
 

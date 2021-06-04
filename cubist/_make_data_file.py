@@ -6,10 +6,10 @@ from pandas.api.types import is_string_dtype, is_numeric_dtype
 def _format(x, digits=15):
     if pd.isna(x):
         return x
-    num_whole_nums = len(str(int(x)))
+    whole_nums_count = len(str(int(x)))
     # case where there are decimal places that need to be rounded
-    if num_whole_nums < digits:
-        remaining_decimals = digits - num_whole_nums
+    if whole_nums_count < digits:
+        remaining_decimals = digits - whole_nums_count
         return str(round(x, remaining_decimals))
     # case where there are no decimals that need to/can be rounded
     else:
