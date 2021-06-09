@@ -6,7 +6,8 @@ import numpy as np
 import os
 import glob
 
-os.environ["CXX"] = "g++-9"
+# os.environ["CXX"] = "g++-9"
+os.environ["CC"] = "gcc"
 
 
 def configuration(parent_package='', top_path=None):
