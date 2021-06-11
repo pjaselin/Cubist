@@ -39,6 +39,8 @@
 #include "redefine.h"
 #include "transform.h"
 
+#include <sys/time.h>
+
 #define NAME T_Cubist
 
 void PrintHeader(String Title)

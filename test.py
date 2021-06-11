@@ -4,17 +4,16 @@ import pandas as pd
 from sklearn.datasets import load_boston
 from cubist import Cubist
 from cubist._make_data_file import make_data_file
-# iris = pd.read_csv('https://raw.githubusercontent.com/mwaskom/seaborn-data/master/iris.csv')
-from cubist import _cubist
+iris = pd.read_csv('https://raw.githubusercontent.com/mwaskom/seaborn-data/master/iris.csv')
 
-titanic = pd.read_csv("sample_data/titanic.csv")
+# titanic = pd.read_csv("sample_data/titanic.csv")
 
-y = titanic["Fare"]
-X = titanic.drop(["Fare"], axis=1)
+# y = titanic["Fare"]
+# X = titanic.drop(["Fare"], axis=1)
 
 
-# y = iris["petal_width"]
-# X = iris.drop(["petal_width"], axis=1)
+y = iris["petal_width"]
+X = iris.drop(["petal_width"], axis=1)
 # X.columns = ["sepal.length", "sepal.width", "petal.length", "species"]
 # X, y = load_boston(return_X_y=True)
 
@@ -24,4 +23,5 @@ model.fit(X, y)
 
 # test = make_data_file(X, y)
 # print(test)
+print(model)
 

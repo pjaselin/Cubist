@@ -16,9 +16,9 @@ def configuration(parent_package='', top_path=None):
     return config
 
 
-exts = [Extension(name='cubist',
-                  sources=["cubist/_cubist.pyx"] + glob.glob("cubist/src/*.c") + glob.glob("cubist/src/*.cpp"),
-                  include_dirs=[np.get_include(), "cubist/src"])]
+exts = [Extension(name='_cubist',
+                  sources=["cubist/_cubist.pyx"] + glob.glob("cubist/src/*.c"),
+                  include_dirs=["cubist/src"])]
 
 
 if __name__ == "__main__":

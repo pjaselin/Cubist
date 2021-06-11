@@ -64,7 +64,7 @@ static void cubist(char **namesv, char **datav, int *unbiased,
 
     // Get the contents of the the model file
     char *modelString = strbuf_getall(rbm_lookup("undefined.model"));
-    char *model = R_alloc(strlen(modelString) + 1, 1);
+    char *model = realloc(strlen(modelString) + 1, 1);
     strcpy(model, modelString);
 
     // I think the previous value of *modelv will be garbage collected
@@ -76,7 +76,7 @@ static void cubist(char **namesv, char **datav, int *unbiased,
 
   // Close file object "Of", and return its contents via argument outputv
   char *outputString = closeOf();
-  char *output = R_alloc(strlen(outputString) + 1, 1);
+  char *output = realloc(strlen(outputString) + 1, 1);
   strcpy(output, outputString);
   *outputv = output;
 
@@ -134,7 +134,7 @@ static void predictions(char **casev, char **namesv, char **datav,
 
   // Close file object "Of", and return its contents via argument outputv
   char *outputString = closeOf();
-  char *output = R_alloc(strlen(outputString) + 1, 1);
+  char *output = realloc(strlen(outputString) + 1, 1);
   strcpy(output, outputString);
   *outputv = output;
 

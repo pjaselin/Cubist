@@ -1,13 +1,12 @@
-# import pyximport
-# pyximport.install()
 from random import randint
 import numpy as np
 import pandas as pd
 import warnings
 from ._make_names_file import make_names_file
 from ._make_data_file import make_data_file
+from _cubist import cubist, predictions
 # from . import _cubist
-import _cubist
+# import _cubist
 
 
 class Cubist:
@@ -93,3 +92,16 @@ class Cubist:
 
         names_string = make_names_file(x, y, w=self.weights, label=self.label, comments=True)
         data_string = make_data_file(x, y, w=self.weights)
+
+        z = _cubist(names_string,
+                   data_string,
+                   self.unbiased,
+                   "yes",
+                   1,
+                   self.committees,
+                   self.sample,
+                   self.seed,
+                   self.rules,
+                   self.extrapolation,
+                   model="1",
+                   output="1")
