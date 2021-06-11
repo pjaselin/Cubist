@@ -1,16 +1,33 @@
+from libc.stdlib cimport free
 
 cdef extern from "src/top.c":
     void cubist(char **namesv, char **datav, int *unbiased,
                 char **compositev, int *neighbors, int *committees,
                 double *sample, int *seed, int *rules, double *extrapolation,
                 char **modelv, char **outputv)
-
-cdef extern from "src/top.c":
     void predictions(char **casev, char **namesv, char **datav,
                      char **modelv, double *predv, char **outputv)
 
-def py_cubist(namesv: str, datav: str, unbiased, compositev: str, neighbors, committees, sample, seed, rules, extrapolation, modelv: str, outputv: str):
-    cubist(namesv, datav, unbiased, compositev, neighbors, committees, sample, seed, rules, extrapolation, modelv, outputv)
+def _cubist(namesv_, datav_, unbiased_, compositev_, neighbors_, committees_, sample_, seed_, rules_, extrapolation_, modelv_, outputv_):
+    cdef char *namesv = namesv_;
+    cdef char *datav = datav_;
+    cdef int unbiased = unbiased_;
+    cdef char *compositev = compositev_;
+    cdef int neighbors = neighbors_;
+    cdef int committees = committees_;
+    cdef double sample = sample_;
+    cdef int seed = seed_;
+    cdef int rules = rules_;
+    cdef double extrapolation = extrapolation_;
+    cdef char *modelv = modelv_;
+    cdef char *outputv = outputv_;
+    cubist(&namesv, &datav, &unbiased, &compositev, &neighbors, &committees, &sample, &seed, &rules, &extrapolation, &modelv, &outputv);
 
-def py_predictions(casev:str, namesv:str, datav:str, modelv: str, predv, outputv: str):
-    predictions(casev, namesv, datav, modelv, predv, outputv)
+def _predictions(casev_, namesv_, datav_, modelv_, predv_, outputv_):
+     cdef char *casev = casev_;
+     cdef char *namesv = namesv_;
+     cdef char *datav = datav_;
+     cdef char *modelv = modelv_;
+     cdef double predv = predv_;
+     cdef char *outputv = outputv_;
+     predictions(&casev, &namesv, &datav, &modelv, &predv, &outputv);

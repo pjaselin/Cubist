@@ -4,7 +4,7 @@ import pandas as pd
 import warnings
 from ._make_names_file import make_names_file
 from ._make_data_file import make_data_file
-from _cubist import cubist, predictions
+from _cubist import _cubist, _predictions
 # from . import _cubist
 # import _cubist
 
@@ -103,5 +103,5 @@ class Cubist:
                    self.seed,
                    self.rules,
                    self.extrapolation,
-                   model="1",
-                   output="1")
+                   "1",
+                   "1")
