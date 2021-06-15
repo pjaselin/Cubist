@@ -1,3 +1,6 @@
+#define PY_SSIZE_T_CLEAN
+#include <Python.h>
+
 #include <setjmp.h>
 
 #include "redefine.h"
@@ -15,7 +18,7 @@ static void cubist(char **namesv, char **datav, int *unbiased,
   int val; /* Used by setjmp/longjmp for implementing rbm_exit */
 
   // Announce ourselves for testing
-  // Rprintf("cubist called\n");
+  // printf("cubist called\n");
 
   // Initialize the globals to the values that the cubist
   // program would have at the start of execution
@@ -35,7 +38,7 @@ static void cubist(char **namesv, char **datav, int *unbiased,
   FreeCases();
 
   // XXX Should this be controlled via an option?
-  // Rprintf("Calling setOf\n");
+  // printf("Calling setOf\n");
   setOf();
 
   // Create a strbuf using *namesv as the buffer.
@@ -57,15 +60,16 @@ static void cubist(char **namesv, char **datav, int *unbiased,
    */
   if ((val = setjmp(rbm_buf)) == 0) {
     // Real work is done here
-    // Rprintf("Calling cubistmain\n");
+    // printf("Calling cubistmain\n");
     cubistmain();
 
-    // Rprintf("cubistmain finished\n");
+    // printf("cubistmain finished\n");
 
     // Get the contents of the the model file
     char *modelString = strbuf_getall(rbm_lookup("undefined.model"));
-    char *model = realloc(strlen(modelString) + 1, 1);
+    char *model = PyMem_Calloc(strlen(modelString) + 1, 1);
     strcpy(model, modelString);
+    
 
     // I think the previous value of *modelv will be garbage collected
     *modelv = model;
@@ -76,7 +80,7 @@ static void cubist(char **namesv, char **datav, int *unbiased,
 
   // Close file object "Of", and return its contents via argument outputv
   char *outputString = closeOf();
-  char *output = realloc(strlen(outputString) + 1, 1);
+  char *output = PyMem_Calloc(strlen(outputString) + 1, 1);
   strcpy(output, outputString);
   *outputv = output;
 
@@ -134,7 +138,7 @@ static void predictions(char **casev, char **namesv, char **datav,
 
   // Close file object "Of", and return its contents via argument outputv
   char *outputString = closeOf();
-  char *output = realloc(strlen(outputString) + 1, 1);
+  char *output = PyMem_Calloc(strlen(outputString) + 1, 1);
   strcpy(output, outputString);
   *outputv = output;
 

@@ -5,8 +5,6 @@ import warnings
 from ._make_names_file import make_names_file
 from ._make_data_file import make_data_file
 from _cubist import _cubist, _predictions
-# from . import _cubist
-# import _cubist
 
 
 class Cubist:
@@ -41,35 +39,6 @@ class Cubist:
         assert weights is None or isinstance(weights, (list, np.ndarray)), "case weights must be numeric"
         self.weights = weights
 
-        # z = cubist(names_string,
-        #            data_string,
-        #            control["unbiased"],
-        #            "yes",
-        #            1,
-        #            committees,
-        #            control["sample"],
-        #            control["seed"],
-        #            control["rules"],
-        #            control["extrapolation"],
-        #            model="1",
-        #            output="1")
-        # Z < -.C("cubist",
-        #     as.character(namesString),
-        #     as.character(dataString),
-        #     as.logical(control$unbiased),      # -u : generate unbiased rules
-        #     "yes",                             # -i and -a : how to combine these?
-        #     as.integer(1),                     # -n : set the number of nearest neighbors (1 to 9)
-        #     as.integer(committees),            # -c : construct a committee model
-        #     as.double(control$sample),         # -S : use a sample of x% for training
-        #                                        #      and a disjoint sample for testing
-        #     as.integer(control$seed),          # -I : set the sampling seed value
-        #     as.integer(control$rules),         # -r: set the maximum number of rules
-        #     as.double(control$extrapolation),  # -e : set the extrapolation limit
-        #     model = character(1),              # pass back .model file as a string
-        #     output = character(1),             # pass back cubist output as a string
-        #     PACKAGE = "Cubist"
-        #     )
-
     def __repr__(self):
         return f'{self.__class__.__name__}(x, y, committees={self.committees}, unbiased={self.unbiased}, ' \
                f'rules={self.rules}, extrapolation={self.extrapolation}, sample={self.sample}, seed={self.seed}, ' \
@@ -93,15 +62,17 @@ class Cubist:
         names_string = make_names_file(x, y, w=self.weights, label=self.label, comments=True)
         data_string = make_data_file(x, y, w=self.weights)
 
-        z = _cubist(names_string,
-                   data_string,
-                   self.unbiased,
-                   "yes",
-                   1,
-                   self.committees,
-                   self.sample,
-                   self.seed,
-                   self.rules,
-                   self.extrapolation,
-                   "1",
-                   "1")
+        model, output = _cubist(names_string.encode(),
+                                data_string.encode(),
+                                self.unbiased,
+                                "yes".encode(),
+                                1,
+                                self.committees,
+                                self.sample,
+                                self.seed,
+                                self.rules,
+                                self.extrapolation,
+                                "1".encode(),
+                                "1".encode())
+        
+        has_reserved = ()

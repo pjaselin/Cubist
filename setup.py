@@ -7,13 +7,13 @@ import os
 import glob
 
 # os.environ["CXX"] = "g++-9"
-os.environ["CC"] = "gcc"
+# os.environ["CC"] = "gcc"
 
 
-def configuration(parent_package='', top_path=None):
-    config = Configuration(None, parent_package, top_path)
-    config.add_subpackage('cubist_src')
-    return config
+# def configuration(parent_package='', top_path=None):
+#     config = Configuration(None, parent_package, top_path)
+#     config.add_subpackage('cubist_src')
+#     return config
 
 
 exts = [Extension(name='_cubist',
@@ -27,5 +27,12 @@ if __name__ == "__main__":
         ext_modules=cythonize(exts),
         zip_safe=False,
         # configuration=configuration,
-        include_package_data=True
+        include_package_data=True,
+        # install_requires = [
+        #     "numpy>=1.19.2"
+        #     "pandas>=1.1.3",
+        #     "setuptools>=52.0.0",
+        #     "cython>=0.29.23",
+        #     "scikit-learn>=0.24.2"
+        # ]
     )

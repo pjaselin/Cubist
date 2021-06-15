@@ -23,5 +23,5 @@ model.fit(X, y)
 
 # test = make_data_file(X, y)
 # print(test)
-print(model)
+# print(model)
 

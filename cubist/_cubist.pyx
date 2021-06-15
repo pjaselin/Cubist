@@ -1,4 +1,3 @@
-from libc.stdlib cimport free
 
 cdef extern from "src/top.c":
     void cubist(char **namesv, char **datav, int *unbiased,
@@ -22,6 +21,8 @@ def _cubist(namesv_, datav_, unbiased_, compositev_, neighbors_, committees_, sa
     cdef char *modelv = modelv_;
     cdef char *outputv = outputv_;
     cubist(&namesv, &datav, &unbiased, &compositev, &neighbors, &committees, &sample, &seed, &rules, &extrapolation, &modelv, &outputv);
+    return (modelv, outputv)
+
 
 def _predictions(casev_, namesv_, datav_, modelv_, predv_, outputv_):
      cdef char *casev = casev_;
@@ -31,3 +32,4 @@ def _predictions(casev_, namesv_, datav_, modelv_, predv_, outputv_):
      cdef double predv = predv_;
      cdef char *outputv = outputv_;
      predictions(&casev, &namesv, &datav, &modelv, &predv, &outputv);
+     return(predv, outputv)
