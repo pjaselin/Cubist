@@ -1,8 +1,13 @@
 name: Test, build, and release cython package
 
 on:
-  - push
-  - pull_request
+  push:
+    branches:
+    - master
+    - main
+    - release
+    - test
+    - dev
 
 jobs:
   build:
@@ -15,9 +20,6 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-
-    # extract branch name to ENV var BRANCH_NAME
-    - uses: nelonoel/branch-name@v1
 
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v2
@@ -37,12 +39,13 @@ jobs:
 
     # if successful build -> release
     - name: Build
+      #if: ${{ env.GITHUB_REF=='refs/heads/release' }}
       run: |
         pip3 install setuptools build wheel
         python3  -m build --sdist --wheel .
 
     - name: Upload Release Asset
-      #if: ${{ env.BRANCH=='release' }}
+      #if: ${{ env.GITHUB_REF=='refs/heads/release' }}
       uses: softprops/action-gh-release@v1
       with:
         name: latest
