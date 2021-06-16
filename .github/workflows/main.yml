@@ -1,13 +1,19 @@
 name: Test, build, and release cython package
 
-# on:
-#   push:
-#     branches:
-#     - master
-#     - main
-#     - release
-#     - test
-#     - dev
+on:
+  workflow_dispatch:
+    inputs:
+      logLevel:
+        description: 'Log level'
+        required: true
+        default: 'warning'
+  push:
+    branches:
+    - master
+    - main
+    - release
+    - test
+    - dev
 
 jobs:
   build:
