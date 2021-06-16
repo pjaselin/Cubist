@@ -24,9 +24,10 @@ setup(
     # configuration=configuration,
     include_package_data=True,
     install_requires=[
+        "build",
         "cython>=0.29.23",
-        # "numpy>=1.19.2"
-        # "pandas>=1.1.3",
+        "numpy>=1.19.2",
+        "pandas>=1.1.3",
         # "setuptools>=52.0.0",
         # "scikit-learn>=0.24.2"
     ]
