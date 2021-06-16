@@ -21,6 +21,13 @@ Taking inspiration from the R wrapper this is what needs to be done.
 8. Adapt api to conform to scikit-learn.
 9. Submit package to scikit-learn.
 
+
+## Building
+`python3 -m build --sdist --wheel .`
+
+## Installing
+`pip3 install .`
+
 #### Help is welcome!
 
 ## Interesting Links:  
