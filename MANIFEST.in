@@ -4,6 +4,7 @@ include setup.py
 include tox.ini
 include pyproject.toml
 include cubist/*.pyx
+include cubist/*.c
 include cubist/src/*
 
 global-exclude __pycache__
