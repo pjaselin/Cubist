@@ -1,4 +1,4 @@
-name: Test, build, and release python package
+name: Test, build, and release cython package
 
 on:
   - push
@@ -15,6 +15,10 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
+
+    # extract branch name to ENV var BRANCH_NAME
+    - uses: nelonoel/branch-name@v1
+
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v2
       with:
@@ -36,3 +40,18 @@ jobs:
       run: |
         pip3 install setuptools build wheel
         python3  -m build --sdist --wheel .
+
+    - name: Upload Release Asset
+      #if: ${{ env.BRANCH=='release' }}
+      uses: softprops/action-gh-release@v1
+      with:
+        name: latest
+        tag_name: latest
+        body: Latest version of distribution
+        files: |
+          dist/*
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    # pypi release
+    # https://github.com/marketplace/actions/pypi-publish
