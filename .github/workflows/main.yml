@@ -1,0 +1,38 @@
+name: Test, build, and release python package
+
+on:
+  - push
+  - pull_request
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        platform: [ubuntu-latest]
+        python-version: [3.6, 3.7, 3.8, 3.9]
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Install dependencies
+      run: |
+        pip3 install --upgrade pip
+        pip3 install tox tox-gh-actions
+
+    - name: Test with tox
+      run: |
+        tox
+      env:
+        PLATFORM: ${{ matrix.platform  }}
+
+    # if successful build -> release
+    - name: Build
+      run: |
+        pip3 install setuptools build wheel
+        python3  -m build --sdist --wheel .
