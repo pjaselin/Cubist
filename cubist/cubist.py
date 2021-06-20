@@ -5,6 +5,8 @@ import warnings
 from ._make_names_file import make_names_file
 from ._make_data_file import make_data_file
 from _cubist import _cubist, _predictions
+import re
+from ._parse_cubist_model import get_splits
 
 
 class Cubist:
@@ -65,14 +67,24 @@ class Cubist:
         model, output = _cubist(names_string.encode(),
                                 data_string.encode(),
                                 self.unbiased,
-                                "yes".encode(),
+                                b"yes",
                                 1,
                                 self.committees,
                                 self.sample,
                                 self.seed,
                                 self.rules,
                                 self.extrapolation,
-                                "1".encode(),
-                                "1".encode())
+                                b"1",
+                                b"1")
         
-        has_reserved = ()
+        model = model.decode()
+        output = output.decode()
+        
+        has_reserved = re.search("\n__Sample", names_string)
+        if has_reserved:
+            output = output.replace("__Sample", "sample")
+            model = model.replace("__Sample", "sample")
+        
+        splits = get_splits(model)
+
+
