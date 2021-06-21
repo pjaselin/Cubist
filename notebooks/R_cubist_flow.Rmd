@@ -1,0 +1,279 @@
+---
+title: "Cubist R Scripts"
+author: "pjaselin"
+date: "4/15/2021"
+output: html_document
+---
+
+The purpose of this notebook is better understand and experiment with the R code flow in the Cubist library in order to ensure the code converted to Python behaves equivalently to the R code.
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Library Imports
+
+```{r}
+library(Cubist)
+library(MASS)
+library(dplyr)
+```
+
+## Data Imports
+
+```{r}
+#x <- as.data.frame(starwars[, c(1:11)]) %>%
+#  select(-'height')
+#y <- as.data.frame(starwars[, c(1:11)]) %>%
+#  pull('height')
+x <- iris %>%
+  select(-"Petal.Width")
+y <- iris %>%
+  select("Petal.Width") %>%
+  pull()
+#x <- Boston %>%
+#  select(-"medv")
+#y <- Boston %>%
+#  select("medv") %>%
+#  pull()
+```
+
+## Cubist Model Training Scripts (cubist.R)
+
+### Understood Function Definitions
+
+```{r}
+cubistControl <- function(
+  unbiased = FALSE,
+  rules = 100,
+  extrapolation = 100,
+  sample = 0.0,
+  seed = sample.int(4096, size=1) - 1L,
+  label = "outcome"
+) {
+  if (!is.na(rules) & (rules < 1 | rules > 1000000))
+    stop("number of rules must be between 1 and 1000000", call. = FALSE)
+  if (extrapolation < 0 | extrapolation > 100)
+    stop("percent extrapolation must between 0 and 100", call. = FALSE)
+  if (sample < 0.0 | sample > 99.9)
+    stop("sampling percentage must be between 0.0 and 99.9", call. = FALSE)
+
+  list(
+    unbiased = unbiased,
+    rules = rules,
+    extrapolation = extrapolation / 100,
+    sample = sample / 100,
+    label = label,
+    seed = seed %% 4096L
+  )
+  }
+```
+
+
+
+### Variable Definitions
+
+```{r}
+committees = 1
+control <- cubistControl()
+weights <- NULL
+test = "hello"
+```
+
+
+### Pre-processing script
+
+```{r}
+if (!is.numeric(y))
+  stop("cubist models require a numeric outcome", call. = FALSE)
+
+if (committees < 1 | committees > 100)
+  stop("number of committees must be between 1 and 100", call. = FALSE)
+
+if (!is.data.frame(x) & !is.matrix(x))
+  stop("x must be a matrix or data frame", call. = FALSE)
+if (inherits(x, "tbl_df")) {
+  x <- as.data.frame(x)
+}
+
+if (!is.null(weights) && !is.numeric(weights))
+  stop("case weights must be numeric", call. = FALSE)
+
+namesString <- makeNamesFile(x, y, w = weights, label = control$label, comments = TRUE)
+dataString <- makeDataFile(x, y, weights)
+```
+
+
+
+```{r}
+    if (is.numeric(y)) {
+      outcomeInfo <- ": continuous."
+    } else {
+      lvls <- escapes(levels(y))
+      prefix <- if (is.ordered(y))
+        "[ordered] "
+      else
+        ""
+      outcomeInfo <- paste(": ",
+                           prefix,
+                           paste(lvls, collapse = ","),
+                           ".", sep = "")
+    }
+outcomeInfo
+```
+
+
+```{r}
+sam <- x %>% mutate(test = rm > 5) %>% select(test)
+```
+
+
+
+
+
+
+
+```{r}
+escapes <- function(x, chars = c(":", ";", "|")) {
+  for (i in chars)
+    x <- gsub(i, paste("\\", i, sep = ""), x, fixed = TRUE)
+  gsub("([^[:alnum:]^[:space:]])", "\\\\\\1", x, useBytes = TRUE)
+}
+varData <- QuinlanAttributes(x)
+varData <-
+      paste(escapes(names(varData)),
+            ": ",
+            varData,
+            sep = "",
+            collapse = "\n")
+varData
+```
+
+
+```{r}
+sw <- starwars[, c(1:11)]
+```
+
+```{r}
+QuinlanAttributes(starwars[,c(1)])
+```
+
+
+
+```{r}
+x <- c("06/23/2013", "06/30/2013", "07/12/2014")
+library(lubridate)
+x.date <- mdy(x)
+class(x.date)
+```
+
+```{r}
+QuinlanAttributes(x.date)
+```
+```{r}
+format(x.date)
+```
+
+
+
+
+
+
+```{r}
+print(namesString)
+```
+
+```{r}
+dataString
+```
+
+```{r}
+c("test"="yes", "hello", "what", "x"="y")
+```
+
+
+
+
+
+
+```{r}
+model <- Cubist::cubist(x, y)
+```
+
+```{r}
+summary(model)
+```
+
+
+
+```{r}
+summary(model)
+```
+
+```{r}
+escapes <- function(x, chars = c(":", ";", "|")) {
+  for (i in chars)
+    x <- gsub(i, paste("\\", i, sep = ""), x, fixed = TRUE)
+  print(x)
+  gsub("([^[:alnum:]^[:space:]])", "\\\\\\1", x, useBytes = TRUE)  
+}
+```
+
+
+```{r}
+escapes(c("1:|", "4|:;", "asd ", "a:"))
+```
+
+```{r}
+grep("([^[:alnum:]^[:space:]])", c("1\\:\\|", "4\\|\\:\\;",  "asd "), value=TRUE, useBytes = TRUE)
+```
+
+
+```{r}
+grep("^sample", c("test", "sample_", "sample"))
+```
+```{r}
+call <- match.call()
+```
+
+
+```{r}
+gsub(":", paste("\\", ":", sep = ""), c("1:|", "4|:;", "asd", "a:"), fixed = TRUE)
+```
+
+
+```{r}
+gsub("([^[:alnum:]^[:space:]])", "\\\\\\1", c("a\\:", "sfsfg\\|aasdf\\:"), useBytes = TRUE) 
+```
+
+
+
+```{r}
+test<-c("a", 1)
+```
+
+
+```{r}
+convert <-
+    unlist(lapply(x, function(x)
+      is.factor(x) | is.character(x)))
+```
+
+```{r}
+convert
+```
+```{r}
+is.null(c(NULL, NULL))
+```
+
+```{r}
+NA_real_
+```
+
+
+```{r}
+for (i in names(test)[test]){
+  print(i)
+}
+```
+

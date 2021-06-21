@@ -1,0 +1,67 @@
+name: Test, build, and release cython package
+
+on:
+  workflow_dispatch:
+    inputs:
+      logLevel:
+        description: 'Log level'
+        required: true
+        default: 'warning'
+  push:
+    branches:
+    - master
+    - main
+    - release
+    - test
+    - dev
+    - feature/builds
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        platform: [ubuntu-latest]
+        python-version: [3.6, 3.7, 3.8, 3.9]
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Install dependencies
+      run: |
+        pip3 install --upgrade pip
+        pip3 install tox tox-gh-actions
+
+    - name: Test with tox
+      run: |
+        tox
+      env:
+        PLATFORM: ${{ matrix.platform  }}
+
+    # if successful build -> release
+    - name: Build
+      #if: ${{ env.GITHUB_REF=='refs/heads/release' }}
+      run: |
+        pip3 install setuptools build wheel
+        python3  -m build --sdist --wheel .
+
+    - name: Upload Release Asset
+      #if: ${{ env.GITHUB_REF=='refs/heads/release' }}
+      uses: softprops/action-gh-release@v1
+      with:
+        name: latest
+        tag_name: latest
+        body: Latest version of distribution
+        files: |
+          dist/*
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    # pypi release
+    # https://github.com/marketplace/actions/pypi-publish
