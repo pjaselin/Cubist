@@ -73,7 +73,7 @@ def get_splits(x):
 def type3(x):
     return
 
-def type2(x):
+def type2(x, dig=3):
     x = x.replace("\"", "")
     a_ind = x.find("att=")
     c_ind = x.find("cut=")
@@ -88,6 +88,15 @@ def type2(x):
     missing_rule = c_ind < 1 and v_ind > 0
     if missing_rule:
         var[missing_rule] = None
+        val[missing_rule] = None
+        rslt[missing_rule] = "="
+    else:
+        print()
+    
+    return {"var": var,
+            "val": val,
+            "rslt": rslt,
+            "text": f"{var} {rslt} {val}"}
     
     return
 

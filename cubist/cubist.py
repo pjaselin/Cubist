@@ -86,5 +86,10 @@ class Cubist:
             model = model.replace("__Sample", "sample")
         
         splits = get_splits(model)
+    
+
+    def predict(new_data, neighbors=0, **kwargs):
+        assert new_data is not None, "newdata must be non-null"
+        return
 
 
