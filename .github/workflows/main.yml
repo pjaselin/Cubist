@@ -48,8 +48,11 @@ jobs:
     - name: Build
       #if: ${{ env.GITHUB_REF=='refs/heads/release' }}
       run: |
-        pip3 install setuptools build wheel
+        pip3 install setuptools build wheel auditwheel
         python3  -m build --sdist --wheel .
+        auditwheel repair -w dist dist/*
+        rm dist/*-linux_x86_64.whl
+
 
     - name: Upload Release Asset
       #if: ${{ env.GITHUB_REF=='refs/heads/release' }}
