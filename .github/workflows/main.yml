@@ -50,7 +50,7 @@ jobs:
       run: |
         pip3 install setuptools build wheel auditwheel
         python3  -m build --sdist --wheel .
-        auditwheel repair -w dist dist/*
+        auditwheel repair dist/*
         rm dist/*-linux_x86_64.whl
 
 
