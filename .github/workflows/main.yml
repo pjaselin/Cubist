@@ -99,7 +99,7 @@ jobs:
 
     - name: Build sdist
       run: |
-        python -m pip install setuptools-rust setuptools wheel
+        python -m pip install setuptools wheel build cython
         python setup.py sdist
 
     - uses: actions/upload-artifact@v2
