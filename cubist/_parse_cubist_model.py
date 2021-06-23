@@ -5,6 +5,15 @@ def count_rules(x):
     return
 
 def split_to_groups(x, f):
+    """Function to convert two lists into a dictionary where the keys are unique values in f and 
+    the values are lists of the corresponding values in x. Analagous to the split function in R.
+
+    :param x: Input list
+    :param f: Input list
+    :return: Formatting information about the Series
+    """
+    if len(x) != len(f):
+        raise ValueError("lists x and f must be of the same length")
     groups = {}
     for a, b in zip(x, f):
         if b in groups:
@@ -20,13 +29,17 @@ def get_splits(x):
     # remove empty strings
     x = [c for c in x if c.strip()]
 
+    # define initial lists and index variables
     com_num = [None] * len(x)
     rule_num = [None] * len(x) 
     cond_num = [None] * len(x)
     com_idx, r_idx = 0, 0
 
     for i in range(len(x)):
+        # break each row of x into dicts for each key/value pair
         tt = parser(x[i])
+        
+        # get the first key in the first entry of tt
         first_key = list(tt[0].keys())[0]
         # start of a new rule
         if first_key == "rules":
@@ -44,6 +57,7 @@ def get_splits(x):
             c_idx += 1
             cond_num[i] = c_idx
     
+    # get the number of committees
     num_com = len([c for c in x if re.search("^rules=", c)])
     
     rules_per_com = split_to_groups(rule_num, com_num)

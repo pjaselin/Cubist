@@ -59,12 +59,15 @@ class Cubist:
             warnings.warn("Input data is a NumPy Array, setting column names to default `var0, var1,...`.")
             x = pd.DataFrame(x, columns=[f'var{i}' for i in range(x.shape[1])])
 
+        # for safety ensure the indices are reset
         x = x.reset_index(drop=True)
         y = y.reset_index(drop=True)
 
+        # create the names and data strings required for cubist
         names_string = make_names_file(x, y, w=self.weights, label=self.label, comments=True)
         data_string = make_data_file(x, y, w=self.weights)
 
+        # call the C implementation of cubist
         model, output = _cubist(names_string.encode(),
                                 data_string.encode(),
                                 self.unbiased,
@@ -78,15 +81,19 @@ class Cubist:
                                 b"1",
                                 b"1")
         
+        # convert output to strings
         model = model.decode()
         output = output.decode()
         
+        # correct reserved names
         has_reserved = re.search("\n__Sample", names_string)
         if has_reserved:
             output = output.replace("__Sample", "sample")
             model = model.replace("__Sample", "sample")
         
+        # get a dataframe containing the rule s[;ots]
         splits = get_splits(model)
+        # get the rule by rule percentiles (?)
         if splits is not None:
             nrows = x.shape[0]
             for i in range(splits.shape[0]):
@@ -94,6 +101,7 @@ class Cubist:
                 var =  splits.loc[i, "value"]
                 splits.loc[i, "percentile"] = get_percentiles(x_col, var, nrows)
         
+        # extract the maxd value and remove the preceding text from the model string
         tmp = model.split("\n")
         tmp = [c for c in tmp if "maxd" in c][0]
         tmp = tmp.split("\"")
