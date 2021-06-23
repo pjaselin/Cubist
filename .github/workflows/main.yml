@@ -50,11 +50,11 @@ jobs:
         pip3 install setuptools build wheel auditwheel
         python3  -m build --sdist --wheel .
 
-    # - name: auditwheel
-    #   if: ${{ matrix.platform=='ubuntu-latest' }}
-    #   run: |
-    #     auditwheel repair dist/*.whl
-    #     rm dist/*-linux_x86_64.whl
+    - name: auditwheel
+      if: ${{ matrix.platform=='ubuntu-latest' }}
+      run: |
+        auditwheel repair dist/*.whl
+        rm dist/*-linux_x86_64.whl
 
     - name: upload artifact
       uses: actions/upload-artifact@v2
