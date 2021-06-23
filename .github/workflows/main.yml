@@ -51,6 +51,7 @@ jobs:
         rm dist/*-linux_x86_64.whl
 
   release:
+    needs: build
     strategy:
       matrix:
         platform: [ubuntu-latest]
