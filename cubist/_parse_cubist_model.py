@@ -51,10 +51,9 @@ def get_splits(x):
     rules_per_com = {a: max(rules_per_com[a]) for a in rules_per_com}
     rules_per_com = {a: rules_per_com[a] for a in rules_per_com if rules_per_com[a] > 0}
     if rules_per_com and num_com > 0:
-        rules_per_com = {f'Com {i}': rules_per_com[a] for i, a in enumerate(list(rules_per_com.keys()))}
+        rules_per_com = {f'Com {i+1}': rules_per_com[a] for i, a in enumerate(list(rules_per_com.keys()))}
     
-    is_new_rule = True if [c for c in x if re.search("^conds=", c)] else False
-
+    is_new_rule = [True if re.search("^conds=", c) else False for c in x]
     split_var = [""] * len(x)
     split_val = [None] * len(x)
     split_cats = [""] * len(x)
@@ -63,7 +62,19 @@ def get_splits(x):
     is_type2 = [i for i, c in enumerate(x) if re.search("^type=\"2\"", c)]
     if is_type2:
         for i in is_type2:
-            split_var[i] = type2(x[i])
+            continuous_split = type2(x[i])
+            split_var[i] = continuous_split["var"].replace('\"', "")
+            split_dir[i] = continuous_split["rslt"]
+            split_val[i] = continuous_split["val"]
+    
+    is_type3 = [i for i, c in enumerate(x) if re.search("^type=\"3\"", c)]
+    if is_type3:
+        for i in is_type3:
+            pass
+
+    print(split_var)
+    print(split_dir)
+    print(split_val)
     
     
 
@@ -71,6 +82,11 @@ def get_splits(x):
     return
 
 def type3(x):
+    a_ind = x.find("att=")
+    e_ind = x.find("elts=")
+    var = x[a_ind+4:e_ind-2]
+    val = x[e_ind+5:]
+    mult_vals = None
     return
 
 def type2(x, dig=3):
@@ -80,25 +96,20 @@ def type2(x, dig=3):
     r_ind = x.find("result=")
     v_ind = x.find("val=")
 
-    var = [""] * len(x)
-    val = [""] * len(x)
-    rslt = [""] * len(x)
-    # print(c_ind, a_ind, r_ind, v_ind)
-    # missing_rule = [a and b for a, b in zip([c < 1 for c in c_ind], [v > 0 for v in v_ind])]
     missing_rule = c_ind < 1 and v_ind > 0
     if missing_rule:
-        var[missing_rule] = None
-        val[missing_rule] = None
-        rslt[missing_rule] = "="
+        var = x[a_ind+4:c_ind-2]
+        val = None
+        rslt = "="
     else:
-        print()
-    
+        var = x[a_ind+4:c_ind-1]
+        val = x[c_ind+4:r_ind-1]
+        val = round(float(val), dig)
+        rslt = x[r_ind+7:]
     return {"var": var,
             "val": val,
             "rslt": rslt,
             "text": f"{var} {rslt} {val}"}
-    
-    return
 
 def eqn(x, dig=10, text=True, var_names=None):
     return
