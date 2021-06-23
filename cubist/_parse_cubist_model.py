@@ -1,6 +1,5 @@
 import re
-# import itertools
-
+import pandas as pd
 
 def count_rules(x):
     return
@@ -54,14 +53,16 @@ def get_splits(x):
         rules_per_com = {f'Com {i+1}': rules_per_com[a] for i, a in enumerate(list(rules_per_com.keys()))}
     
     is_new_rule = [True if re.search("^conds=", c) else False for c in x]
-    split_var = [""] * len(x)
+    split_var = [None] * len(x)
     split_val = [None] * len(x)
     split_cats = [""] * len(x)
     split_dir = [""] * len(x)
+    split_type = [""] * len(x)
     
     is_type2 = [i for i, c in enumerate(x) if re.search("^type=\"2\"", c)]
     if is_type2:
         for i in is_type2:
+            split_type[i] = "type2"
             continuous_split = type2(x[i])
             split_var[i] = continuous_split["var"].replace('\"', "")
             split_dir[i] = continuous_split["rslt"]
@@ -70,17 +71,30 @@ def get_splits(x):
     is_type3 = [i for i, c in enumerate(x) if re.search("^type=\"3\"", c)]
     if is_type3:
         for i in is_type3:
+            split_type[i] = "type3"
             pass
-
+    
     print(split_var)
     print(split_dir)
     print(split_val)
     
+    if not is_type2 and not is_type3:
+        return None
     
+    split_data = pd.DataFrame({
+        "committee": com_num,
+        "rule": rule_num,
+        "variable": split_var,
+        "dir": split_dir,
+        "value": split_val,
+        "category": split_cats,
+        "type": split_type
+    })
+    split_data = split_data.dropna(subset=['variable'])
+    # reset index?
+    return split_data
 
-    
-    return
-
+# TODO: finish with categorical data
 def type3(x):
     a_ind = x.find("att=")
     e_ind = x.find("elts=")
