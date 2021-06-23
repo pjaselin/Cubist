@@ -55,6 +55,7 @@ jobs:
       run: |
         auditwheel repair dist/*.whl
         rm dist/*-linux_x86_64.whl
+        ls dist/
 
     - name: upload artifact
       uses: actions/upload-artifact@v2
