@@ -44,18 +44,24 @@ jobs:
         PLATFORM: ${{ matrix.platform  }}
 
     # if successful build -> release
-    - name: Build wheel
-      # some
-      run: |
-        pip3 install setuptools build wheel auditwheel
-        python3  -m build --sdist --wheel .
+    # - name: Build wheel
+    #   if: ${{ matrix.platform!='ubuntu-latest' }}
+    #   run: |
+    #     pip3 install setuptools build wheel auditwheel
+    #     python3  -m build --sdist --wheel .
 
-    - name: auditwheel
+
+    - name: Setup build wheel manylinux
       if: ${{ matrix.platform=='ubuntu-latest' }}
       run: |
-        auditwheel repair dist/*.whl
-        rm dist/*-linux_x86_64.whl
-        ls dist/
+        echo "MANY_LINUX_VERSION=$(python -V | sed 's/[^0-9]*//g' | cut -b1,2)" >> $GITHUB_ENV
+
+    - name: Build wheel manylinux
+      if: ${{ matrix.platform=='ubuntu-latest' }}
+      uses: RalfG/python-wheels-manylinux-build@v0.3.4-manylinux2010_x86_64
+      with:
+        python-versions: 'cp${{ env.MANY_LINUX_VERSION }}-cp${{ env.MANY_LINUX_VERSION }}m'
+        build-requirements: 'cython setuptools build wheel'
 
     - name: upload artifact
       uses: actions/upload-artifact@v2
