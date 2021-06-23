@@ -48,10 +48,10 @@ jobs:
     strategy:
       matrix:
         include:
-          - vers: i686
-            os: ubuntu-20.04
-          - vers: aarch64
-            os: ubuntu-20.04
+          # - vers: i686
+          #   os: ubuntu-20.04
+          # - vers: aarch64
+          #   os: ubuntu-20.04
           - vers: auto64
             os: ubuntu-20.04
           # - vers: arm64
