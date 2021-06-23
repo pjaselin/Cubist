@@ -1,4 +1,4 @@
-name: Test, build, and release cython package
+name: build and release cubist
 
 on:
   workflow_dispatch:
@@ -38,7 +38,7 @@ jobs:
 
     - name: Test with tox
       run: |
-        tox
+        tox -e py${{ matrix.python-version }}-${{ matrix.platform  }}
       env:
         PLATFORM: ${{ matrix.platform  }}
 
@@ -50,6 +50,14 @@ jobs:
         auditwheel repair dist/*
         rm dist/*-linux_x86_64.whl
 
+  release:
+    strategy:
+      matrix:
+        platform: [ubuntu-latest]
+        python-version: [3.9]
+    runs-on: ${{ matrix.platform }}
+
+    steps:
     # test publish to pypi
     - name: Publish distribution 📦 to Test PyPI
       uses: pypa/gh-action-pypi-publish@master
