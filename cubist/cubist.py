@@ -6,7 +6,8 @@ from ._make_names_file import make_names_file
 from ._make_data_file import make_data_file
 from _cubist import _cubist, _predictions
 import re
-from ._parse_cubist_model import get_splits
+from ._parse_cubist_model import get_splits, get_percentiles
+from ._var_usage import var_usage
 
 
 class Cubist:
@@ -86,7 +87,22 @@ class Cubist:
             model = model.replace("__Sample", "sample")
         
         splits = get_splits(model)
-    
+        if splits is not None:
+            nrows = x.shape[0]
+            for i in range(splits.shape[0]):
+                x_col = pd.to_numeric(x[splits.loc[i, "variable"]])
+                var =  splits.loc[i, "value"]
+                splits.loc[i, "percentile"] = get_percentiles(x_col, var, nrows)
+        
+        tmp = model.split("\n")
+        tmp = [c for c in tmp if "maxd" in c][0]
+        tmp = tmp.split("\"")
+        maxd_i = [i for i, c in enumerate(tmp) if "maxd" in c][0]
+        maxd = tmp[maxd_i + 1]
+        model = model.replace(f'insts=\"1\" nn=\"1\" maxd=\"{maxd}\"', 'insts=\"0\"')
+        maxd = float(maxd)
+
+        usage = var_usage(output)
 
     def predict(new_data, neighbors=0, **kwargs):
         assert new_data is not None, "newdata must be non-null"

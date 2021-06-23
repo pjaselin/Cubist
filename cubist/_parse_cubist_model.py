@@ -91,7 +91,7 @@ def get_splits(x):
         "type": split_type
     })
     split_data = split_data.dropna(subset=['variable'])
-    # reset index?
+    split_data = split_data.reset_index(drop=True)
     return split_data
 
 # TODO: finish with categorical data
@@ -112,10 +112,11 @@ def type2(x, dig=3):
 
     missing_rule = c_ind < 1 and v_ind > 0
     if missing_rule:
-        var = x[a_ind+4:c_ind-2]
+        var = x[a_ind+4:c_ind-1]
         val = None
         rslt = "="
     else:
+        print(x)
         var = x[a_ind+4:c_ind-1]
         val = x[c_ind+4:r_ind-1]
         val = round(float(val), dig)
@@ -124,6 +125,10 @@ def type2(x, dig=3):
             "val": val,
             "rslt": rslt,
             "text": f"{var} {rslt} {val}"}
+
+def get_percentiles(x_col, value, nrows):
+    if value:
+        return sum([c <= value for c in x_col]) / nrows
 
 def eqn(x, dig=10, text=True, var_names=None):
     return
