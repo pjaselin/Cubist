@@ -24,7 +24,8 @@ jobs:
     runs-on: ${{ matrix.platform }}
 
     steps:
-    - uses: actions/checkout@v2
+    - name: Checkout repo
+      uses: actions/checkout@v2
 
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v2
@@ -43,7 +44,7 @@ jobs:
         PLATFORM: ${{ matrix.platform  }}
 
     # if successful build -> release
-    - name: Build
+    - name: Build wheel
       # some
       run: |
         pip3 install setuptools build wheel auditwheel
@@ -55,6 +56,12 @@ jobs:
     #     auditwheel repair dist/*.whl
     #     rm dist/*-linux_x86_64.whl
 
+    - name: upload artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: wheels
+        path: dist/*
+
   release:
     needs: build
     strategy:
@@ -64,6 +71,16 @@ jobs:
     runs-on: ${{ matrix.platform }}
 
     steps:
+    - name: download artifacts
+      uses: actions/download-artifact@v2
+      with:
+        name: wheels
+
+    - name: ls
+      # some
+      run: |
+        ls dist/
+
     # test publish to pypi
     - name: Publish distribution 📦 to Test PyPI
       uses: pypa/gh-action-pypi-publish@master
