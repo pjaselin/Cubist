@@ -71,13 +71,17 @@ jobs:
     runs-on: ${{ matrix.platform }}
 
     steps:
+    - name: mkdir
+      run: |
+        mkdir dist
+
     - name: download artifacts
       uses: actions/download-artifact@v2
       with:
         name: wheels
+        path: dist
 
     - name: ls
-      # some
       run: |
         ls dist/
 
