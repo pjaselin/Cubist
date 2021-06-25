@@ -38,7 +38,6 @@ def get_splits(x):
     for i in range(len(x)):
         # break each row of x into dicts for each key/value pair
         tt = parser(x[i])
-        
         # get the first key in the first entry of tt
         first_key = list(tt[0].keys())[0]
         # start of a new rule
@@ -88,9 +87,9 @@ def get_splits(x):
             split_type[i] = "type3"
             pass
     
-    print(split_var)
-    print(split_dir)
-    print(split_val)
+    # print(split_var)
+    # print(split_dir)
+    # print(split_val)
     
     if not is_type2 and not is_type3:
         return None
@@ -130,7 +129,7 @@ def type2(x, dig=3):
         val = None
         rslt = "="
     else:
-        print(x)
+        # print(x)
         var = x[a_ind+4:c_ind-1]
         val = x[c_ind+4:r_ind-1]
         val = round(float(val), dig)

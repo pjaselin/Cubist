@@ -84,7 +84,7 @@ class Cubist:
         # convert output to strings
         model = model.decode()
         output = output.decode()
-        
+        # print(model, output)
         # correct reserved names
         has_reserved = re.search("\n__Sample", names_string)
         if has_reserved:
