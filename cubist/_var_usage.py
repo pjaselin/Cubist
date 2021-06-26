@@ -1,6 +1,3 @@
-from typing import ValuesView
-
-
 def var_usage(x):
     x = x.split("\n")
     start_vars = [i for i, c in enumerate(x) if '\tAttribute usage' in c]
@@ -22,7 +19,7 @@ def get_values(x):
     
     has_pct = ["%" in c for c in x2]
     if sum(has_pct) == 2:
-        x2 = [x2[i] for i, c in has_pct if c] 
+        x2 = [x2[i] for i, c in enumerate(has_pct) if c] 
         x2 = [c.replace("%", "") for c in x2]
 
 
