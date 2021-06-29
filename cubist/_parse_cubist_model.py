@@ -1,6 +1,5 @@
 import re
 import pandas as pd
-import numpy as np
 
 def count_rules(x):
     return
@@ -145,7 +144,7 @@ def get_percentiles(x_col, value, nrows):
     if value:
         return sum([c <= value for c in x_col]) / nrows
 
-def eqn(x, dig=10, text=True, var_names=None):
+def eqn(x, var_names=None):
     x = x.replace("\"", "")
     starts = [m.start(0) for m in re.finditer("(coeff=)|(att=)", x)]
     p = int((len(starts) - 1)/2)
@@ -161,17 +160,15 @@ def eqn(x, dig=10, text=True, var_names=None):
     vals = tmp[::2]
     vals = [float(c) for c in vals]
     nms = tmp[1::2]
-    # if text:
-    #     signs = [np.sign(c) for c in vals]
-    #     vals = [np.abs(c) for c in vals]
-    #     print(signs)
     nms = ["(Intercept)"] + nms
     vals = {nm: val for nm, val in zip(nms, vals)}
     if var_names:
-        vars2 = None
-    
-    print(vals)
-    print(nms)
+        vars2 = [var for var in var_names if var not in nms]
+        vals2 = [None] * len(vars2)
+        vals2 = {nm: val for nm, val in zip(vars2, vals2)}
+        vals = {**vals, **vals2}
+        new_names = ["(Intercept)"] + var_names
+        vals = {nm: vals[nm] for nm in new_names}
     return vals
 
 def make_parsed_dict(y):
@@ -215,8 +212,12 @@ def coef_cubist(x, var_names=None, *kwargs):
             cond_num[i] = c_idx
     is_eqn = [i for i, c in enumerate(x) if "coeff=" in c]
     # coefs = eqn([x[i] for i in is_eqn], dig=0, text=False, var_names=var_names)
-    coefs = [eqn(x[i], dig=0, text=False, var_names=var_names) for i in is_eqn]
+    coefs = [eqn(x[i], var_names=var_names) for i in is_eqn]
     p = len(coefs)
+    dims = [len(c) for c in coefs]
+    coms = None
+    rls = None
+    print(coefs)
     #print(is_eqn)
     #print(x)
     return
