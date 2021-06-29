@@ -32,4 +32,4 @@ def _predictions(casev_, namesv_, datav_, modelv_, predv_, outputv_):
      cdef double predv = predv_;
      cdef char *outputv = outputv_;
      predictions(&casev, &namesv, &datav, &modelv, &predv, &outputv);
-     return(predv, outputv)
+     return (predv, outputv)

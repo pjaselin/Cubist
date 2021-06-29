@@ -24,6 +24,9 @@ def make_data_file(x, y, w=None):
             if value:
                 x[col] = escapes(x[col].astype(str))
 
+    # if y is None:
+    #     y = [None] * x.shape[0]
+    #     y = pd.Series(y)
     # unclear if this needs to be implemented in Python:
     # if y.isnull().all():
     #     y = escapes()
