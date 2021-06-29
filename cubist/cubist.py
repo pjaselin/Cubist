@@ -6,7 +6,7 @@ from ._make_names_file import make_names_file
 from ._make_data_file import make_data_file
 from _cubist import _cubist, _predictions
 import re
-from ._parse_cubist_model import get_splits, get_percentiles
+from ._parse_cubist_model import get_splits, get_percentiles, coef_cubist
 from ._var_usage import var_usage
 
 
@@ -111,6 +111,34 @@ class Cubist:
         maxd = float(maxd)
 
         usage = var_usage(output)
+        if usage is None or usage.shape[0] < x.shape[1]:
+            x_names = set(x.columns)
+            u_names = set(usage["Variable"]) if usage is not None else set()
+            missing_vars = list(x_names - u_names)
+            if missing_vars:
+                zero_list = [0] * len(missing_vars)
+                usage2 = pd.DataFrame({"Conditions": zero_list,
+                                       "Model": zero_list,
+                                       "Variable": missing_vars})
+                usage = pd.concat([usage, usage2], axis=1)
+                usage = usage.reset_index(drop=True)
+        
+        out = {
+            "data": data_string,
+            "names": names_string,
+            "case_weights": not self.weights is None,
+            "model": model,
+            "output": output,
+            "committees": self.committees,
+            "maxd": maxd,
+            "dims": x.shape,
+            "splits": splits,
+            "usage": usage
+        }
+        # TODO: consider capturing function call as in the R scripts
+
+        coefs = coef_cubist(model, var_names=list(x.columns))
+
 
     def predict(new_data, neighbors=0, **kwargs):
         assert new_data is not None, "newdata must be non-null"

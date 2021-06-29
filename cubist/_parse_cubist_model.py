@@ -1,5 +1,6 @@
 import re
 import pandas as pd
+import numpy as np
 
 def count_rules(x):
     return
@@ -25,6 +26,7 @@ def split_to_groups(x, f):
 def get_splits(x):
     # split on newline
     x = x.split("\n")
+    x = [c for c in x if c != '']
 
     # remove empty strings
     x = [c for c in x if c.strip()]
@@ -144,14 +146,40 @@ def get_percentiles(x_col, value, nrows):
         return sum([c <= value for c in x_col]) / nrows
 
 def eqn(x, dig=10, text=True, var_names=None):
-    return
+    x = x.replace("\"", "")
+    starts = [m.start(0) for m in re.finditer("(coeff=)|(att=)", x)]
+    p = int((len(starts) - 1)/2)
+    vars = [""] * p
+    tmp = [""] * len(starts)
+    for i in range(len(starts)):
+        if i < len(starts) - 1:
+            txt = x[starts[i]:starts[i+1]-1]
+        else:
+            txt = x[starts[i]:]
+        tmp[i] = txt.replace("coeff=", "").replace("att=", "")
+        
+    vals = tmp[::2]
+    vals = [float(c) for c in vals]
+    nms = tmp[1::2]
+    # if text:
+    #     signs = [np.sign(c) for c in vals]
+    #     vals = [np.abs(c) for c in vals]
+    #     print(signs)
+    nms = ["(Intercept)"] + nms
+    vals = {nm: val for nm, val in zip(nms, vals)}
+    if var_names:
+        vars2 = None
+    
+    print(vals)
+    print(nms)
+    return vals
 
 def make_parsed_dict(y):
     y = y.split("=")
     if len(y) > 1:
         return {y[0]: y[1]}
-    else:
-        return y
+    # else:
+    #     return y
 
 def parser(x):
     x = x.split(" ")
@@ -159,4 +187,36 @@ def parser(x):
     return x
 
 def coef_cubist(x, var_names=None, *kwargs):
+    x = x.split("\n")
+    x = [c for c in x if c != '']
+    com_num = [None] * len(x)
+    rule_num = [None] * len(x)
+    cond_num = [None] * len(x)
+    com_idx, r_idx = 0, 0
+    for i in range(len(x)):
+         # break each row of x into dicts for each key/value pair
+        tt = parser(x[i])
+        # get the first key in the first entry of tt
+        first_key = list(tt[0].keys())[0]
+        # start of a new rule
+        if first_key == "rules":
+            com_idx += 1
+            r_idx = 0
+        com_num[i] = com_idx
+        # start of a new condition
+        if first_key == "conds":
+            r_idx += 1
+            c_idx = 0
+        rule_num[i] = r_idx
+        # within a rule, type designates the type of conditional statement
+        # type = 2 appears to be a simple split of a continuous predictor
+        if first_key == "type":
+            c_idx += 1
+            cond_num[i] = c_idx
+    is_eqn = [i for i, c in enumerate(x) if "coeff=" in c]
+    # coefs = eqn([x[i] for i in is_eqn], dig=0, text=False, var_names=var_names)
+    coefs = [eqn(x[i], dig=0, text=False, var_names=var_names) for i in is_eqn]
+    p = len(coefs)
+    #print(is_eqn)
+    #print(x)
     return
