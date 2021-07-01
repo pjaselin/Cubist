@@ -15,8 +15,8 @@ with open("README.md", 'r') as f:
 
 setup(
     name="cubist",
-    version="0.0.1",
-    description="A python port of the R library cubist.",
+    version="0.0.2",
+    description="A Python port of the R Cubist library.",
     long_description=long_description,
     long_description_content_type='text/markdown',
     ext_modules=cythonize(exts),
