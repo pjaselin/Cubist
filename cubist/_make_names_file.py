@@ -5,10 +5,12 @@ from ._quinlan_attributes import quinlan_attributes
 
 
 def make_names_file(x, y, w=None, label="outcome", comments=True):
+    # clean reserved names if they're in x
     has_sample = [i for i, c in enumerate(x.columns) if bool(re.search('^sample', c))]
     if has_sample:
         x.columns = [re.sub('^sample', '_Sample', c) for c in x.columns]
 
+    # generate the comments string showing the Python version and current timestamps
     if comments:
         python_version = tuple(sys.version_info)
         now = datetime.now()
@@ -19,16 +21,21 @@ def make_names_file(x, y, w=None, label="outcome", comments=True):
 
     outcome_info = ": continuous."
 
+    # build base out string
     out = f'{out}\n{label}.\n{label}{outcome_info}'
 
+    # get dictionary of feature names as keys and data types as values
     var_data = quinlan_attributes(x)
 
+    # if weights are present add this to var_data
     if w is not None:
         var_data["case weight"] = "continuous."
 
+    # join the column names and data types into a single string
     var_data = [f'{escapes([key])[0]}: {value}' for key, value in var_data.items()]
     var_data = '\n'.join(var_data)
 
+    # merge the out and var_data strings
     out = f'{out}\n{var_data}\n'
     return out
 

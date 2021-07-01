@@ -5,6 +5,9 @@ import warnings
 from ._make_names_file import make_names_file
 from ._make_data_file import make_data_file
 from _cubist import _cubist, _predictions
+import re
+from ._parse_cubist_model import get_splits, get_percentiles
+from ._var_usage import var_usage
 
 
 class Cubist:
@@ -56,23 +59,61 @@ class Cubist:
             warnings.warn("Input data is a NumPy Array, setting column names to default `var0, var1,...`.")
             x = pd.DataFrame(x, columns=[f'var{i}' for i in range(x.shape[1])])
 
+        # for safety ensure the indices are reset
         x = x.reset_index(drop=True)
         y = y.reset_index(drop=True)
 
+        # create the names and data strings required for cubist
         names_string = make_names_file(x, y, w=self.weights, label=self.label, comments=True)
         data_string = make_data_file(x, y, w=self.weights)
 
+        # call the C implementation of cubist
         model, output = _cubist(names_string.encode(),
                                 data_string.encode(),
                                 self.unbiased,
-                                "yes".encode(),
+                                b"yes",
                                 1,
                                 self.committees,
                                 self.sample,
                                 self.seed,
                                 self.rules,
                                 self.extrapolation,
-                                "1".encode(),
-                                "1".encode())
+                                b"1",
+                                b"1")
         
-        has_reserved = ()
+        # convert output to strings
+        model = model.decode()
+        output = output.decode()
+        # print(model, output)
+        # correct reserved names
+        has_reserved = re.search("\n__Sample", names_string)
+        if has_reserved:
+            output = output.replace("__Sample", "sample")
+            model = model.replace("__Sample", "sample")
+        
+        # get a dataframe containing the rule s[;ots]
+        splits = get_splits(model)
+        # get the rule by rule percentiles (?)
+        if splits is not None:
+            nrows = x.shape[0]
+            for i in range(splits.shape[0]):
+                x_col = pd.to_numeric(x[splits.loc[i, "variable"]])
+                var =  splits.loc[i, "value"]
+                splits.loc[i, "percentile"] = get_percentiles(x_col, var, nrows)
+        
+        # extract the maxd value and remove the preceding text from the model string
+        tmp = model.split("\n")
+        tmp = [c for c in tmp if "maxd" in c][0]
+        tmp = tmp.split("\"")
+        maxd_i = [i for i, c in enumerate(tmp) if "maxd" in c][0]
+        maxd = tmp[maxd_i + 1]
+        model = model.replace(f'insts=\"1\" nn=\"1\" maxd=\"{maxd}\"', 'insts=\"0\"')
+        maxd = float(maxd)
+
+        usage = var_usage(output)
+
+    def predict(new_data, neighbors=0, **kwargs):
+        assert new_data is not None, "newdata must be non-null"
+        return
+
+

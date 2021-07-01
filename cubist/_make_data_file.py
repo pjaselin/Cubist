@@ -30,9 +30,12 @@ def make_data_file(x, y, w=None):
     # if (is.null(y))
     #     y < - rep(NA_real_, nrow(x))
 
+    # format the y column for special charactesrs
     y = pd.Series(escapes(y.astype(str)))
+    # insert the y column as the first column of x
     x.insert(0, "y", y)
 
+    # handle weights matrix (?)
     if w is not None:
         column_names = list(x.columns) + [f"w{i}" for i in range(w.shape[1])]
         x = pd.concat([x, w], axis=1, ignore_index=True)
