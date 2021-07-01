@@ -10,6 +10,9 @@ __pycache__/
 # MacOS
 .DS_Store
 
+# vscode
+.vscode
+
 # Distribution / packaging
 .Python
 build/

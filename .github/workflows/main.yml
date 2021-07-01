@@ -1,4 +1,4 @@
-name: Test, build, and release cython package
+name: build and release cubist
 
 on:
   workflow_dispatch:
@@ -14,24 +14,22 @@ on:
     - release
     - test
     - dev
-    - feature/builds
 
 jobs:
-  build:
-
-    runs-on: ubuntu-latest
+  test:
+    name: Test with tox
     strategy:
       matrix:
-        platform: [ubuntu-latest]
-        python-version: [3.6, 3.7, 3.8, 3.9]
+        os: [ubuntu-latest] # [ macos-latest, windows-latest]
+        python-version: [36, 37, 38, 39]
+    runs-on: ${{ matrix.os }}
 
     steps:
-    - uses: actions/checkout@v2
+    - name: Checkout repo
+      uses: actions/checkout@v2
 
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v2
-      with:
-        python-version: ${{ matrix.python-version }}
 
     - name: Install dependencies
       run: |
@@ -40,22 +38,108 @@ jobs:
 
     - name: Test with tox
       run: |
-        tox
+        tox -e py${{ matrix.python-version }}-${{ matrix.os  }}
       env:
-        PLATFORM: ${{ matrix.platform  }}
+        PLATFORM: ${{ matrix.os  }}
 
-    # if successful build -> release
-    - name: Build
-      #if: ${{ env.GITHUB_REF=='refs/heads/release' }}
+  build_wheels:
+    name: Build wheels on ${{ matrix.os }}  - ${{ matrix.vers }}
+    needs: test
+    strategy:
+      matrix:
+        include:
+          # - vers: i686
+          #   os: ubuntu-20.04
+          # - vers: aarch64
+          #   os: ubuntu-20.04
+          - vers: auto64
+            os: ubuntu-20.04
+          # - vers: arm64
+          #   os: macos-10.15
+          # - vers: auto64
+          #   os: macos-10.15
+          # - vers: auto64
+          #   os: windows-2019
+    runs-on: ${{ matrix.os }}
+    env:
+      CIBW_SKIP: "cp27-* cp34-* cp35-* pp* *-win32"
+
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v2
+
+    - name: Install Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: "3.9"
+
+    - name: wheels Linux ${{ matrix.vers }}
+      if: runner.os == 'Linux'
+      uses: joerick/cibuildwheel@v1.10.0
+      env:
+        CIBW_ARCHS_LINUX: ${{ matrix.vers }}
+
+    - name: upload artifact
+      uses: actions/upload-artifact@v2
+      with:
+        path: ./wheelhouse/*.whl
+
+  build_sdist:
+    name: Build source distribution
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v2
+
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: "3.9"
+
+    - name: Build sdist
       run: |
-        pip3 install setuptools build wheel auditwheel
-        python3  -m build --sdist --wheel .
-        auditwheel repair dist/*
-        rm dist/*-linux_x86_64.whl
+        python -m pip install setuptools wheel build cython
+        python setup.py sdist
 
+    - uses: actions/upload-artifact@v2
+      with:
+        path: dist/*.tar.gz
 
+  release:
+    name: release distribution
+    needs: [build_wheels, build_sdist]
+    strategy:
+      matrix:
+        platform: [ubuntu-latest]
+        python-version: [3.9]
+    runs-on: ${{ matrix.platform }}
+
+    steps:
+    - name: mkdir
+      run: |
+        mkdir dist
+
+    - name: download artifacts
+      uses: actions/download-artifact@v2
+      with:
+        name: artifact
+        path: dist
+
+    - name: ls
+      run: |
+        ls dist/
+
+    # test publish to pypi
+    - name: Publish distribution 📦 to Test PyPI
+      uses: pypa/gh-action-pypi-publish@master
+      with:
+        password: ${{ secrets.TEST_PYPI_API_TOKEN }}
+        repository_url: https://test.pypi.org/legacy/
+
+    # github upload release asset
     - name: Upload Release Asset
-      #if: ${{ env.GITHUB_REF=='refs/heads/release' }}
+      if: ${{ env.GITHUB_REF=='refs/heads/release' }}
       uses: softprops/action-gh-release@v1
       with:
         name: latest
@@ -66,18 +150,9 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-    # pypi release
-    # https://github.com/marketplace/actions/pypi-publish
-    - name: Build manylinux Python wheels
-      uses: RalfG/python-wheels-manylinux-build@v0.3.4-manylinux2010_x86_64
-    
-    - name: Publish distribution 📦 to Test PyPI
-      uses: pypa/gh-action-pypi-publish@master
-      with:
-        password: ${{ secrets.TEST_PYPI_API_TOKEN }}
-        repository_url: https://test.pypi.org/legacy/
+    # publish to pypi
     - name: Publish distribution 📦 to PyPI
-      if: startsWith(github.ref, 'refs/tags')
+      if: ${{ env.GITHUB_REF=='refs/heads/release' }}
       uses: pypa/gh-action-pypi-publish@master
       with:
         password: ${{ secrets.PYPI_API_TOKEN }}
