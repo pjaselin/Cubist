@@ -1,3 +1,4 @@
+import numpy as np
 
 cdef extern from "src/top.c":
     void cubist(char **namesv, char **datav, int *unbiased,
@@ -25,11 +26,14 @@ def _cubist(namesv_, datav_, unbiased_, compositev_, neighbors_, committees_, sa
 
 
 def _predictions(casev_, namesv_, datav_, modelv_, predv_, outputv_):
-     cdef char *casev = casev_;
-     cdef char *namesv = namesv_;
-     cdef char *datav = datav_;
-     cdef char *modelv = modelv_;
-     cdef double predv = predv_;
-     cdef char *outputv = outputv_;
-     predictions(&casev, &namesv, &datav, &modelv, &predv, &outputv);
-     return (predv, outputv)
+    print(predv_)
+    print(np.zeros(predv_, dtype=int))
+    cdef char *casev = casev_;
+    cdef char *namesv = namesv_;
+    cdef char *datav = datav_;
+    cdef char *modelv = modelv_;
+    cdef double[:] predv = np.zeros(predv_, dtype=int) ; # predv_;
+    print(predv)
+    cdef char *outputv = outputv_;
+    predictions(&casev, &namesv, &datav, &modelv, predv, &outputv);
+    return (predv, outputv)

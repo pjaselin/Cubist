@@ -16,6 +16,14 @@ class Cubist:
 
     Parameters
     ----------
+    committes
+    unbiased
+    rules
+    extrapolation
+    sample
+    seed
+    label
+    weights
 
     Attributes
     ----------
@@ -58,7 +66,7 @@ class Cubist:
         assert weights is None or isinstance(weights, (list, np.ndarray)), "case weights must be numeric"
         self.weights = weights
 
-        # initialize other class variables
+        # initialize remaining class variables
         self.names = None
         self.data = None
         self.model = None
@@ -165,6 +173,9 @@ class Cubist:
         if neighbors > 0:
             self.model = self.model.replace("insts=\"0\"",  f"insts=\"1\" nn=\"{neighbors}\" maxd=\"{self.maxd}\"")
         
+        # for safety ensure indices are reset
+        new_data = new_data.reset_index(drop=True)
+        
         ## If there are case weights used during training, the C code
         ## will expect a column of weights in the new data but the
         ## values will be ignored. `makeDataFile` puts those last in
@@ -175,10 +186,11 @@ class Cubist:
         
         # make cases file
         case_string = make_data_file(x=new_data, y=None)
+        # print(case_string)
 
         # fix breaking predictions when using sample parameter
         case_model = "" if True else self.model
-
+        pred_vals = [0] * new_data.shape[0]
         # get cubist predictions from trained model
         pred, output = _predictions(case_string.encode(),
                                     self.names.encode(),
@@ -186,5 +198,6 @@ class Cubist:
                                     case_model.encode(),
                                     new_data.shape[0],
                                     b"1")
-        pred = pred.decode()
+        print(pred)
+        print(output.decode())
         return pred

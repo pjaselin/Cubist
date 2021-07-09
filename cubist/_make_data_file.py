@@ -1,4 +1,5 @@
 import pandas as pd
+import numpy as np
 from ._make_names_file import escapes
 from pandas.api.types import is_string_dtype, is_numeric_dtype
 
@@ -17,6 +18,7 @@ def _format(x, digits=15):
 
 
 def make_data_file(x, y, w=None):
+    # get a dictionary with keys as column names and values as whether the column is a string dtype
     convert = {col: is_string_dtype(x[col]) for col in x}
 
     if True in convert.values():
@@ -24,9 +26,10 @@ def make_data_file(x, y, w=None):
             if value:
                 x[col] = escapes(x[col].astype(str))
 
-    # if y is None:
-    #     y = [None] * x.shape[0]
-    #     y = pd.Series(y)
+    if y is None:
+        y = [None] * x.shape[0]
+        y = pd.Series(y)
+    
     # unclear if this needs to be implemented in Python:
     # if y.isnull().all():
     #     y = escapes()
@@ -35,9 +38,10 @@ def make_data_file(x, y, w=None):
 
     # format the y column for special charactesrs
     y = pd.Series(escapes(y.astype(str)))
+
     # insert the y column as the first column of x
     x.insert(0, "y", y)
-
+    
     # handle weights matrix (?)
     if w is not None:
         column_names = list(x.columns) + [f"w{i}" for i in range(w.shape[1])]
