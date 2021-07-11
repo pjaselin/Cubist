@@ -35,7 +35,7 @@ jobs:
       run: |
         pip3 install --upgrade pip
         pip3 install setuptools wheel build cython
-        pip3 flake8 pytest pytest-cov
+        pip3 install flake8 pytest pytest-cov
         pip3 install .
 
     # # lint syntax errors
