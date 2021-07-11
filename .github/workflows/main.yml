@@ -107,8 +107,10 @@ jobs:
         path: dist/*.tar.gz
 
   release:
+    # release only tagged commits to pypi / github
     name: release distribution
     needs: [build_wheels, build_sdist]
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags')
     strategy:
       matrix:
         platform: [ubuntu-latest]
@@ -139,7 +141,6 @@ jobs:
 
     # github upload release asset
     - name: Upload Release Asset
-      if: ${{ env.GITHUB_REF=='refs/heads/release' }}
       uses: softprops/action-gh-release@v1
       with:
         name: latest
@@ -150,9 +151,8 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-    # publish to pypi
+    # publish only tagged commits to pypi
     - name: Publish distribution 📦 to PyPI
-      if: ${{ env.GITHUB_REF=='refs/heads/release' }}
       uses: pypa/gh-action-pypi-publish@master
       with:
         password: ${{ secrets.PYPI_API_TOKEN }}
