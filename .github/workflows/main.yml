@@ -17,11 +17,11 @@ on:
 
 jobs:
   test:
-    name: Test with tox
+    name: Test with pytest
     strategy:
       matrix:
         os: [ubuntu-latest] # [ macos-latest, windows-latest]
-        python-version: [36, 37, 38, 39]
+        python-version: [3.6, 3.7, 3.8, 3.9]
     runs-on: ${{ matrix.os }}
 
     steps:
