@@ -34,7 +34,8 @@ jobs:
     - name: Install dependencies
       run: |
         pip3 install --upgrade pip
-        pip3 install flake8 pytest setuptools wheel build cython
+        pip3 install setuptools wheel build cython
+        pip3 flake8 pytest pytest-cov
         pip3 install .
 
     # # lint syntax errors
@@ -48,7 +49,7 @@ jobs:
     # test
     - name: Test with pytest
       run: |
-        pytest
+        pytest --cov=com --cov-report=xml --cov-report=html tests/
 
   build_wheels:
     name: Build wheels on ${{ matrix.os }}  - ${{ matrix.vers }}
