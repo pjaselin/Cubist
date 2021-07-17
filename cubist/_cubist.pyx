@@ -31,8 +31,6 @@ def _predictions(casev_, namesv_, datav_, modelv_, np.ndarray[double, ndim=1, mo
     cdef char *namesv = namesv_;
     cdef char *datav = datav_;
     cdef char *modelv = modelv_;
-    # cdef double predv = predv_;
     cdef char *outputv = outputv_;
-    # cdef double[:] testslice = np.zeros(predv_);
     predictions(&casev, &namesv, &datav, &modelv, <double*> np.PyArray_DATA(predv_), &outputv);
     return (predv_, outputv)

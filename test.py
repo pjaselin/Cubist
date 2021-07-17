@@ -20,8 +20,8 @@ X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_
 model = Cubist()
 
 model.fit(X_train, y_train)
-print(X_test.iloc[0:5,:])
-model.predict(X_test.iloc[0:5,:])
+
+print(model.predict(X_test))
 
 # test = make_data_file(X, y)
 # print(test)

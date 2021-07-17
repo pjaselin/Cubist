@@ -217,7 +217,7 @@ def coef_cubist(x, var_names=None, *kwargs):
     dims = [len(c) for c in coefs]
     coms = None
     rls = None
-    print(coefs)
+    # print(coefs)
     #print(is_eqn)
     #print(x)
     return

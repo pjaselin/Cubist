@@ -189,18 +189,14 @@ class Cubist:
         # print(case_string)
 
         # fix breaking predictions when using sample parameter
-        case_model = "" if True else self.model
-        pred_vals = [0] * new_data.shape[0]
+        case_model = "" if "sample" in self.model else self.model
 
-        
         # get cubist predictions from trained model
-        pred, output = _predictions(case_string.encode(),
-                                    self.names.encode(),
-                                    self.data.encode(),
-                                    case_model.encode(),
-                                    np.zeros(new_data.shape[0]),
-                                    # new_data.shape[0],
-                                    b"1")
-        print("pred", pred)
-        print("output", output.decode())
-        return pred
+        self.pred, output = _predictions(case_string.encode(),
+                                         self.names.encode(),
+                                         self.data.encode(),
+                                         case_model.encode(),
+                                         np.zeros(new_data.shape[0]),
+                                         b"1")
+        self.pred = self.pred.tolist()
+        return self.pred
