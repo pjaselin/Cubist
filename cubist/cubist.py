@@ -192,11 +192,11 @@ class Cubist:
         case_model = "" if "sample" in self.model else self.model
 
         # get cubist predictions from trained model
-        self.pred, output = _predictions(case_string.encode(),
-                                         self.names.encode(),
-                                         self.data.encode(),
-                                         case_model.encode(),
-                                         np.zeros(new_data.shape[0]),
-                                         b"1")
-        self.pred = self.pred.tolist()
-        return self.pred
+        pred, output = _predictions(case_string.encode(),
+                                    self.names.encode(),
+                                    self.data.encode(),
+                                    case_model.encode(),
+                                    np.zeros(new_data.shape[0]),
+                                    b"1")
+        pred = pred.tolist()
+        return pred
