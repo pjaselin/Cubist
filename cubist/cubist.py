@@ -68,7 +68,7 @@ class Cubist:
 
         # initialize remaining class variables
         self.names = None
-        self.data = None
+        # self.data = None
         self.model = None
         self.output = None
         self.maxd = None
@@ -99,11 +99,11 @@ class Cubist:
 
         # create the names and data strings required for cubist
         self.names = make_names_file(x, y, w=self.weights, label=self.label, comments=True)
-        self.data = make_data_file(x, y, w=self.weights)
+        data = make_data_file(x, y, w=self.weights)
 
         # call the C implementation of cubist
         self.model, self.output = _cubist(self.names.encode(),
-                                          self.data.encode(),
+                                          data.encode(),
                                           self.unbiased,
                                           b"yes",
                                           1,
@@ -189,12 +189,11 @@ class Cubist:
         # print(case_string)
 
         # fix breaking predictions when using sample parameter
-        case_model = "" if "sample" in self.model else self.model
+        case_model = self.model[:self.model.index("sample")] + self.model[self.model.index("entries"):] if "sample" in self.model else self.model
 
         # get cubist predictions from trained model
         pred, output = _predictions(case_string.encode(),
                                     self.names.encode(),
-                                    self.data.encode(),
                                     case_model.encode(),
                                     np.zeros(new_data.shape[0]),
                                     b"1")
