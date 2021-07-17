@@ -1,8 +1,6 @@
 #define PY_SSIZE_T_CLEAN
 #include <Python.h>
-
 #include <setjmp.h>
-
 #include "redefine.h"
 #include "rulebasedmodels.h"
 #include "strbuf.h"
@@ -16,7 +14,7 @@ static void cubist(char **namesv, char **datav, int *unbiased,
                    double *sample, int *seed, int *rules, double *extrapolation,
                    char **modelv, char **outputv) {
   int val; /* Used by setjmp/longjmp for implementing rbm_exit */
-
+  
   // Announce ourselves for testing
   // printf("cubist called\n");
 
@@ -94,7 +92,13 @@ static void cubist(char **namesv, char **datav, int *unbiased,
 static void predictions(char **casev, char **namesv, char **datav,
                         char **modelv, double *predv, char **outputv) {
   int val; /* Used by setjmp/longjmp for implementing rbm_exit */
+  // printf("%f\n", predv);
+  printf("size: %d\n", sizeof(predv)/sizeof(predv[0]));
+  int loop;
 
+  // for(loop = 0; loop < 10; loop++)
+  //   printf("%f ", predv[loop]);
+  // int predv[5] = {0};
   // Announce ourselves for testing
   // Rprintf("predictions called\n");
 
