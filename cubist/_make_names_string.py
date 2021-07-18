@@ -4,8 +4,12 @@ from datetime import datetime
 from ._quinlan_attributes import quinlan_attributes
 
 
-def make_names_string(x, y, w=None, label="outcome"):
-    # clean reserved names if they're in x
+def make_names_string(x, w=None, label="outcome"):
+    """
+    Create the names string to pass to Cubist. This string contains information about Python and the time of run along
+    with the column names and their data types.
+    """
+    # clean reserved sample name if it's in x
     has_sample = [i for i, c in enumerate(x.columns) if bool(re.search('^sample', c))]
     if has_sample:
         x.columns = [re.sub('^sample', '_Sample', c) for c in x.columns]
@@ -16,10 +20,11 @@ def make_names_string(x, y, w=None, label="outcome"):
     out = f'| Generated using Python {python_version[0]}.{python_version[1]}.{python_version[2]}\n' \
           f'| on {now.strftime("%a %b %d %H:%M:%S %Y")}'
 
-    outcome_info = ": continuous."
+    # define the outcome data type
+    outcome_type = ": continuous."
 
     # build base out string
-    out = f'{out}\n{label}.\n{label}{outcome_info}'
+    out = f'{out}\n{label}.\n{label}{outcome_type}'
 
     # get dictionary of feature names as keys and data types as values
     var_data = quinlan_attributes(x)
@@ -38,6 +43,9 @@ def make_names_string(x, y, w=None, label="outcome"):
 
 
 def escapes(x, chars=None):
+    """
+    Double escape special characters in x
+    """
     if chars is None:
         chars = [':', ';', '|']
     for i in chars:

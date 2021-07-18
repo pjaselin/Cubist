@@ -1,6 +1,7 @@
 cimport numpy as np
 np.import_array()
 
+# external declarations for cubist and predictions function from the top.c file
 cdef extern from "src/top.c":
     void cubist(char **namesv, char **datav, int *unbiased,
                 char **compositev, int *neighbors, int *committees,
@@ -8,6 +9,7 @@ cdef extern from "src/top.c":
                 char **modelv, char **outputv)
     void predictions(char **casev, char **namesv, char **modelv, double *predv, char **outputv)
 
+# define the Python functions that interface with the C functions
 def _cubist(namesv_, datav_, unbiased_, compositev_, neighbors_, committees_, sample_, seed_, rules_, extrapolation_, modelv_, outputv_):
     cdef char *namesv = namesv_;
     cdef char *datav = datav_;

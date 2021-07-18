@@ -78,6 +78,7 @@ class Cubist(RegressorMixin, BaseEstimator, metaclass=ABCMeta):
         self.maxd = None
         self.variable_usage = None
         self.rule_splits = None
+        self.coefficients = None
 
     def fit(self, X, y):
         assert isinstance(y, (list, pd.Series, np.ndarray)), "Cubist requires a numeric target outcome"
@@ -96,7 +97,7 @@ class Cubist(RegressorMixin, BaseEstimator, metaclass=ABCMeta):
         y = y.reset_index(drop=True)
 
         # create the names and data strings required for cubist
-        self.names_string = make_names_string(X, y, w=self.weights, label=self.target_label)
+        self.names_string = make_names_string(X, w=self.weights, label=self.target_label)
         data_string = make_data_string(X, y, w=self.weights)
 
         # call the C implementation of cubist
@@ -151,7 +152,8 @@ class Cubist(RegressorMixin, BaseEstimator, metaclass=ABCMeta):
                 self.variable_usage = pd.concat([self.variable_usage, usage2], axis=1)
                 self.variable_usage = self.variable_usage.reset_index(drop=True)
         
-        coefs = get_cubist_coefficients(self.model, var_names=list(X.columns))
+        self.coefficients = get_cubist_coefficients(self.model, var_names=list(X.columns))
+        
 
         # print model output if using verbose output
         if self.verbose:
@@ -178,14 +180,14 @@ class Cubist(RegressorMixin, BaseEstimator, metaclass=ABCMeta):
         ## will expect a column of weights in the new data but the
         ## values will be ignored. `makeDataFile` puts those last in
         ## the data when `cubist.default` is run, so we will add a
-        ## column of NA values at the end here
+        ## column of NaN values at the end here
         if self.weights:
             X["case_weight_pred"] = np.nan
         
         # make data string for predictions
         data_string = make_data_string(X)
 
-        # clean model string to fix breaking predictions when using sample parameter
+        # clean model string to fix breaking predictions when using reserved sample name
         model = self.model[:self.model.index("sample")] + self.model[self.model.index("entries"):] if "sample" in self.model else self.model
 
         # get cubist predictions from trained model

@@ -4,38 +4,37 @@ from ._make_names_string import escapes
 from pandas.api.types import is_string_dtype, is_numeric_dtype
 
 
-def _format(x, digits=15):
+def _format(x: float, digits: int=15) -> str:
+    """
+    Python version of the R format function to return a number formatted as a string
+    """
+    # if x is NA return NA
     if pd.isna(x):
         return x
+    # get the count of whole number digits, i.e. the number of digits to the left of the decimal place
     whole_nums_count = len(str(int(x)))
-    # case where there are decimal places that need to be rounded
+    # Where there are decimal places that need to be rounded, round to digits - whole_nums_count decimal places
     if whole_nums_count < digits:
         remaining_decimals = digits - whole_nums_count
         return str(round(x, remaining_decimals))
-    # case where there are no decimals that need to/can be rounded
+    # Where there are no decimals that need to/can be rounded
     else:
         return str(x)
 
 
 def make_data_string(x, y=None, w=None):
-    # get a dictionary with keys as column names and values as whether the column is a string dtype
-    convert = {col: is_string_dtype(x[col]) for col in x}
-
-    if True in convert.values():
-        for col, value in convert.items():
-            if value:
-                x[col] = escapes(x[col].astype(str))
+    """
+    Converts input dataset array X into a string.
+    """
+    # apply the escapes function to all string columns
+    for col in x:
+        if is_string_dtype(x[col]):
+            x[col] = escapes(x[col].astype(str))
 
     # if y is None for model predictions, set y as a column of NaN values, which will become ?'s later
     if y is None:
         y = [np.nan] * x.shape[0]
         y = pd.Series(y)
-    
-    # unclear if this needs to be implemented in Python:
-    # if y.isnull().all():
-    #     y = escapes()
-    # if (is.null(y))
-    #     y < - rep(NA_real_, nrow(x))
 
     # format the y column for special charactesrs
     y = pd.Series(escapes(y.astype(str)))
@@ -43,7 +42,7 @@ def make_data_string(x, y=None, w=None):
     # insert the y column as the first column of x
     x.insert(0, "y", y)
     
-    # handle weights matrix (?)
+    # handle weights matrix (?) TODO: validate
     if w is not None:
         column_names = list(x.columns) + [f"w{i}" for i in range(w.shape[1])]
         x = pd.concat([x, w], axis=1, ignore_index=True)
@@ -66,9 +65,11 @@ def make_data_string(x, y=None, w=None):
 
     # convert dataframe to list of lists
     x = x.to_numpy().tolist()
-    # join each row as comma separated entries
+
+    # merge each sublist into single strings with entries separated by commas
     x = [','.join(row) for row in x]
-    # join all rows separated by \n
+
+    # join all row strings into a single string separated by \n's
     x = "\n".join(x)
     return x
 

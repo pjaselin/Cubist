@@ -25,10 +25,9 @@ def split_to_groups(x, f):
 def get_rule_splits(x):
     # split on newline
     x = x.split("\n")
-    x = [c for c in x if c != '']
 
     # remove empty strings
-    x = [c for c in x if c.strip()]
+    x = [c for c in x if c.strip() or c != '']
 
     # define initial lists and index variables
     com_num = [None] * len(x)
@@ -183,7 +182,10 @@ def parser(x):
 
 def get_cubist_coefficients(x, var_names=None, *kwargs):
     x = x.split("\n")
-    x = [c for c in x if c != '']
+    
+    # remove empty strings
+    x = [c for c in x if c.strip() or c != '']
+
     com_num = [None] * len(x)
     rule_num = [None] * len(x)
     cond_num = [None] * len(x)
