@@ -45,7 +45,8 @@ class Cubist(RegressorMixin, BaseEstimator, metaclass=ABCMeta):
                  sample: float = 0.0,
                  seed: int = randint(0, 4095),  # TODO fix this since its different from R
                  target_label: str = "outcome",
-                 weights=None):
+                 weights=None,
+                 verbose: bool=True):
         super().__init__()
 
         assert n_committees > 1 or n_committees < 100, "number of committees must be between 1 and 100"
@@ -68,6 +69,8 @@ class Cubist(RegressorMixin, BaseEstimator, metaclass=ABCMeta):
 
         assert weights is None or isinstance(weights, (list, np.ndarray)), "case weights must be numeric"
         self.weights = weights
+
+        self.verbose = verbose
 
         # initialize remaining class variables
         self.names_string = None
@@ -148,8 +151,11 @@ class Cubist(RegressorMixin, BaseEstimator, metaclass=ABCMeta):
                 self.variable_usage = pd.concat([self.variable_usage, usage2], axis=1)
                 self.variable_usage = self.variable_usage.reset_index(drop=True)
         
-        # TODO: consider capturing function call as in the R scripts
         coefs = get_cubist_coefficients(self.model, var_names=list(X.columns))
+
+        # print model output if using verbose output
+        if self.verbose:
+            print(output)
 
 
     def predict(self, X, neighbors=0):
@@ -180,12 +186,12 @@ class Cubist(RegressorMixin, BaseEstimator, metaclass=ABCMeta):
         data_string = make_data_string(X)
 
         # clean model string to fix breaking predictions when using sample parameter
-        case_model = self.model[:self.model.index("sample")] + self.model[self.model.index("entries"):] if "sample" in self.model else self.model
+        model = self.model[:self.model.index("sample")] + self.model[self.model.index("entries"):] if "sample" in self.model else self.model
 
         # get cubist predictions from trained model
         pred, output = _predictions(data_string.encode(),
                                     self.names_string.encode(),
-                                    case_model.encode(),
+                                    model.encode(),
                                     np.zeros(X.shape[0]),
                                     b"1")
         pred = pred.tolist()
