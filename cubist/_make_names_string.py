@@ -4,20 +4,17 @@ from datetime import datetime
 from ._quinlan_attributes import quinlan_attributes
 
 
-def make_names_file(x, y, w=None, label="outcome", comments=True):
+def make_names_string(x, y, w=None, label="outcome"):
     # clean reserved names if they're in x
     has_sample = [i for i, c in enumerate(x.columns) if bool(re.search('^sample', c))]
     if has_sample:
         x.columns = [re.sub('^sample', '_Sample', c) for c in x.columns]
 
     # generate the comments string showing the Python version and current timestamps
-    if comments:
-        python_version = tuple(sys.version_info)
-        now = datetime.now()
-        out = f'| Generated using Python {python_version[0]}.{python_version[1]}.{python_version[2]}\n' \
-              f'| on {now.strftime("%a %b %d %H:%M:%S %Y")}'
-    else:
-        out = ""
+    python_version = tuple(sys.version_info)
+    now = datetime.now()
+    out = f'| Generated using Python {python_version[0]}.{python_version[1]}.{python_version[2]}\n' \
+          f'| on {now.strftime("%a %b %d %H:%M:%S %Y")}'
 
     outcome_info = ": continuous."
 

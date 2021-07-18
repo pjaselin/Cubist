@@ -1,6 +1,6 @@
 import pandas as pd
 import numpy as np
-from ._make_names_file import escapes
+from ._make_names_string import escapes
 from pandas.api.types import is_string_dtype, is_numeric_dtype
 
 
@@ -17,7 +17,7 @@ def _format(x, digits=15):
         return str(x)
 
 
-def make_data_file(x, y, w=None):
+def make_data_string(x, y=None, w=None):
     # get a dictionary with keys as column names and values as whether the column is a string dtype
     convert = {col: is_string_dtype(x[col]) for col in x}
 

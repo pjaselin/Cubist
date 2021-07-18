@@ -1,7 +1,7 @@
 import pandas as pd
 
 
-def var_usage(x):
+def get_variable_usage(x):
     x = x.split("\n")
     start_vars = [i for i, c in enumerate(x) if '\tAttribute usage' in c]
     if len(start_vars) != 1:
@@ -14,7 +14,7 @@ def var_usage(x):
     x = [x[i] for i in has_pct]
     values = [get_values(c) for c in x]
     values = pd.DataFrame(values, columns=["Conditions", "Model"])
-    values["Variable"] = [get_var(c) for c in x]
+    values["Variable"] = [get_variable(c) for c in x]
     return values
 
 
@@ -40,6 +40,6 @@ def get_values(x):
             return 0
 
 
-def get_var(x):
+def get_variable(x):
     x = x.split(" ")
     return x[-1]

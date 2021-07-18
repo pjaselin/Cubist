@@ -2,7 +2,7 @@ import pandas as pd
 from sklearn.datasets import load_boston, load_diabetes, load_linnerud
 from sklearn.model_selection import train_test_split
 from cubist import Cubist
-from cubist._make_data_file import make_data_file
+from cubist._make_data_string import make_data_string
 iris = pd.read_csv('https://raw.githubusercontent.com/mwaskom/seaborn-data/master/iris.csv')
 
 titanic = pd.read_csv("sample_data/titanic.csv")

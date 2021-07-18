@@ -22,7 +22,7 @@ def split_to_groups(x, f):
             groups[b] = [a]
     return groups
 
-def get_splits(x):
+def get_rule_splits(x):
     # split on newline
     x = x.split("\n")
     x = [c for c in x if c != '']
@@ -175,15 +175,13 @@ def make_parsed_dict(y):
     y = y.split("=")
     if len(y) > 1:
         return {y[0]: y[1]}
-    # else:
-    #     return y
 
 def parser(x):
     x = x.split(" ")
     x = [make_parsed_dict(c) for c in x]
     return x
 
-def coef_cubist(x, var_names=None, *kwargs):
+def get_cubist_coefficients(x, var_names=None, *kwargs):
     x = x.split("\n")
     x = [c for c in x if c != '']
     com_num = [None] * len(x)
@@ -221,3 +219,12 @@ def coef_cubist(x, var_names=None, *kwargs):
     #print(is_eqn)
     #print(x)
     return
+
+
+def get_maxd_value(model):
+    tmp = model.split("\n")
+    tmp = [c for c in tmp if "maxd" in c][0]
+    tmp = tmp.split("\"")
+    maxd_i = [i for i, c in enumerate(tmp) if "maxd" in c][0]
+    maxd = tmp[maxd_i + 1]
+    return maxd
