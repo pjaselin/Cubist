@@ -35,7 +35,7 @@ jobs:
       run: |
         pip3 install --upgrade pip
         pip3 install setuptools wheel build cython
-        pip3 install flake8 pytest pytest-cov numpy
+        pip3 install flake8 pytest pytest-cov
         pip3 install .
 
     # # lint syntax errors
@@ -108,7 +108,7 @@ jobs:
 
     - name: Build sdist
       run: |
-        python -m pip install setuptools wheel build cython
+        python -m pip install setuptools wheel build cython numpy
         python setup.py sdist
 
     - uses: actions/upload-artifact@v2
