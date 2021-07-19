@@ -14,7 +14,7 @@ from abc import ABCMeta
 
 class Cubist(RegressorMixin, BaseEstimator, metaclass=ABCMeta):
     """
-    Cubist Regression Model
+    Cubist Regression Model (v2.07)
 
     Parameters
     ----------
@@ -33,8 +33,13 @@ class Cubist(RegressorMixin, BaseEstimator, metaclass=ABCMeta):
     Examples
     --------
     >>> from cubist import Cubist
-    >>> from sklearn.datasets import 
+    >>> from sklearn.datasets import load_boston
     >>> from sklearn.model_selection import train_test_split
+    >>> X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+    >>> model = Cubist()
+    >>> model.fit(X_train, y_train)
+    >>> model.predict(X_test)
+    >>> model.score(X_test, y_test)
 
     """
     def __init__(self,
@@ -46,7 +51,7 @@ class Cubist(RegressorMixin, BaseEstimator, metaclass=ABCMeta):
                  seed: int = randint(0, 4095),  # TODO fix this since its different from R
                  target_label: str = "outcome",
                  weights=None,
-                 verbose: bool=True):
+                 verbose: bool=False):
         super().__init__()
 
         assert n_committees > 1 or n_committees < 100, "number of committees must be between 1 and 100"
@@ -196,6 +201,5 @@ class Cubist(RegressorMixin, BaseEstimator, metaclass=ABCMeta):
                                     model.encode(),
                                     np.zeros(X.shape[0]),
                                     b"1")
-        pred = pred.tolist()
         # TODO: parse and handle errors in output
         return pred

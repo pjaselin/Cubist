@@ -5,12 +5,9 @@ def count_rules(x):
     return
 
 def split_to_groups(x, f):
-    """Function to convert two lists into a dictionary where the keys are unique values in f and 
+    """
+    Function to convert two lists into a dictionary where the keys are unique values in f and 
     the values are lists of the corresponding values in x. Analagous to the split function in R.
-
-    :param x: Input list
-    :param f: Input list
-    :return: Formatting information about the Series
     """
     if len(x) != len(f):
         raise ValueError("lists x and f must be of the same length")
@@ -27,7 +24,7 @@ def get_rule_splits(x):
     x = x.split("\n")
 
     # remove empty strings
-    x = [c for c in x if c.strip() or c != '']
+    x = [c for c in x if c.strip() != '']
 
     # define initial lists and index variables
     com_num = [None] * len(x)
@@ -59,7 +56,9 @@ def get_rule_splits(x):
     # get the number of committees
     num_com = len([c for c in x if re.search("^rules=", c)])
     
+    # 
     rules_per_com = split_to_groups(rule_num, com_num)
+
     rules_per_com = {a: max(rules_per_com[a]) for a in rules_per_com}
     rules_per_com = {a: rules_per_com[a] for a in rules_per_com if rules_per_com[a] > 0}
     if rules_per_com and num_com > 0:
@@ -184,7 +183,7 @@ def get_cubist_coefficients(x, var_names=None, *kwargs):
     x = x.split("\n")
     
     # remove empty strings
-    x = [c for c in x if c.strip() or c != '']
+    x = [c for c in x if c.strip() != '']
 
     com_num = [None] * len(x)
     rule_num = [None] * len(x)
