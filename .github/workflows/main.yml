@@ -17,11 +17,11 @@ on:
 
 jobs:
   test:
-    name: Test with tox
+    name: Test with pytest
     strategy:
       matrix:
         os: [ubuntu-latest] # [ macos-latest, windows-latest]
-        python-version: [36, 37, 38, 39]
+        python-version: [3.6, 3.7, 3.8, 3.9]
     runs-on: ${{ matrix.os }}
 
     steps:
@@ -34,13 +34,22 @@ jobs:
     - name: Install dependencies
       run: |
         pip3 install --upgrade pip
-        pip3 install tox tox-gh-actions
+        pip3 install setuptools wheel build cython
+        pip3 install flake8 pytest pytest-cov numpy
+        pip3 install .
 
-    - name: Test with tox
+    # # lint syntax errors
+    # - name: Lint with flake8
+    #   run: |
+    #     # stop the build if there are Python syntax errors or undefined names
+    #     flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+    #     # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
+    #     flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+
+    # test
+    - name: Test with pytest
       run: |
-        tox -e py${{ matrix.python-version }}-${{ matrix.os  }}
-      env:
-        PLATFORM: ${{ matrix.os  }}
+        pytest --cov=com --cov-report=xml --cov-report=html tests/
 
   build_wheels:
     name: Build wheels on ${{ matrix.os }}  - ${{ matrix.vers }}
@@ -107,8 +116,10 @@ jobs:
         path: dist/*.tar.gz
 
   release:
+    # release only tagged commits to pypi / github
     name: release distribution
     needs: [build_wheels, build_sdist]
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags')
     strategy:
       matrix:
         platform: [ubuntu-latest]
@@ -139,7 +150,6 @@ jobs:
 
     # github upload release asset
     - name: Upload Release Asset
-      if: ${{ env.GITHUB_REF=='refs/heads/release' }}
       uses: softprops/action-gh-release@v1
       with:
         name: latest
@@ -150,9 +160,8 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-    # publish to pypi
+    # publish only tagged commits to pypi
     - name: Publish distribution 📦 to PyPI
-      if: ${{ env.GITHUB_REF=='refs/heads/release' }}
       uses: pypa/gh-action-pypi-publish@master
       with:
         password: ${{ secrets.PYPI_API_TOKEN }}

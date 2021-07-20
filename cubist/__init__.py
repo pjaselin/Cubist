@@ -1,5 +1,7 @@
 from .cubist import Cubist
+from .version import __version__
 
 __all__ = [
-    Cubist
+    Cubist,
+    __version__
 ]
