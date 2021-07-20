@@ -9,10 +9,9 @@ import re
 from ._parse_cubist_model import get_rule_splits, get_percentiles, get_cubist_coefficients, get_maxd_value
 from ._variable_usage import get_variable_usage
 from sklearn.base import RegressorMixin, BaseEstimator
-from abc import ABCMeta
 
 
-class Cubist(RegressorMixin, BaseEstimator, metaclass=ABCMeta):
+class Cubist(RegressorMixin, BaseEstimator):
     """
     Cubist Regression Model (v2.07)
 
