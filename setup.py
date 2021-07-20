@@ -1,12 +1,13 @@
 from setuptools import setup, Extension
 from Cython.Build import cythonize
 import glob
+import numpy as np
 
 exts = [
     Extension(
         name='_cubist',
         sources=["cubist/_cubist.pyx"] + glob.glob("cubist/src/*.c"),
-        include_dirs=["cubist/src"]
+        include_dirs=["cubist/src", np.get_include()]
     )
 ]
 
