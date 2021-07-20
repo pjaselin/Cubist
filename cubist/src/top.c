@@ -1,6 +1,8 @@
 #define PY_SSIZE_T_CLEAN
 #include <Python.h>
+
 #include <setjmp.h>
+
 #include "redefine.h"
 #include "rulebasedmodels.h"
 #include "strbuf.h"
@@ -14,7 +16,7 @@ static void cubist(char **namesv, char **datav, int *unbiased,
                    double *sample, int *seed, int *rules, double *extrapolation,
                    char **modelv, char **outputv) {
   int val; /* Used by setjmp/longjmp for implementing rbm_exit */
-  
+
   // Announce ourselves for testing
   // printf("cubist called\n");
 
@@ -89,7 +91,7 @@ static void cubist(char **namesv, char **datav, int *unbiased,
   initglobals();
 }
 
-static void predictions(char **casev, char **namesv, //// char **datav,
+static void predictions(char **casev, char **namesv, char **datav,
                         char **modelv, double *predv, char **outputv) {
   int val; /* Used by setjmp/longjmp for implementing rbm_exit */
 
@@ -112,9 +114,9 @@ static void predictions(char **casev, char **namesv, //// char **datav,
   STRBUF *sb_names = strbuf_create_full(*namesv, strlen(*namesv));
   rbm_register(sb_names, "undefined.names", 1);
 
-  // STRBUF *sb_datav = strbuf_create_full(*datav, strlen(*datav));
-  // /* XXX why is sb_datav copied? */
-  // rbm_register(strbuf_copy(sb_datav), "undefined.data", 1);
+  STRBUF *sb_datav = strbuf_create_full(*datav, strlen(*datav));
+  /* XXX why is sb_datav copied? */
+  rbm_register(strbuf_copy(sb_datav), "undefined.data", 1);
 
   STRBUF *sb_modelv = strbuf_create_full(*modelv, strlen(*modelv));
   /* XXX should sb_modelv be copied? */
