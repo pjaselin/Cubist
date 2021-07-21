@@ -9,11 +9,14 @@ on:
         default: 'warning'
   push:
     branches:
-    - master
-    - main
-    - release
-    - test
-    - dev
+      - master
+      - main
+      - release
+      - test
+      - dev
+  release:
+    types:
+      - created
 
 jobs:
   test:
