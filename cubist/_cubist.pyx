@@ -1,12 +1,15 @@
+cimport numpy as np
+np.import_array()
 
+# external declarations for cubist and predictions function from the top.c file
 cdef extern from "src/top.c":
     void cubist(char **namesv, char **datav, int *unbiased,
                 char **compositev, int *neighbors, int *committees,
                 double *sample, int *seed, int *rules, double *extrapolation,
                 char **modelv, char **outputv)
-    void predictions(char **casev, char **namesv, char **datav,
-                     char **modelv, double *predv, char **outputv)
+    void predictions(char **casev, char **namesv, char **modelv, double *predv, char **outputv)
 
+# define the Python functions that interface with the C functions
 def _cubist(namesv_, datav_, unbiased_, compositev_, neighbors_, committees_, sample_, seed_, rules_, extrapolation_, modelv_, outputv_):
     cdef char *namesv = namesv_;
     cdef char *datav = datav_;
@@ -24,12 +27,10 @@ def _cubist(namesv_, datav_, unbiased_, compositev_, neighbors_, committees_, sa
     return (modelv, outputv)
 
 
-def _predictions(casev_, namesv_, datav_, modelv_, predv_, outputv_):
-     cdef char *casev = casev_;
-     cdef char *namesv = namesv_;
-     cdef char *datav = datav_;
-     cdef char *modelv = modelv_;
-     cdef double predv = predv_;
-     cdef char *outputv = outputv_;
-     predictions(&casev, &namesv, &datav, &modelv, &predv, &outputv);
-     return(predv, outputv)
+def _predictions(casev_, namesv_, modelv_, np.ndarray[double, ndim=1, mode="c"] predv_, outputv_):
+    cdef char *casev = casev_;
+    cdef char *namesv = namesv_;
+    cdef char *modelv = modelv_;
+    cdef char *outputv = outputv_;
+    predictions(&casev, &namesv, &modelv, <double*> np.PyArray_DATA(predv_), &outputv);
+    return (predv_, outputv)
