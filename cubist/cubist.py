@@ -142,12 +142,8 @@ class Cubist(RegressorMixin, BaseEstimator):
         if not isinstance(y, pd.Series):
             y = pd.Series(y)
 
-        assert isinstance(X, (pd.DataFrame, np.ndarray)), "X must be a Numpy Array or Pandas DataFrame"
-        if isinstance(X, np.ndarray):
-            assert len(X.shape) == 2, "Input NumPy array has more than two dimensions, only a two dimensional matrix " \
-                                      "may be passed."
-            warnings.warn("Input data is a NumPy Array, setting column names to default `var0, var1,...`.")
-            X = pd.DataFrame(X, columns=[f'var{i}' for i in range(X.shape[1])])
+        # validate input data
+        X = self._validate_x(X)
 
         # for safety ensure the indices are reset
         X = X.reset_index(drop=True)
@@ -179,50 +175,30 @@ class Cubist(RegressorMixin, BaseEstimator):
         if "\n__Sample" in self.names_string:
             output = output.replace("__Sample", "sample")
             self.model = self.model.replace("__Sample", "sample")
-        
-        # get a dataframe containing the rule splits
-        self.rule_splits = get_rule_splits(self.model)
+            # clean model string to fix breaking predictions when using reserved sample name
+            self.model = self.model[:self.model.index("sample")] + self.model[self.model.index("entries"):]
 
-        # get the rule by rule percentiles (?)
-        if self.rule_splits is not None:
-            nrows = X.shape[0]
-            for i in range(self.rule_splits.shape[0]):
-                x_col = pd.to_numeric(X[self.rule_splits.loc[i, "variable"]])
-                var = self.rule_splits.loc[i, "value"]
-                self.rule_splits.loc[i, "percentile"] = get_percentiles(x_col, var, nrows)
+        # get a dataframe containing the rule splits
+        self.rule_splits = get_rule_splits(self.model, X)
         
         # extract the maxd value and remove the preceding text from the model string
         maxd = get_maxd_value(self.model)
         self.model = self.model.replace(f'insts=\"1\" nn=\"1\" maxd=\"{maxd}\"', 'insts=\"0\"')
         self.maxd = float(maxd)
 
-        self.variable_usage = get_variable_usage(output)
-        if self.variable_usage is None or self.variable_usage.shape[0] < X.shape[1]:
-            x_names = set(X.columns)
-            u_names = set(self.variable_usage["Variable"]) if self.variable_usage is not None else set()
-            missing_vars = list(x_names - u_names)
-            if missing_vars:
-                zero_list = [0] * len(missing_vars)
-                usage2 = pd.DataFrame({"Conditions": zero_list,
-                                       "Model": zero_list,
-                                       "Variable": missing_vars})
-                self.variable_usage = pd.concat([self.variable_usage, usage2], axis=1)
-                self.variable_usage = self.variable_usage.reset_index(drop=True)
+        # get the input data variable usage
+        self.variable_usage = get_variable_usage(output, X)
         
+        # get the model coefficients
         self.coefficients = get_cubist_coefficients(self.model, var_names=list(X.columns))
         
-
         # print model output if using verbose output
         if self.verbose:
             print(output)
 
     def predict(self, X):
-        assert isinstance(X, (pd.DataFrame, np.ndarray)), "X must be a Numpy Array or Pandas DataFrame"
-        if isinstance(X, np.ndarray):
-            assert len(X.shape) == 2, "Input NumPy array has more than two dimensions, only a two dimensional matrix " \
-                                      "may be passed."
-            warnings.warn("Input data is a NumPy Array, setting column names to default `var0, var1,...`.")
-            X = pd.DataFrame(X, columns=[f'var{i}' for i in range(X.shape[1])])
+        # validate input data
+        X = self._validate_x(X)
         
         # for safety ensure indices are reset
         X = X.reset_index(drop=True)
@@ -241,14 +217,20 @@ class Cubist(RegressorMixin, BaseEstimator):
         # make data string for predictions
         data_string = make_data_string(X)
 
-        # clean model string to fix breaking predictions when using reserved sample name
-        model = self.model[:self.model.index("sample")] + self.model[self.model.index("entries"):] if "sample" in self.model else self.model
-
         # get cubist predictions from trained model
         pred, output = _predictions(data_string.encode(),
                                     self.names_string.encode(),
-                                    model.encode(),
+                                    self.model.encode(),
                                     np.zeros(X.shape[0]),
                                     b"1")
         # TODO: parse and handle errors in output
         return pred
+
+    def _validate_x(x):
+        assert isinstance(x, (pd.DataFrame, np.ndarray)), "X must be a Numpy Array or Pandas DataFrame"
+        if isinstance(x, np.ndarray):
+            assert len(x.shape) == 2, "Input NumPy array has more than two dimensions, only a two dimensional matrix " \
+                                      "may be passed."
+            warnings.warn("Input data is a NumPy Array, setting column names to default `var0, var1,...`.")
+            x = pd.DataFrame(x, columns=[f'var{i}' for i in range(x.shape[1])])
+        return x
