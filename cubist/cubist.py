@@ -5,7 +5,6 @@ import warnings
 from ._make_names_string import make_names_string
 from ._make_data_string import make_data_string
 from _cubist import _cubist, _predictions
-import re
 from ._parse_cubist_model import get_rule_splits, get_percentiles, get_cubist_coefficients, get_maxd_value
 from ._variable_usage import get_variable_usage
 from sklearn.base import RegressorMixin, BaseEstimator
@@ -50,39 +49,93 @@ class Cubist(RegressorMixin, BaseEstimator):
                  seed: int = randint(0, 4095),  # TODO fix this since its different from R
                  target_label: str = "outcome",
                  weights=None,
-                 verbose: bool=False):
+                 verbose: bool=False,
+                 neighbors: int = 0):
         super().__init__()
 
-        assert n_committees > 1 or n_committees < 100, "number of committees must be between 1 and 100"
+        # initialize instance variables
         self.n_committees = n_committees
-
         self.unbiased = unbiased
-
-        assert n_rules is not None and (n_rules > 1 or n_rules < 1000000), "number of rules must be between 1 and 1000000"
         self.n_rules = n_rules
-
-        assert extrapolation >= 0.0 and extrapolation <= 1.0, "extrapolation percentage must be between 0.0 and 1.0"
         self.extrapolation = extrapolation
-
-        assert sample >= 0.0 and sample <= 1.0, "sampling percentage must be between 0.0 and 1.0"
         self.sample = sample
-
-        self.seed = seed % 4095
-
+        self.seed = seed
         self.target_label = target_label
-
-        assert weights is None or isinstance(weights, (list, np.ndarray)), "case weights must be numeric"
         self.weights = weights
-
         self.verbose = verbose
+        self.neighbors = neighbors
 
-        # initialize remaining class variables
+        # initialize remaining instance variables
         self.names_string = None
         self.model = None
         self.maxd = None
         self.variable_usage = None
         self.rule_splits = None
         self.coefficients = None
+    
+    @property
+    def n_committees(self):
+        return self._n_committees
+    
+    @n_committees.setter
+    def n_committees(self, value):
+        assert value > 1 or value < 100, "number of committees must be between 1 and 100"
+        self._n_committees = value
+
+    @property
+    def n_rules(self):
+        return self._n_rules
+    
+    @n_rules.setter
+    def n_rules(self, value):
+        assert value is not None and (value > 1 or value < 1000000), "number of rules must be between 1 and 1000000"
+        self._n_rules = value
+
+    @property
+    def extrapolation(self):
+        return self._extrapolation
+    
+    @extrapolation.setter
+    def extrapolation(self, value):
+        assert value >= 0.0 and value <= 1.0, "extrapolation percentage must be between 0.0 and 1.0"
+        self._extrapolation = value
+    
+    @property
+    def sample(self):
+        return self._sample
+    
+    @sample.setter
+    def sample(self, value):
+        assert value >= 0.0 and value <= 1.0, "sampling percentage must be between 0.0 and 1.0"
+        self._sample = value
+    
+    @property
+    def seed(self):
+        return self._seed
+    
+    @seed.setter
+    def seed(self, value):
+        self._seed = value % 4095
+    
+    @property
+    def weights(self):
+        return self._weights
+    
+    @weights.setter
+    def weights(self, value):
+        assert value is None or isinstance(value, (list, np.ndarray)), "case weights must be numeric"
+        self._weights = value
+    
+    @property
+    def neighbors(self):
+        return self._neighbors
+    
+    @neighbors.setter
+    def neighbors(self, value):
+        assert isinstance(value, int), "Only an integer value for neighbors is allowed"
+        assert value <= 10 and value >=0, "'neighbors' must be 0 or greater and 10 or less"
+        self._neighbors = value
+
 
     def fit(self, X, y):
         assert isinstance(y, (list, pd.Series, np.ndarray)), "Cubist requires a numeric target outcome"
@@ -163,8 +216,7 @@ class Cubist(RegressorMixin, BaseEstimator):
         if self.verbose:
             print(output)
 
-
-    def predict(self, X, neighbors=0):
+    def predict(self, X):
         assert isinstance(X, (pd.DataFrame, np.ndarray)), "X must be a Numpy Array or Pandas DataFrame"
         if isinstance(X, np.ndarray):
             assert len(X.shape) == 2, "Input NumPy array has more than two dimensions, only a two dimensional matrix " \
@@ -174,11 +226,9 @@ class Cubist(RegressorMixin, BaseEstimator):
         
         # for safety ensure indices are reset
         X = X.reset_index(drop=True)
-
-        assert isinstance(neighbors, int), "Only an integer value for neighbors is allowed"
-        assert neighbors <= 10 and neighbors >=0, "'neighbors' must be 0 or greater and 10 or less"
-        if neighbors > 0:
-            self.model = self.model.replace("insts=\"0\"",  f"insts=\"1\" nn=\"{neighbors}\" maxd=\"{self.maxd}\"")
+        
+        if self.neighbors > 0:
+            self.model = self.model.replace("insts=\"0\"",  f"insts=\"1\" nn=\"{self.neighbors}\" maxd=\"{self.maxd}\"")
         
         ## If there are case weights used during training, the C code
         ## will expect a column of weights in the new data but the

@@ -1,6 +1,6 @@
 # Cubist
 
-A Python package for fitting Ross Quinlan's [Cubist](https://www.rulequest.com/cubist-unix.html) regression model. Inspired by and based on the [R wrapper](https://github.com/topepo/Cubist) for Cubist. Designed after and inherits from the [scikit-learn](https://scikit-learn.org/stable/) framework.
+A Python package for fitting Ross Quinlan's [Cubist](https://www.rulequest.com/cubist-unix.html) v2.07 regression model. Inspired by and based on the [R wrapper](https://github.com/topepo/Cubist) for Cubist. Designed after and inherits from the [scikit-learn](https://scikit-learn.org/stable/) framework.
 
 ## Background
 Cubist is a novel regression algorithm develped by Ross Quinlan...

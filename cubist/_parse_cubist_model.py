@@ -1,6 +1,11 @@
 import re
 import pandas as pd
 
+
+class CubistModel:
+    def __init__(self) -> None:
+        pass
+
 def count_rules(x):
     return
 
