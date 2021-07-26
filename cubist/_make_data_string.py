@@ -2,7 +2,16 @@ import pandas as pd
 import numpy as np
 from ._make_names_string import escapes
 from pandas.api.types import is_string_dtype, is_numeric_dtype
+import warnings
 
+def validate_x(x):
+    assert isinstance(x, (pd.DataFrame, np.ndarray)), "X must be a Numpy Array or Pandas DataFrame"
+    if isinstance(x, np.ndarray):
+        assert len(x.shape) == 2, "Input NumPy array has more than two dimensions, only a two dimensional matrix " \
+                                  "may be passed."
+        warnings.warn("Input data is a NumPy Array, setting column names to default `var0, var1,...`.")
+        x = pd.DataFrame(x, columns=[f'var{i}' for i in range(x.shape[1])])
+    return x
 
 def _format(x: float, digits: int=15) -> str:
     """

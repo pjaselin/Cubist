@@ -1,5 +1,6 @@
 import re
 import pandas as pd
+import numpy as np
 
 def count_rules(x):
     return
@@ -22,10 +23,9 @@ def split_to_groups(x, f):
 def get_rule_splits(model, X):
     # split on newline
     model = model.split("\n")
-    model_len = len(model)
-
     # remove empty strings
     model = [c for c in model if c.strip() != '']
+    model_len = len(model)
 
     # define initial lists and index variables
     com_num = [None] * model_len
@@ -57,7 +57,7 @@ def get_rule_splits(model, X):
     # get the number of committees
     num_com = len([c for c in model if re.search("^rules=", c)])
     
-    # 
+    # apply the analogous R split function to get a dict
     rules_per_com = split_to_groups(rule_num, com_num)
 
     rules_per_com = {a: max(rules_per_com[a]) for a in rules_per_com}
@@ -105,7 +105,7 @@ def get_rule_splits(model, X):
     })
     split_data = split_data.dropna(subset=['variable'])
     split_data = split_data.reset_index(drop=True)
-    
+
     # get the rule by rule percentiles (?)
     nrows = X.shape[0]
     for i in range(split_data.shape[0]):
@@ -136,7 +136,6 @@ def type2(x, dig=3):
         val = None
         rslt = "="
     else:
-        # print(x)
         var = x[a_ind+4:c_ind-1]
         val = x[c_ind+4:r_ind-1]
         val = round(float(val), dig)
@@ -153,8 +152,8 @@ def get_percentiles(x_col, value, nrows):
 def eqn(x, var_names=None):
     x = x.replace("\"", "")
     starts = [m.start(0) for m in re.finditer("(coeff=)|(att=)", x)]
-    p = int((len(starts) - 1)/2)
-    vars = [""] * p
+    # p = int((len(starts) - 1)/2)
+    # vars = [""] * p
     tmp = [""] * len(starts)
     for i in range(len(starts)):
         if i < len(starts) - 1:
@@ -170,36 +169,36 @@ def eqn(x, var_names=None):
     vals = {nm: val for nm, val in zip(nms, vals)}
     if var_names:
         vars2 = [var for var in var_names if var not in nms]
-        vals2 = [None] * len(vars2)
+        vals2 = [np.nan] * len(vars2)
         vals2 = {nm: val for nm, val in zip(vars2, vals2)}
         vals = {**vals, **vals2}
         new_names = ["(Intercept)"] + var_names
         vals = {nm: vals[nm] for nm in new_names}
     return vals
 
-def make_parsed_dict(y):
-    y = y.split("=")
-    if len(y) > 1:
-        return {y[0]: y[1]}
+def make_parsed_dict(x):
+    x = x.split("=")
+    if len(x) > 1:
+        return {x[0]: x[1]}
 
 def parser(x):
     x = x.split(" ")
     x = [make_parsed_dict(c) for c in x]
     return x
 
-def get_cubist_coefficients(x, var_names=None, *kwargs):
-    x = x.split("\n")
-    
+def get_cubist_coefficients(model, var_names=None, *kwargs):
+    model = model.split("\n")
     # remove empty strings
-    x = [c for c in x if c.strip() != '']
+    model = [c for c in model if c.strip() != '']
+    model_len = len(model)
 
-    com_num = [None] * len(x)
-    rule_num = [None] * len(x)
-    cond_num = [None] * len(x)
+    com_num = [None] * model_len
+    rule_num = [None] * model_len
+    cond_num = [None] * model_len
     com_idx, r_idx = 0, 0
-    for i in range(len(x)):
-         # break each row of x into dicts for each key/value pair
-        tt = parser(x[i])
+    for i in range(model_len):
+         # break each row of model into dicts for each key/value pair
+        tt = parser(model[i])
         # get the first key in the first entry of tt
         first_key = list(tt[0].keys())[0]
         # start of a new rule
@@ -217,17 +216,14 @@ def get_cubist_coefficients(x, var_names=None, *kwargs):
         if first_key == "type":
             c_idx += 1
             cond_num[i] = c_idx
-    is_eqn = [i for i, c in enumerate(x) if "coeff=" in c]
-    # coefs = eqn([x[i] for i in is_eqn], dig=0, text=False, var_names=var_names)
-    coefs = [eqn(x[i], var_names=var_names) for i in is_eqn]
-    p = len(coefs)
-    dims = [len(c) for c in coefs]
-    coms = None
-    rls = None
-    # print(coefs)
-    #print(is_eqn)
-    #print(x)
-    return
+    is_eqn = [i for i, c in enumerate(model) if "coeff=" in c]
+    coefs = [eqn(model[i], var_names=var_names) for i in is_eqn]
+    committee = [com_num[i] for i in is_eqn]
+    rules = [rule_num[i] for i in is_eqn]
+    out = pd.DataFrame(coefs)
+    out["committee"] = committee
+    out["rule"] = rules
+    return out
 
 
 def get_maxd_value(model):

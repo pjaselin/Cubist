@@ -1,11 +1,10 @@
 from random import randint
 import numpy as np
 import pandas as pd
-import warnings
 from ._make_names_string import make_names_string
-from ._make_data_string import make_data_string
+from ._make_data_string import make_data_string, validate_x
 from _cubist import _cubist, _predictions
-from ._parse_cubist_model import get_rule_splits, get_percentiles, get_cubist_coefficients, get_maxd_value
+from ._parse_cubist_model import get_rule_splits, get_cubist_coefficients, get_maxd_value
 from ._variable_usage import get_variable_usage
 from sklearn.base import RegressorMixin, BaseEstimator
 
@@ -24,15 +23,24 @@ class Cubist(RegressorMixin, BaseEstimator):
     seed
     target_label
     weights
+    neighbors
+    verbose
 
     Attributes
     ----------
+    names_string
+    model
+    maxd
+    variable_usage
+    rule_splits
+    coefficients
 
     Examples
     --------
     >>> from cubist import Cubist
     >>> from sklearn.datasets import load_boston
     >>> from sklearn.model_selection import train_test_split
+    >>> X, y = load_boston(return_X_y=True)
     >>> X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
     >>> model = Cubist()
     >>> model.fit(X_train, y_train)
@@ -48,9 +56,9 @@ class Cubist(RegressorMixin, BaseEstimator):
                  sample: float = 0.0,
                  seed: int = randint(0, 4095),  # TODO fix this since its different from R
                  target_label: str = "outcome",
-                 weights=None,
-                 verbose: bool=False,
-                 neighbors: int = 0):
+                 weights = None,
+                 neighbors: int = 0,
+                 verbose: bool = False):
         super().__init__()
 
         # initialize instance variables
@@ -62,8 +70,8 @@ class Cubist(RegressorMixin, BaseEstimator):
         self.seed = seed
         self.target_label = target_label
         self.weights = weights
-        self.verbose = verbose
         self.neighbors = neighbors
+        self.verbose = verbose
 
         # initialize remaining instance variables
         self.names_string = None
@@ -143,11 +151,14 @@ class Cubist(RegressorMixin, BaseEstimator):
             y = pd.Series(y)
 
         # validate input data
-        X = self._validate_x(X)
+        X = validate_x(X)
 
         # for safety ensure the indices are reset
         X = X.reset_index(drop=True)
         y = y.reset_index(drop=True)
+
+        # get input column names
+        X_columns = list(X.columns)
 
         # create the names and data strings required for cubist
         self.names_string = make_names_string(X, w=self.weights, label=self.target_label)
@@ -173,6 +184,7 @@ class Cubist(RegressorMixin, BaseEstimator):
         
         # replace "__Sample" with "sample" if this is used in the model
         if "\n__Sample" in self.names_string:
+            # replace "__Sample" with "sample"
             output = output.replace("__Sample", "sample")
             self.model = self.model.replace("__Sample", "sample")
             # clean model string to fix breaking predictions when using reserved sample name
@@ -190,21 +202,25 @@ class Cubist(RegressorMixin, BaseEstimator):
         self.variable_usage = get_variable_usage(output, X)
         
         # get the model coefficients
-        self.coefficients = get_cubist_coefficients(self.model, var_names=list(X.columns))
+        self.coefficients = get_cubist_coefficients(self.model, var_names=X_columns)
         
+        tmp = None
+
         # print model output if using verbose output
         if self.verbose:
             print(output)
 
     def predict(self, X):
         # validate input data
-        X = self._validate_x(X)
+        X = validate_x(X)
         
         # for safety ensure indices are reset
         X = X.reset_index(drop=True)
         
         if self.neighbors > 0:
-            self.model = self.model.replace("insts=\"0\"",  f"insts=\"1\" nn=\"{self.neighbors}\" maxd=\"{self.maxd}\"")
+            model = self.model.replace("insts=\"0\"",  f"insts=\"1\" nn=\"{self.neighbors}\" maxd=\"{self.maxd}\"")
+        else:
+            model = self.model
         
         ## If there are case weights used during training, the C code
         ## will expect a column of weights in the new data but the
@@ -220,17 +236,10 @@ class Cubist(RegressorMixin, BaseEstimator):
         # get cubist predictions from trained model
         pred, output = _predictions(data_string.encode(),
                                     self.names_string.encode(),
-                                    self.model.encode(),
+                                    model.encode(),
                                     np.zeros(X.shape[0]),
                                     b"1")
         # TODO: parse and handle errors in output
+        if output:
+            print(output)
         return pred
-
-    def _validate_x(x):
-        assert isinstance(x, (pd.DataFrame, np.ndarray)), "X must be a Numpy Array or Pandas DataFrame"
-        if isinstance(x, np.ndarray):
-            assert len(x.shape) == 2, "Input NumPy array has more than two dimensions, only a two dimensional matrix " \
-                                      "may be passed."
-            warnings.warn("Input data is a NumPy Array, setting column names to default `var0, var1,...`.")
-            x = pd.DataFrame(x, columns=[f'var{i}' for i in range(x.shape[1])])
-        return x
