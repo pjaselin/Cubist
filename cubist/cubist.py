@@ -165,7 +165,7 @@ class Cubist(RegressorMixin, BaseEstimator):
         # create the names and data strings required for cubist
         self.names_string = make_names_string(X, w=self.weights, label=self.target_label)
         data_string = make_data_string(X, y, w=self.weights)
-        print(self.names_string)
+        
         # call the C implementation of cubist
         self.model, output = _cubist(self.names_string.encode(),
                                      data_string.encode(),
@@ -191,6 +191,10 @@ class Cubist(RegressorMixin, BaseEstimator):
             self.model = self.model.replace("__Sample", "sample")
             # clean model string to fix breaking predictions when using reserved sample name
             self.model = self.model[:self.model.index("sample")] + self.model[self.model.index("entries"):]
+        
+        # raise cubist errors
+        if "Error limit exceeded" in output:
+            raise Exception(output)
         
         # print model output if using verbose output
         if self.verbose:

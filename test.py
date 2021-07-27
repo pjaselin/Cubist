@@ -10,16 +10,16 @@ from cubist import Cubist
 # X = iris.drop(["petal_width"], axis=1)
 
 titanic = pd.read_csv("https://raw.githubusercontent.com/mwaskom/seaborn-data/master/raw/titanic.csv")
-titanic = titanic.drop(["name", "ticket", "cabin"], axis=1)
+titanic = titanic.drop(["name"], axis=1)
 y = titanic["fare"]
 X = titanic.drop(["fare"], axis=1)
 
 # X, y = load_diabetes(return_X_y=True, as_frame=True)
 
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
-model = Cubist(verbose=True, n_committees=5)
+model = Cubist(verbose=True)
 
-model.fit(X_train, y_train)
+model.fit(X, y)
 
 
 # print(model.predict(X_test))
@@ -28,5 +28,5 @@ model.fit(X_train, y_train)
 
 # test = make_data_file(X, y)
 # print(test)
-print(model.rule_splits)
-print(model.coefficients)
+# print(model.rule_splits)
+# print(model.coefficients)

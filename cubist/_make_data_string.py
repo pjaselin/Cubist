@@ -35,6 +35,10 @@ def make_data_string(x, y=None, w=None):
     """
     Converts input dataset array X into a string.
     """
+    # copy Pandas objects so they aren't changed outside of this function
+    x = x.copy(deep=True)
+    y = y.copy(deep=True)
+
     # apply the escapes function to all string columns
     for col in x:
         if is_string_dtype(x[col]):

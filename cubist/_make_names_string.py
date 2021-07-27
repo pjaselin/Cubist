@@ -9,6 +9,9 @@ def make_names_string(x, w=None, label="outcome"):
     Create the names string to pass to Cubist. This string contains information about Python and the time of run along
     with the column names and their data types.
     """
+    # copy Pandas objects so they aren't changed outside of this function
+    x = x.copy(deep=True)
+
     # clean reserved sample name if it's in x
     has_sample = [i for i, c in enumerate(x.columns) if bool(re.search('^sample', c))]
     if has_sample:

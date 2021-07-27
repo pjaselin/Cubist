@@ -85,10 +85,6 @@ def get_rule_splits(model, X):
         categorical_split = type3(model[i])
         split_var[i] = categorical_split["var"]
         split_cats[i] = categorical_split["val"]
-
-    print(split_var)
-    print(split_dir)
-    print(split_val)
     
     if is_type2 == [] and is_type3 == []:
         return None
@@ -108,10 +104,10 @@ def get_rule_splits(model, X):
     # get the rule by rule percentiles (?)
     nrows = X.shape[0]
     for i in range(split_data.shape[0]):
-        print(X[split_data.loc[i, "variable"]])
-        x_col = pd.to_numeric(X[split_data.loc[i, "variable"]])
         var = split_data.loc[i, "value"]
-        split_data.loc[i, "percentile"] = get_percentiles(x_col, var, nrows)
+        if not np.isnan(var):
+            x_col = pd.to_numeric(X[split_data.loc[i, "variable"]])
+            split_data.loc[i, "percentile"] = sum([c <= var for c in x_col]) / nrows
     return split_data
 
 def type3(x):
@@ -150,10 +146,6 @@ def type2(x, dig=3):
             "val": val,
             "rslt": rslt,
             "text": f"{var} {rslt} {val}"}
-
-def get_percentiles(x_col, value, nrows):
-    if value:
-        return sum([c <= value for c in x_col]) / nrows
 
 def eqn(x, var_names=None):
     x = x.replace("\"", "")
