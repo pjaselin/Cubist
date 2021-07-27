@@ -108,6 +108,7 @@ def get_rule_splits(model, X):
     # get the rule by rule percentiles (?)
     nrows = X.shape[0]
     for i in range(split_data.shape[0]):
+        print(X[split_data.loc[i, "variable"]])
         x_col = pd.to_numeric(X[split_data.loc[i, "variable"]])
         var = split_data.loc[i, "value"]
         split_data.loc[i, "percentile"] = get_percentiles(x_col, var, nrows)
@@ -116,7 +117,7 @@ def get_rule_splits(model, X):
 def type3(x):
     a_ind = x.find("att=")
     e_ind = x.find("elts=")
-    var = x[a_ind+4:e_ind-2]
+    var = x[a_ind+5:e_ind-2]
     val = x[e_ind+5:]
     val = val.replace("[{}]", "").replace("\"", "").replace(" ", "")
     mult_vals = "," in val
@@ -157,8 +158,6 @@ def get_percentiles(x_col, value, nrows):
 def eqn(x, var_names=None):
     x = x.replace("\"", "")
     starts = [m.start(0) for m in re.finditer("(coeff=)|(att=)", x)]
-    # p = int((len(starts) - 1)/2)
-    # vars = [""] * p
     tmp = [""] * len(starts)
     for i in range(len(starts)):
         if i < len(starts) - 1:

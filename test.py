@@ -17,7 +17,7 @@ X = titanic.drop(["fare"], axis=1)
 # X, y = load_diabetes(return_X_y=True, as_frame=True)
 
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
-model = Cubist(verbose=True)
+model = Cubist(verbose=True, n_committees=5)
 
 model.fit(X_train, y_train)
 
