@@ -1,5 +1,6 @@
 import re
 import pandas as pd
+import numpy as np
 
 def count_rules(x):
     return
@@ -19,22 +20,22 @@ def split_to_groups(x, f):
             groups[b] = [a]
     return groups
 
-def get_rule_splits(x):
+def get_rule_splits(model, X):
     # split on newline
-    x = x.split("\n")
-
+    model = model.split("\n")
     # remove empty strings
-    x = [c for c in x if c.strip() != '']
+    model = [c for c in model if c.strip() != '']
+    model_len = len(model)
 
     # define initial lists and index variables
-    com_num = [None] * len(x)
-    rule_num = [None] * len(x) 
-    cond_num = [None] * len(x)
+    com_num = [None] * model_len
+    rule_num = [None] * model_len 
+    cond_num = [None] * model_len
     com_idx, r_idx = 0, 0
 
-    for i in range(len(x)):
+    for i in range(model_len):
         # break each row of x into dicts for each key/value pair
-        tt = parser(x[i])
+        tt = parser(model[i])
         # get the first key in the first entry of tt
         first_key = list(tt[0].keys())[0]
         # start of a new rule
@@ -54,9 +55,9 @@ def get_rule_splits(x):
             cond_num[i] = c_idx
     
     # get the number of committees
-    num_com = len([c for c in x if re.search("^rules=", c)])
+    num_com = len([c for c in model if re.search("^rules=", c)])
     
-    # 
+    # apply the analogous R split function to get a dict
     rules_per_com = split_to_groups(rule_num, com_num)
 
     rules_per_com = {a: max(rules_per_com[a]) for a in rules_per_com}
@@ -64,33 +65,28 @@ def get_rule_splits(x):
     if rules_per_com and num_com > 0:
         rules_per_com = {f'Com {i+1}': rules_per_com[a] for i, a in enumerate(list(rules_per_com.keys()))}
     
-    is_new_rule = [True if re.search("^conds=", c) else False for c in x]
-    split_var = [None] * len(x)
-    split_val = [None] * len(x)
-    split_cats = [""] * len(x)
-    split_dir = [""] * len(x)
-    split_type = [""] * len(x)
+    is_new_rule = [True if re.search("^conds=", c) else False for c in model]
+    split_var = [None] * model_len
+    split_val = [None] * model_len
+    split_cats = [""] * model_len
+    split_dir = [""] * model_len
+    split_type = [""] * model_len
     
-    is_type2 = [i for i, c in enumerate(x) if re.search("^type=\"2\"", c)]
-    if is_type2:
-        for i in is_type2:
-            split_type[i] = "type2"
-            continuous_split = type2(x[i])
-            split_var[i] = continuous_split["var"].replace('\"', "")
-            split_dir[i] = continuous_split["rslt"]
-            split_val[i] = continuous_split["val"]
+    is_type2 = [i for i, c in enumerate(model) if re.search("^type=\"2\"", c)]
+    for i in is_type2:
+        split_type[i] = "type2"
+        continuous_split = type2(model[i])
+        split_var[i] = continuous_split["var"].replace('\"', "")
+        split_dir[i] = continuous_split["rslt"]
+        split_val[i] = continuous_split["val"]
     
-    is_type3 = [i for i, c in enumerate(x) if re.search("^type=\"3\"", c)]
-    if is_type3:
-        for i in is_type3:
-            split_type[i] = "type3"
-            pass
+    is_type3 = [i for i, c in enumerate(model) if re.search("^type=\"3\"", c)]
+    for i in is_type3:
+        categorical_split = type3(model[i])
+        split_var[i] = categorical_split["var"]
+        split_cats[i] = categorical_split["val"]
     
-    # print(split_var)
-    # print(split_dir)
-    # print(split_val)
-    
-    if not is_type2 and not is_type3:
+    if is_type2 == [] and is_type3 == []:
         return None
     
     split_data = pd.DataFrame({
@@ -104,16 +100,30 @@ def get_rule_splits(x):
     })
     split_data = split_data.dropna(subset=['variable'])
     split_data = split_data.reset_index(drop=True)
+
+    # get the rule by rule percentiles (?)
+    nrows = X.shape[0]
+    for i in range(split_data.shape[0]):
+        var = split_data.loc[i, "value"]
+        if not np.isnan(var):
+            x_col = pd.to_numeric(X[split_data.loc[i, "variable"]])
+            split_data.loc[i, "percentile"] = sum([c <= var for c in x_col]) / nrows
     return split_data
 
-# TODO: finish with categorical data
 def type3(x):
     a_ind = x.find("att=")
     e_ind = x.find("elts=")
-    var = x[a_ind+4:e_ind-2]
+    var = x[a_ind+5:e_ind-2]
     val = x[e_ind+5:]
-    mult_vals = None
-    return
+    val = val.replace("[{}]", "").replace("\"", "").replace(" ", "")
+    mult_vals = "," in val
+    val = val.replace(",", ", ")
+    if mult_vals:
+        val = f"{{mult_vals}}"
+        txt = f"{var} in {val}"
+    else:
+        txt = f"{var} = {val}"
+    return {"var": var, "val": val, "text": txt}
 
 def type2(x, dig=3):
     x = x.replace("\"", "")
@@ -128,7 +138,6 @@ def type2(x, dig=3):
         val = None
         rslt = "="
     else:
-        # print(x)
         var = x[a_ind+4:c_ind-1]
         val = x[c_ind+4:r_ind-1]
         val = round(float(val), dig)
@@ -138,15 +147,9 @@ def type2(x, dig=3):
             "rslt": rslt,
             "text": f"{var} {rslt} {val}"}
 
-def get_percentiles(x_col, value, nrows):
-    if value:
-        return sum([c <= value for c in x_col]) / nrows
-
 def eqn(x, var_names=None):
     x = x.replace("\"", "")
     starts = [m.start(0) for m in re.finditer("(coeff=)|(att=)", x)]
-    p = int((len(starts) - 1)/2)
-    vars = [""] * p
     tmp = [""] * len(starts)
     for i in range(len(starts)):
         if i < len(starts) - 1:
@@ -162,36 +165,36 @@ def eqn(x, var_names=None):
     vals = {nm: val for nm, val in zip(nms, vals)}
     if var_names:
         vars2 = [var for var in var_names if var not in nms]
-        vals2 = [None] * len(vars2)
+        vals2 = [np.nan] * len(vars2)
         vals2 = {nm: val for nm, val in zip(vars2, vals2)}
         vals = {**vals, **vals2}
         new_names = ["(Intercept)"] + var_names
         vals = {nm: vals[nm] for nm in new_names}
     return vals
 
-def make_parsed_dict(y):
-    y = y.split("=")
-    if len(y) > 1:
-        return {y[0]: y[1]}
+def make_parsed_dict(x):
+    x = x.split("=")
+    if len(x) > 1:
+        return {x[0]: x[1]}
 
 def parser(x):
     x = x.split(" ")
     x = [make_parsed_dict(c) for c in x]
     return x
 
-def get_cubist_coefficients(x, var_names=None, *kwargs):
-    x = x.split("\n")
-    
+def get_cubist_coefficients(model, var_names=None, *kwargs):
+    model = model.split("\n")
     # remove empty strings
-    x = [c for c in x if c.strip() != '']
+    model = [c for c in model if c.strip() != '']
+    model_len = len(model)
 
-    com_num = [None] * len(x)
-    rule_num = [None] * len(x)
-    cond_num = [None] * len(x)
+    com_num = [None] * model_len
+    rule_num = [None] * model_len
+    cond_num = [None] * model_len
     com_idx, r_idx = 0, 0
-    for i in range(len(x)):
-         # break each row of x into dicts for each key/value pair
-        tt = parser(x[i])
+    for i in range(model_len):
+         # break each row of model into dicts for each key/value pair
+        tt = parser(model[i])
         # get the first key in the first entry of tt
         first_key = list(tt[0].keys())[0]
         # start of a new rule
@@ -209,17 +212,14 @@ def get_cubist_coefficients(x, var_names=None, *kwargs):
         if first_key == "type":
             c_idx += 1
             cond_num[i] = c_idx
-    is_eqn = [i for i, c in enumerate(x) if "coeff=" in c]
-    # coefs = eqn([x[i] for i in is_eqn], dig=0, text=False, var_names=var_names)
-    coefs = [eqn(x[i], var_names=var_names) for i in is_eqn]
-    p = len(coefs)
-    dims = [len(c) for c in coefs]
-    coms = None
-    rls = None
-    # print(coefs)
-    #print(is_eqn)
-    #print(x)
-    return
+    is_eqn = [i for i, c in enumerate(model) if "coeff=" in c]
+    coefs = [eqn(model[i], var_names=var_names) for i in is_eqn]
+    committee = [com_num[i] for i in is_eqn]
+    rules = [rule_num[i] for i in is_eqn]
+    out = pd.DataFrame(coefs)
+    out["committee"] = committee
+    out["rule"] = rules
+    return out
 
 
 def get_maxd_value(model):

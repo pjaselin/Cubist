@@ -1,12 +1,10 @@
 from random import randint
 import numpy as np
 import pandas as pd
-import warnings
 from ._make_names_string import make_names_string
-from ._make_data_string import make_data_string
+from ._make_data_string import make_data_string, validate_x
 from _cubist import _cubist, _predictions
-import re
-from ._parse_cubist_model import get_rule_splits, get_percentiles, get_cubist_coefficients, get_maxd_value
+from ._parse_cubist_model import get_rule_splits, get_cubist_coefficients, get_maxd_value
 from ._variable_usage import get_variable_usage
 from sklearn.base import RegressorMixin, BaseEstimator
 
@@ -25,15 +23,25 @@ class Cubist(RegressorMixin, BaseEstimator):
     seed
     target_label
     weights
+    neighbors
+    verbose
 
     Attributes
     ----------
+    names_string
+    model
+    maxd
+    variable_usage
+    rule_splits
+    coefficients
+    vars
 
     Examples
     --------
     >>> from cubist import Cubist
     >>> from sklearn.datasets import load_boston
     >>> from sklearn.model_selection import train_test_split
+    >>> X, y = load_boston(return_X_y=True)
     >>> X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
     >>> model = Cubist()
     >>> model.fit(X_train, y_train)
@@ -49,61 +57,115 @@ class Cubist(RegressorMixin, BaseEstimator):
                  sample: float = 0.0,
                  seed: int = randint(0, 4095),  # TODO fix this since its different from R
                  target_label: str = "outcome",
-                 weights=None,
-                 verbose: bool=False):
+                 weights = None,
+                 neighbors: int = 0,
+                 verbose: bool = False):
         super().__init__()
 
-        assert n_committees > 1 or n_committees < 100, "number of committees must be between 1 and 100"
+        # initialize instance variables
         self.n_committees = n_committees
-
         self.unbiased = unbiased
-
-        assert n_rules is not None and (n_rules > 1 or n_rules < 1000000), "number of rules must be between 1 and 1000000"
         self.n_rules = n_rules
-
-        assert extrapolation >= 0.0 and extrapolation <= 1.0, "extrapolation percentage must be between 0.0 and 1.0"
         self.extrapolation = extrapolation
-
-        assert sample >= 0.0 and sample <= 1.0, "sampling percentage must be between 0.0 and 1.0"
         self.sample = sample
-
-        self.seed = seed % 4095
-
+        self.seed = seed
         self.target_label = target_label
-
-        assert weights is None or isinstance(weights, (list, np.ndarray)), "case weights must be numeric"
         self.weights = weights
-
+        self.neighbors = neighbors
         self.verbose = verbose
 
-        # initialize remaining class variables
+        # initialize remaining instance variables
         self.names_string = None
         self.model = None
         self.maxd = None
         self.variable_usage = None
         self.rule_splits = None
         self.coefficients = None
+        self.vars = None
+    
+    @property
+    def n_committees(self):
+        return self._n_committees
+    
+    @n_committees.setter
+    def n_committees(self, value):
+        assert value > 1 or value < 100, "number of committees must be between 1 and 100"
+        self._n_committees = value
+
+    @property
+    def n_rules(self):
+        return self._n_rules
+    
+    @n_rules.setter
+    def n_rules(self, value):
+        assert value is not None and (value > 1 or value < 1000000), "number of rules must be between 1 and 1000000"
+        self._n_rules = value
+
+    @property
+    def extrapolation(self):
+        return self._extrapolation
+    
+    @extrapolation.setter
+    def extrapolation(self, value):
+        assert value >= 0.0 and value <= 1.0, "extrapolation percentage must be between 0.0 and 1.0"
+        self._extrapolation = value
+    
+    @property
+    def sample(self):
+        return self._sample
+    
+    @sample.setter
+    def sample(self, value):
+        assert value >= 0.0 and value <= 1.0, "sampling percentage must be between 0.0 and 1.0"
+        self._sample = value
+    
+    @property
+    def seed(self):
+        return self._seed
+    
+    @seed.setter
+    def seed(self, value):
+        self._seed = value % 4095
+    
+    @property
+    def weights(self):
+        return self._weights
+    
+    @weights.setter
+    def weights(self, value):
+        assert value is None or isinstance(value, (list, np.ndarray)), "case weights must be numeric"
+        self._weights = value
+    
+    @property
+    def neighbors(self):
+        return self._neighbors
+    
+    @neighbors.setter
+    def neighbors(self, value):
+        assert isinstance(value, int), "Only an integer value for neighbors is allowed"
+        assert value <= 10 and value >=0, "'neighbors' must be 0 or greater and 10 or less"
+        self._neighbors = value
+
 
     def fit(self, X, y):
         assert isinstance(y, (list, pd.Series, np.ndarray)), "Cubist requires a numeric target outcome"
         if not isinstance(y, pd.Series):
             y = pd.Series(y)
 
-        assert isinstance(X, (pd.DataFrame, np.ndarray)), "X must be a Numpy Array or Pandas DataFrame"
-        if isinstance(X, np.ndarray):
-            assert len(X.shape) == 2, "Input NumPy array has more than two dimensions, only a two dimensional matrix " \
-                                      "may be passed."
-            warnings.warn("Input data is a NumPy Array, setting column names to default `var0, var1,...`.")
-            X = pd.DataFrame(X, columns=[f'var{i}' for i in range(X.shape[1])])
+        # validate input data
+        X = validate_x(X)
 
         # for safety ensure the indices are reset
         X = X.reset_index(drop=True)
         y = y.reset_index(drop=True)
 
+        # get input column names
+        X_columns = list(X.columns)
+
         # create the names and data strings required for cubist
         self.names_string = make_names_string(X, w=self.weights, label=self.target_label)
         data_string = make_data_string(X, y, w=self.weights)
-
+        
         # call the C implementation of cubist
         self.model, output = _cubist(self.names_string.encode(),
                                      data_string.encode(),
@@ -124,61 +186,56 @@ class Cubist(RegressorMixin, BaseEstimator):
         
         # replace "__Sample" with "sample" if this is used in the model
         if "\n__Sample" in self.names_string:
+            # replace "__Sample" with "sample"
             output = output.replace("__Sample", "sample")
             self.model = self.model.replace("__Sample", "sample")
+            # clean model string to fix breaking predictions when using reserved sample name
+            self.model = self.model[:self.model.index("sample")] + self.model[self.model.index("entries"):]
         
-        # get a dataframe containing the rule splits
-        self.rule_splits = get_rule_splits(self.model)
+        # raise cubist errors
+        if "Error limit exceeded" in output:
+            raise Exception(output)
+        
+        # print model output if using verbose output
+        if self.verbose:
+            print(output)
 
-        # get the rule by rule percentiles (?)
-        if self.rule_splits is not None:
-            nrows = X.shape[0]
-            for i in range(self.rule_splits.shape[0]):
-                x_col = pd.to_numeric(X[self.rule_splits.loc[i, "variable"]])
-                var = self.rule_splits.loc[i, "value"]
-                self.rule_splits.loc[i, "percentile"] = get_percentiles(x_col, var, nrows)
+        # get a dataframe containing the rule splits
+        self.rule_splits = get_rule_splits(self.model, X)
         
         # extract the maxd value and remove the preceding text from the model string
         maxd = get_maxd_value(self.model)
         self.model = self.model.replace(f'insts=\"1\" nn=\"1\" maxd=\"{maxd}\"', 'insts=\"0\"')
         self.maxd = float(maxd)
 
-        self.variable_usage = get_variable_usage(output)
-        if self.variable_usage is None or self.variable_usage.shape[0] < X.shape[1]:
-            x_names = set(X.columns)
-            u_names = set(self.variable_usage["Variable"]) if self.variable_usage is not None else set()
-            missing_vars = list(x_names - u_names)
-            if missing_vars:
-                zero_list = [0] * len(missing_vars)
-                usage2 = pd.DataFrame({"Conditions": zero_list,
-                                       "Model": zero_list,
-                                       "Variable": missing_vars})
-                self.variable_usage = pd.concat([self.variable_usage, usage2], axis=1)
-                self.variable_usage = self.variable_usage.reset_index(drop=True)
+        # get the input data variable usage
+        self.variable_usage = get_variable_usage(output, X)
         
-        self.coefficients = get_cubist_coefficients(self.model, var_names=list(X.columns))
+        # get the model coefficients
+        self.coefficients = get_cubist_coefficients(self.model, var_names=X_columns)
         
+        # get the names of columns that have no nan values
+        not_na_cols = self.coefficients.columns[~self.coefficients.isna().any()].tolist()
+        # skip the first three since these are always filled
+        not_na_cols = not_na_cols[3:]
+        if self.rule_splits is not None:
+            used_variables = set(self.rule_splits["variable"]).union(
+                set(not_na_cols)
+            )
+            self.vars = {"all": X_columns,
+                         "used": list(used_variables)}
 
-        # print model output if using verbose output
-        if self.verbose:
-            print(output)
-
-
-    def predict(self, X, neighbors=0):
-        assert isinstance(X, (pd.DataFrame, np.ndarray)), "X must be a Numpy Array or Pandas DataFrame"
-        if isinstance(X, np.ndarray):
-            assert len(X.shape) == 2, "Input NumPy array has more than two dimensions, only a two dimensional matrix " \
-                                      "may be passed."
-            warnings.warn("Input data is a NumPy Array, setting column names to default `var0, var1,...`.")
-            X = pd.DataFrame(X, columns=[f'var{i}' for i in range(X.shape[1])])
+    def predict(self, X):
+        # validate input data
+        X = validate_x(X)
         
         # for safety ensure indices are reset
         X = X.reset_index(drop=True)
-
-        assert isinstance(neighbors, int), "Only an integer value for neighbors is allowed"
-        assert neighbors <= 10 and neighbors >=0, "'neighbors' must be 0 or greater and 10 or less"
-        if neighbors > 0:
-            self.model = self.model.replace("insts=\"0\"",  f"insts=\"1\" nn=\"{neighbors}\" maxd=\"{self.maxd}\"")
+        
+        if self.neighbors > 0:
+            model = self.model.replace("insts=\"0\"",  f"insts=\"1\" nn=\"{self.neighbors}\" maxd=\"{self.maxd}\"")
+        else:
+            model = self.model
         
         ## If there are case weights used during training, the C code
         ## will expect a column of weights in the new data but the
@@ -191,9 +248,6 @@ class Cubist(RegressorMixin, BaseEstimator):
         # make data string for predictions
         data_string = make_data_string(X)
 
-        # clean model string to fix breaking predictions when using reserved sample name
-        model = self.model[:self.model.index("sample")] + self.model[self.model.index("entries"):] if "sample" in self.model else self.model
-
         # get cubist predictions from trained model
         pred, output = _predictions(data_string.encode(),
                                     self.names_string.encode(),
@@ -201,4 +255,6 @@ class Cubist(RegressorMixin, BaseEstimator):
                                     np.zeros(X.shape[0]),
                                     b"1")
         # TODO: parse and handle errors in output
+        if output:
+            print(output)
         return pred
