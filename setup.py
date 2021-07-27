@@ -3,7 +3,7 @@ from Cython.Build import cythonize
 import glob
 import numpy as np
 
-exts = [
+extensions = [
     Extension(
         name='_cubist',
         sources=["cubist/_cubist.pyx"] + glob.glob("cubist/src/*.c"),
@@ -23,7 +23,7 @@ setup(
     description="A Python port of the R Cubist library.",
     long_description=long_description,
     long_description_content_type='text/markdown',
-    ext_modules=cythonize(exts),
+    ext_modules=cythonize(extensions),
     zip_safe=False,
     include_package_data=True,
     install_requires=requires,
