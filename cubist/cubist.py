@@ -11,8 +11,7 @@ from sklearn.base import RegressorMixin, BaseEstimator
 
 class Cubist(RegressorMixin, BaseEstimator):
     """
-    Cubist Regression Model (Public v2.07) developed by JR Quinlan
-
+    Cubist Regression Model (Public v2.07) developed by JR Quinlan.
 
     References: 
     - https://www.rdocumentation.org/packages/Cubist/versions/0.3.0
@@ -185,6 +184,22 @@ class Cubist(RegressorMixin, BaseEstimator):
         self._neighbors = value
 
     def fit(self, X, y):
+        """
+        Build a Cubist regression model from training set (X, y).
+
+        Parameters
+        ----------
+        X : {array-like} of shape (n_samples, n_features)
+            The training input samples.
+
+        y : array-like of shape (n_samples,)
+            The target values (Real numbers in regression).
+
+        Returns
+        -------
+        self : object
+        """
+
         assert isinstance(y, (list, pd.Series, np.ndarray)), "Cubist requires a numeric target outcome"
         if not isinstance(y, pd.Series):
             y = pd.Series(y)
@@ -255,15 +270,31 @@ class Cubist(RegressorMixin, BaseEstimator):
         not_na_cols = self.coefficients.columns[~self.coefficients.isna().any()].tolist()
         # skip the first three since these are always filled
         not_na_cols = not_na_cols[3:]
-
+        # store a dictionary containing all the training dataset columns and those that were used by the model
         if self.rule_splits is not None:
             used_variables = set(self.rule_splits["variable"]).union(
                 set(not_na_cols)
             )
             self.variables = {"all": X_columns,
                               "used": list(used_variables)}
+        
+        return self
 
     def predict(self, X):
+        """
+        Predict Cubist regression target for X.
+
+        Parameters
+        ----------
+        X : {array-like} of shape (n_samples, n_features)
+            The input samples. 
+
+        Returns
+        -------
+        y : ndarray of shape (n_samples,)
+            The predicted values.
+        """
+        
         # validate input data
         validate_x(X)
 
