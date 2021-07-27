@@ -34,6 +34,7 @@ class Cubist(RegressorMixin, BaseEstimator):
     variable_usage
     rule_splits
     coefficients
+    vars
 
     Examples
     --------
@@ -80,6 +81,7 @@ class Cubist(RegressorMixin, BaseEstimator):
         self.variable_usage = None
         self.rule_splits = None
         self.coefficients = None
+        self.vars = None
     
     @property
     def n_committees(self):
@@ -163,7 +165,7 @@ class Cubist(RegressorMixin, BaseEstimator):
         # create the names and data strings required for cubist
         self.names_string = make_names_string(X, w=self.weights, label=self.target_label)
         data_string = make_data_string(X, y, w=self.weights)
-
+        print(self.names_string)
         # call the C implementation of cubist
         self.model, output = _cubist(self.names_string.encode(),
                                      data_string.encode(),
@@ -189,6 +191,10 @@ class Cubist(RegressorMixin, BaseEstimator):
             self.model = self.model.replace("__Sample", "sample")
             # clean model string to fix breaking predictions when using reserved sample name
             self.model = self.model[:self.model.index("sample")] + self.model[self.model.index("entries"):]
+        
+        # print model output if using verbose output
+        if self.verbose:
+            print(output)
 
         # get a dataframe containing the rule splits
         self.rule_splits = get_rule_splits(self.model, X)
@@ -204,11 +210,16 @@ class Cubist(RegressorMixin, BaseEstimator):
         # get the model coefficients
         self.coefficients = get_cubist_coefficients(self.model, var_names=X_columns)
         
-        tmp = None
-
-        # print model output if using verbose output
-        if self.verbose:
-            print(output)
+        # get the names of columns that have no nan values
+        not_na_cols = self.coefficients.columns[~self.coefficients.isna().any()].tolist()
+        # skip the first three since these are always filled
+        not_na_cols = not_na_cols[3:]
+        if self.rule_splits is not None:
+            used_variables = set(self.rule_splits["variable"]).union(
+                set(not_na_cols)
+            )
+            self.vars = {"all": X_columns,
+                         "used": list(used_variables)}
 
     def predict(self, X):
         # validate input data

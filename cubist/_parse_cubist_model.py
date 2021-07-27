@@ -73,25 +73,24 @@ def get_rule_splits(model, X):
     split_type = [""] * model_len
     
     is_type2 = [i for i, c in enumerate(model) if re.search("^type=\"2\"", c)]
-    if is_type2:
-        for i in is_type2:
-            split_type[i] = "type2"
-            continuous_split = type2(model[i])
-            split_var[i] = continuous_split["var"].replace('\"', "")
-            split_dir[i] = continuous_split["rslt"]
-            split_val[i] = continuous_split["val"]
+    for i in is_type2:
+        split_type[i] = "type2"
+        continuous_split = type2(model[i])
+        split_var[i] = continuous_split["var"].replace('\"', "")
+        split_dir[i] = continuous_split["rslt"]
+        split_val[i] = continuous_split["val"]
     
     is_type3 = [i for i, c in enumerate(model) if re.search("^type=\"3\"", c)]
-    if is_type3:
-        for i in is_type3:
-            split_type[i] = "type3"
-            pass
+    for i in is_type3:
+        categorical_split = type3(model[i])
+        split_var[i] = categorical_split["var"]
+        split_cats[i] = categorical_split["val"]
+
+    print(split_var)
+    print(split_dir)
+    print(split_val)
     
-    # print(split_var)
-    # print(split_dir)
-    # print(split_val)
-    
-    if not is_type2 and not is_type3:
+    if is_type2 == [] and is_type3 == []:
         return None
     
     split_data = pd.DataFrame({
@@ -114,14 +113,20 @@ def get_rule_splits(model, X):
         split_data.loc[i, "percentile"] = get_percentiles(x_col, var, nrows)
     return split_data
 
-# TODO: finish with categorical data
 def type3(x):
     a_ind = x.find("att=")
     e_ind = x.find("elts=")
     var = x[a_ind+4:e_ind-2]
     val = x[e_ind+5:]
-    mult_vals = None
-    return
+    val = val.replace("[{}]", "").replace("\"", "").replace(" ", "")
+    mult_vals = "," in val
+    val = val.replace(",", ", ")
+    if mult_vals:
+        val = f"{{mult_vals}}"
+        txt = f"{var} in {val}"
+    else:
+        txt = f"{var} = {val}"
+    return {"var": var, "val": val, "text": txt}
 
 def type2(x, dig=3):
     x = x.replace("\"", "")
