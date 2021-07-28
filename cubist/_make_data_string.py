@@ -1,8 +1,10 @@
-import pandas as pd
-import numpy as np
-from ._make_names_string import escapes
-from pandas.api.types import is_string_dtype, is_numeric_dtype
 import warnings
+
+import pandas as pd
+from pandas.api.types import is_string_dtype, is_numeric_dtype
+import numpy as np
+
+from ._make_names_string import escapes
 
 
 def validate_x(x):

@@ -1,6 +1,7 @@
 import re
 import sys
 from datetime import datetime
+
 from ._quinlan_attributes import quinlan_attributes
 
 
@@ -53,14 +54,14 @@ def escapes(x, chars=None):
         chars = [':', ';', '|']
     for i in chars:
         x = [c.replace(i, f'\\{i}') for c in x]
-    x = [_re_escape(c) for c in x]
+    x = [re_escape(c) for c in x]
     return x
 
 
 _special_chars_map = {i: '\\' + chr(i) for i in b'()[]{}?*+-|:;^$\\.&~#\t\n\r\v\f'}
 
 
-def _re_escape(pattern):
+def re_escape(pattern):
     """
     Escape special characters in a string. Sourced from 're' Python package.
     """

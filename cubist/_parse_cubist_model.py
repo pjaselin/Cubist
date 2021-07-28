@@ -1,4 +1,5 @@
 import re
+
 import pandas as pd
 import numpy as np
 
@@ -23,9 +24,13 @@ def split_to_groups(x, f):
     return groups
 
 
-def get_rule_splits(model, X):
+def get_rules_and_coefficients(model, x):
     # split on newline
     model = model.split("\n")
+
+    # get column names
+    var_names = list(x.columns)
+
     # remove empty strings
     model = [c for c in model if c.strip() != '']
     model_len = len(model)
@@ -67,8 +72,7 @@ def get_rule_splits(model, X):
     rules_per_com = {a: rules_per_com[a] for a in rules_per_com if rules_per_com[a] > 0}
     if rules_per_com and num_com > 0:
         rules_per_com = {f'Com {i + 1}': rules_per_com[a] for i, a in enumerate(list(rules_per_com.keys()))}
-
-    is_new_rule = [True if re.search("^conds=", c) else False for c in model]
+    
     split_var = [None] * model_len
     split_val = [None] * model_len
     split_cats = [""] * model_len
@@ -109,9 +113,16 @@ def get_rule_splits(model, X):
     for i in range(split_data.shape[0]):
         var = split_data.loc[i, "value"]
         if not np.isnan(var):
-            x_col = pd.to_numeric(X[split_data.loc[i, "variable"]])
+            x_col = pd.to_numeric(x[split_data.loc[i, "variable"]])
             split_data.loc[i, "percentile"] = sum([c <= var for c in x_col]) / nrows
-    return split_data
+    
+    # get coefficients
+    is_eqn = [i for i, c in enumerate(model) if "coeff=" in c]
+    coefs = [eqn(model[i], var_names=var_names) for i in is_eqn]
+    out = pd.DataFrame(coefs)
+    out["committee"] = [com_num[i] for i in is_eqn]
+    out["rule"] = [rule_num[i] for i in is_eqn]
+    return split_data, out
 
 
 def type3(x):
@@ -189,46 +200,6 @@ def parser(x):
     x = x.split(" ")
     x = [make_parsed_dict(c) for c in x]
     return x
-
-
-def get_cubist_coefficients(model, var_names=None, *kwargs):
-    model = model.split("\n")
-    # remove empty strings
-    model = [c for c in model if c.strip() != '']
-    model_len = len(model)
-
-    com_num = [None] * model_len
-    rule_num = [None] * model_len
-    cond_num = [None] * model_len
-    com_idx, r_idx = 0, 0
-    for i in range(model_len):
-        # break each row of model into dicts for each key/value pair
-        tt = parser(model[i])
-        # get the first key in the first entry of tt
-        first_key = list(tt[0].keys())[0]
-        # start of a new rule
-        if first_key == "rules":
-            com_idx += 1
-            r_idx = 0
-        com_num[i] = com_idx
-        # start of a new condition
-        if first_key == "conds":
-            r_idx += 1
-            c_idx = 0
-        rule_num[i] = r_idx
-        # within a rule, type designates the type of conditional statement
-        # type = 2 appears to be a simple split of a continuous predictor
-        if first_key == "type":
-            c_idx += 1
-            cond_num[i] = c_idx
-    is_eqn = [i for i, c in enumerate(model) if "coeff=" in c]
-    coefs = [eqn(model[i], var_names=var_names) for i in is_eqn]
-    committee = [com_num[i] for i in is_eqn]
-    rules = [rule_num[i] for i in is_eqn]
-    out = pd.DataFrame(coefs)
-    out["committee"] = committee
-    out["rule"] = rules
-    return out
 
 
 def get_maxd_value(model):

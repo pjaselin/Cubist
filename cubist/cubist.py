@@ -1,12 +1,14 @@
 from random import randint
+
 import numpy as np
 import pandas as pd
+from sklearn.base import RegressorMixin, BaseEstimator
+
 from ._make_names_string import make_names_string
 from ._make_data_string import make_data_string, validate_x
-from _cubist import _cubist, _predictions
-from ._parse_cubist_model import get_rule_splits, get_cubist_coefficients, get_maxd_value
+from ._parse_cubist_model import get_rules_and_coefficients, get_maxd_value
 from ._variable_usage import get_variable_usage
-from sklearn.base import RegressorMixin, BaseEstimator
+from _cubist import _cubist, _predictions
 
 
 class Cubist(RegressorMixin, BaseEstimator):
@@ -252,8 +254,8 @@ class Cubist(RegressorMixin, BaseEstimator):
         if self.verbose:
             print(output)
 
-        # get a dataframe containing the rule splits
-        self.rule_splits = get_rule_splits(self.model, X)
+        # get dataframes containing the rule splits and coefficients
+        self.rule_splits, self.coefficients = get_rules_and_coefficients(self.model, X)
 
         # extract the maxd value and remove the preceding text from the model string
         maxd = get_maxd_value(self.model)
@@ -263,13 +265,12 @@ class Cubist(RegressorMixin, BaseEstimator):
         # get the input data variable usage
         self.variable_usage = get_variable_usage(output, X)
 
-        # get the model coefficients
-        self.coefficients = get_cubist_coefficients(self.model, var_names=X_columns)
-
         # get the names of columns that have no nan values
         not_na_cols = self.coefficients.columns[~self.coefficients.isna().any()].tolist()
+
         # skip the first three since these are always filled
         not_na_cols = not_na_cols[3:]
+        
         # store a dictionary containing all the training dataset columns and those that were used by the model
         if self.rule_splits is not None:
             used_variables = set(self.rule_splits["variable"]).union(
