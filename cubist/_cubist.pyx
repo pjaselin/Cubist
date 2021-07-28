@@ -11,6 +11,10 @@ cdef extern from "src/top.c":
 
 # define the Python functions that interface with the C functions
 def _cubist(namesv_, datav_, unbiased_, compositev_, neighbors_, committees_, sample_, seed_, rules_, extrapolation_, modelv_, outputv_):
+    """
+    Train and retun Cubist model and output from C code
+    Reference: 
+    """
     cdef char *namesv = namesv_;
     cdef char *datav = datav_;
     cdef int unbiased = unbiased_;
@@ -28,6 +32,10 @@ def _cubist(namesv_, datav_, unbiased_, compositev_, neighbors_, committees_, sa
 
 
 def _predictions(casev_, namesv_, modelv_, np.ndarray[double, ndim=1, mode="c"] predv_, outputv_):
+    """
+    Obtain predictions using existing Cubist model and return output if raised
+    Reference: https://scipy-lectures.org/advanced/interfacing_with_c/interfacing_with_c.html#id13
+    """
     cdef char *casev = casev_;
     cdef char *namesv = namesv_;
     cdef char *modelv = modelv_;
