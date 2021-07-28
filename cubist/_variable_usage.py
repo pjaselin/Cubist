@@ -1,20 +1,32 @@
 import pandas as pd
 
 
-def get_variable_usage(x):
-    x = x.split("\n")
-    start_vars = [i for i, c in enumerate(x) if '\tAttribute usage' in c]
+def get_variable_usage(output, x):
+    output = output.split("\n")
+    start_vars = [i for i, c in enumerate(output) if '\tAttribute usage' in c]
     if len(start_vars) != 1:
         raise ValueError("cannot find attribute usage data")
-    x = x[start_vars[0]:(len(x))-2]
-    x = [c.replace("\t", "") for c in x]
-    has_pct = [i for i, c in enumerate(x) if "%" in c]
+    output = output[start_vars[0]:(len(output))-2]
+    output = [c.replace("\t", "") for c in output]
+    has_pct = [i for i, c in enumerate(output) if "%" in c]
     if len(has_pct) < 1:
         return None
-    x = [x[i] for i in has_pct]
-    values = [get_values(c) for c in x]
+    output = [output[i] for i in has_pct]
+    values = [get_values(c) for c in output]
     values = pd.DataFrame(values, columns=["Conditions", "Model"])
-    values["Variable"] = [get_variable(c) for c in x]
+    values["Variable"] = [get_variable(c) for c in output]
+
+    if values.shape[0] < x.shape[1]:
+        x_names = set(x.columns)
+        u_names = set(values["Variable"]) if values is not None else set()
+        missing_vars = list(x_names - u_names)
+        if missing_vars:
+            zero_list = [0] * len(missing_vars)
+            usage2 = pd.DataFrame({"Conditions": zero_list,
+                                   "Model": zero_list,
+                                   "Variable": missing_vars})
+            values = pd.concat([values, usage2], axis=1)
+            values = values.reset_index(drop=True)
     return values
 
 

@@ -2,9 +2,22 @@ import pandas as pd
 import numpy as np
 from ._make_names_string import escapes
 from pandas.api.types import is_string_dtype, is_numeric_dtype
+import warnings
 
 
-def _format(x: float, digits: int=15) -> str:
+def validate_x(x):
+    """
+    Ensure input dataset is of a valid type and format
+    """
+    assert isinstance(x, (pd.DataFrame, np.ndarray)), "X must be a Numpy Array or Pandas DataFrame"
+    if isinstance(x, np.ndarray):
+        assert len(x.shape) == 2, "Input NumPy array has more than two dimensions, only a two dimensional matrix " \
+                                  "may be passed."
+        warnings.warn("Input data is a NumPy Array, setting column names to default `var0, var1,...`.")
+        x = pd.DataFrame(x, columns=[f'var{i}' for i in range(x.shape[1])])
+
+
+def r_format(x: float, digits: int = 15) -> str:
     """
     Python version of the R format function to return a number formatted as a string
     """
@@ -26,6 +39,10 @@ def make_data_string(x, y=None, w=None):
     """
     Converts input dataset array X into a string.
     """
+    # copy Pandas objects so they aren't changed outside of this function
+    x = x.copy(deep=True)
+    y = y.copy(deep=True)
+
     # apply the escapes function to all string columns
     for col in x:
         if is_string_dtype(x[col]):
@@ -41,7 +58,7 @@ def make_data_string(x, y=None, w=None):
 
     # insert the y column as the first column of x
     x.insert(0, "y", y)
-    
+
     # handle weights matrix (?) TODO: validate
     if w is not None:
         column_names = list(x.columns) + [f"w{i}" for i in range(w.shape[1])]
@@ -51,7 +68,7 @@ def make_data_string(x, y=None, w=None):
     # convert all columns to strings
     for col in x:
         if is_numeric_dtype(x[col]):
-            x[col] = x[col].apply(_format)
+            x[col] = x[col].apply(r_format)
             x[col] = x[col].astype(str)
         else:
             x[col] = x[col].astype(str)
@@ -72,4 +89,3 @@ def make_data_string(x, y=None, w=None):
     # join all row strings into a single string separated by \n's
     x = "\n".join(x)
     return x
-
