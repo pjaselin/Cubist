@@ -1,7 +1,7 @@
 import pandas as pd
 
 
-def get_variable_usage(output, X):
+def get_variable_usage(output, x):
     output = output.split("\n")
     start_vars = [i for i, c in enumerate(output) if '\tAttribute usage' in c]
     if len(start_vars) != 1:
@@ -16,8 +16,8 @@ def get_variable_usage(output, X):
     values = pd.DataFrame(values, columns=["Conditions", "Model"])
     values["Variable"] = [get_variable(c) for c in output]
 
-    if values.shape[0] < X.shape[1]:
-        x_names = set(X.columns)
+    if values.shape[0] < x.shape[1]:
+        x_names = set(x.columns)
         u_names = set(values["Variable"]) if values is not None else set()
         missing_vars = list(x_names - u_names)
         if missing_vars:

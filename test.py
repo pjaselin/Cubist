@@ -10,7 +10,7 @@ from cubist import Cubist
 # X = iris.drop(["petal_width"], axis=1)
 
 titanic = pd.read_csv("https://raw.githubusercontent.com/mwaskom/seaborn-data/master/raw/titanic.csv")
-titanic = titanic.drop(["name"], axis=1)
+titanic = titanic.drop(["name", "ticket"], axis=1)
 y = titanic["fare"]
 X = titanic.drop(["fare"], axis=1)
 
@@ -21,7 +21,7 @@ model = Cubist(verbose=True)
 
 model.fit(X, y)
 
-
+print(model)
 # print(model.predict(X_test))
 # print(model.score(X_train, y_train))
 # print(model.score(X_test, y_test))
