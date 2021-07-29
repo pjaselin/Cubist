@@ -38,12 +38,12 @@ def r_format(x: float, digits: int = 15) -> str:
     x : float
         Floating point number to format as a string
 
-    digits: int, default=15
+    digits : int, default=15
         Number of digits to preserve in the formatted string starting from the left
 
     Returns
     -------
-    formatted_string: str
+    formatted_string : str
         Input string formatted per the R format function.
     """
     # if x is NA return NA
@@ -77,7 +77,7 @@ def make_data_string(x, y=None, w=None):
 
     Returns
     -------
-    formatted_string: str
+    x : str
         Input dataset converted to a string and formatted per Cubist's requirements.
     """
     # copy Pandas objects so they aren't changed outside of this function

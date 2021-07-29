@@ -12,6 +12,19 @@ def split_to_groups(x, f):
     """
     Function to convert two lists into a dictionary where the keys are unique values in f and 
     the values are lists of the corresponding values in x. Analogous to the split function in R.
+
+    Parameters
+    ----------
+    x : list
+        Pandas Series from which to extract data type
+    
+    f : list
+        second list.
+    
+    Returns
+    -------
+    groups : dict
+        Dictionary with
     """
     if len(x) != len(f):
         raise ValueError("lists x and f must be of the same length")
@@ -44,8 +57,10 @@ def get_rules_and_coefficients(model, x):
     for i in range(model_len):
         # break each row of x into dicts for each key/value pair
         tt = parser(model[i])
+
         # get the first key in the first entry of tt
         first_key = list(tt[0].keys())[0]
+        
         # start of a new rule
         if first_key == "rules":
             com_idx += 1
@@ -109,7 +124,7 @@ def get_rules_and_coefficients(model, x):
     split_data = split_data.reset_index(drop=True)
 
     # get the rule by rule percentiles (?)
-    nrows = X.shape[0]
+    nrows = x.shape[0]
     for i in range(split_data.shape[0]):
         var = split_data.loc[i, "value"]
         if not np.isnan(var):

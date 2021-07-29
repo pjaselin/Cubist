@@ -9,6 +9,22 @@ def make_names_string(x, w=None, label="outcome"):
     """
     Create the names string to pass to Cubist. This string contains information about Python and the time of run along
     with the column names and their data types.
+
+    Parameters
+    ----------
+    x : {pd.DataFrame} of shape (n_samples, n_features)
+        The input samples.
+
+    w : ndarray of shape (n_samples,)
+        Instance weights.
+    
+    label : str, default="outcome"
+        A label for the outcome variable. This is only used for printing rules.
+
+    Returns
+    -------
+    out : str
+        Case name string describing training dataset columns and their types.
     """
     # copy Pandas objects so they aren't changed outside of this function
     x = x.copy(deep=True)
@@ -48,12 +64,28 @@ def make_names_string(x, w=None, label="outcome"):
 
 def escapes(x, chars=None):
     """
-    Double escape special characters in x
+    Double escape reserved and special characters in x
+
+    Parameters
+    ----------
+    x : str
+        String to double escape special characters
+
+    chars : list
+        List of special characters to be double escaped
+    
+    Returns
+    -------
+    x : str
+        Input string with special characters double escaped
     """
+    # set custom reserved characters list
     if chars is None:
         chars = [':', ';', '|']
+    # apply first escaping
     for i in chars:
         x = [c.replace(i, f'\\{i}') for c in x]
+    # apply second escaping
     x = [re_escape(c) for c in x]
     return x
 
@@ -64,6 +96,16 @@ _special_chars_map = {i: '\\' + chr(i) for i in b'()[]{}?*+-|:;^$\\.&~#\t\n\r\v\
 def re_escape(pattern):
     """
     Escape special characters in a string. Sourced from 're' Python package.
+
+    Parameters
+    ----------
+    pattern : str
+        String to escape special characters
+    
+    Returns
+    -------
+    x : str
+        Input string with special characters escaped
     """
     if isinstance(pattern, str):
         return pattern.translate(_special_chars_map)
