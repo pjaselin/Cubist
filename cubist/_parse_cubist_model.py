@@ -40,12 +40,9 @@ def split_to_groups(x, f):
 def get_rules_and_coefficients(model, x):
     # split on newline
     model = model.split("\n")
-
-    # get column names
-    var_names = list(x.columns)
-
     # remove empty strings
     model = [c for c in model if c.strip() != '']
+    # get model length
     model_len = len(model)
 
     # define initial lists and index variables
@@ -54,13 +51,14 @@ def get_rules_and_coefficients(model, x):
     cond_num = [None] * model_len
     com_idx, r_idx = 0, 0
 
-    for i in range(model_len):
+    # loop through model and indicate
+    for i, row in enumerate(model):
         # break each row of x into dicts for each key/value pair
-        tt = parser(model[i])
+        tt = parser(row)
 
         # get the first key in the first entry of tt
         first_key = list(tt[0].keys())[0]
-        
+
         # start of a new rule
         if first_key == "rules":
             com_idx += 1
@@ -76,7 +74,7 @@ def get_rules_and_coefficients(model, x):
         if first_key == "type":
             c_idx += 1
             cond_num[i] = c_idx
-
+    
     # get the number of committees
     num_com = len([c for c in model if re.search("^rules=", c)])
 
@@ -133,7 +131,7 @@ def get_rules_and_coefficients(model, x):
     
     # get coefficients
     is_eqn = [i for i, c in enumerate(model) if "coeff=" in c]
-    coefs = [eqn(model[i], var_names=var_names) for i in is_eqn]
+    coefs = [eqn(model[i], var_names=list(x.columns)) for i in is_eqn]
     out = pd.DataFrame(coefs)
     out["committee"] = [com_num[i] for i in is_eqn]
     out["rule"] = [rule_num[i] for i in is_eqn]
@@ -209,6 +207,8 @@ def make_parsed_dict(x):
     x = x.split("=")
     if len(x) > 1:
         return {x[0]: x[1]}
+    else:
+        return None
 
 
 def parser(x):

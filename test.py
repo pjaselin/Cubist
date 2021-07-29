@@ -18,10 +18,9 @@ X = titanic.drop(["fare"], axis=1)
 
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 model = Cubist(verbose=True)
-
 model.fit(X, y)
 
-print(model)
+# print(model)
 # print(model.predict(X_test))
 # print(model.score(X_train, y_train))
 # print(model.score(X_test, y_test))

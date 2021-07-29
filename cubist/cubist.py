@@ -85,9 +85,7 @@ class Cubist(RegressorMixin, BaseEstimator):
     >>> model.fit(X_train, y_train)
     >>> model.predict(X_test)
     >>> model.score(X_test, y_test)
-
     """
-
     def __init__(self,
                  n_rules: int = 100,
                  n_committees: int = 1,
@@ -201,12 +199,12 @@ class Cubist(RegressorMixin, BaseEstimator):
         -------
         self : object
         """
-
         assert isinstance(y, (list, pd.Series, np.ndarray)), "Cubist requires a numeric target outcome"
         if not isinstance(y, pd.Series):
             y = pd.Series(y)
 
         # validate input data
+        # X, y = self._validate_data(X, y)
         validate_x(X)
 
         # for safety ensure the indices are reset
@@ -295,7 +293,6 @@ class Cubist(RegressorMixin, BaseEstimator):
         y : ndarray of shape (n_samples,)
             The predicted values.
         """
-        
         # validate input data
         validate_x(X)
 
