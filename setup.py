@@ -19,7 +19,7 @@ with open("requirements.txt", 'r') as f:
 
 setup(
     name="cubist",
-    version="0.0.6",
+    version="0.0.7",
     description="A Python port of the R Cubist library.",
     long_description=long_description,
     long_description_content_type='text/markdown',
