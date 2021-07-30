@@ -1,13 +1,24 @@
-import pandas as pd
-import numpy as np
-from ._make_names_string import escapes
-from pandas.api.types import is_string_dtype, is_numeric_dtype
 import warnings
+
+import pandas as pd
+from pandas.api.types import is_string_dtype, is_numeric_dtype
+import numpy as np
+
+from ._make_names_string import escapes
 
 
 def validate_x(x):
     """
     Ensure input dataset is of a valid type and format
+
+    Parameters
+    ----------
+    x : {array-like} of shape (n_samples, n_features)
+        The input samples.
+
+    Returns
+    -------
+    None
     """
     assert isinstance(x, (pd.DataFrame, np.ndarray)), "X must be a Numpy Array or Pandas DataFrame"
     if isinstance(x, np.ndarray):
@@ -19,7 +30,21 @@ def validate_x(x):
 
 def r_format(x: float, digits: int = 15) -> str:
     """
-    Python version of the R format function to return a number formatted as a string
+    Python version of the R format function to return a number formatted as a string rounded to `digits` number of digits
+    from the left.
+
+    Parameters
+    ----------
+    x : float
+        Floating point number to format as a string
+
+    digits : int, default=15
+        Number of digits to preserve in the formatted string starting from the left
+
+    Returns
+    -------
+    formatted_string : str
+        Input string formatted per the R format function.
     """
     # if x is NA return NA
     if pd.isna(x):
@@ -38,6 +63,22 @@ def r_format(x: float, digits: int = 15) -> str:
 def make_data_string(x, y=None, w=None):
     """
     Converts input dataset array X into a string.
+
+    Parameters
+    ----------
+    x : {pd.DataFrame} of shape (n_samples, n_features)
+        The input samples.
+
+    y : pd.Series
+        The predicted values.
+    
+    w : ndarray of shape (n_samples,)
+        Instance weights.
+
+    Returns
+    -------
+    x : str
+        Input dataset converted to a string and formatted per Cubist's requirements.
     """
     # copy Pandas objects so they aren't changed outside of this function
     x = x.copy(deep=True)
