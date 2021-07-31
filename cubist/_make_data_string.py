@@ -15,6 +15,7 @@ def validate_x(x):
                                   "may be passed."
         warnings.warn("Input data is a NumPy Array, setting column names to default `var0, var1,...`.")
         x = pd.DataFrame(x, columns=[f'var{i}' for i in range(x.shape[1])])
+    return x
 
 
 def r_format(x: float, digits: int = 15) -> str:
