@@ -23,6 +23,7 @@ def split_to_groups(x, f):
 
 
 def parse_cubist_model(model, x):
+    print(model)
     # split on newline
     model = model.split("\n")
     # remove empty strings
@@ -126,6 +127,7 @@ def parse_cubist_model(model, x):
     tmp = tmp.split("\"")
     maxd_i = [i for i, c in enumerate(tmp) if "maxd" in c][0]
     maxd = tmp[maxd_i + 1]
+    print(split_data, out, maxd)
     return split_data, out, float(maxd)
 
 
