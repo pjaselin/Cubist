@@ -9,23 +9,8 @@ def count_rules(x):
 
 
 def split_to_groups(x, f):
-    """
-    Function to convert two lists into a dictionary where the keys are unique values in f and 
-    the values are lists of the corresponding values in x. Analogous to the split function in R.
-
-    Parameters
-    ----------
-    x : list
-        Pandas Series from which to extract data type
-    
-    f : list
-        second list.
-    
-    Returns
-    -------
-    groups : dict
-        Dictionary with
-    """
+    """Function to convert two lists into a dictionary where the keys are unique values in f and 
+    the values are lists of the corresponding values in x. Analogous to the split function in R."""
     if len(x) != len(f):
         raise ValueError("lists x and f must be of the same length")
     groups = {}
