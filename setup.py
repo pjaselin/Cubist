@@ -33,7 +33,7 @@ setup(
     license="LICENSE",
     classifiers = [
         "Programming Language :: Python",
-        "License: GPL-3.0",
+        "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
         "Topic :: Software Development :: Libraries",
         "Intended Audience :: Developers",
         "Intended Audience :: Science/Research"

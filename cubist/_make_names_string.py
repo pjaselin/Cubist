@@ -63,22 +63,7 @@ def make_names_string(x, w=None, label="outcome"):
 
 
 def escapes(x, chars=None):
-    """
-    Double escape reserved and special characters in x
-
-    Parameters
-    ----------
-    x : str
-        String to double escape special characters
-
-    chars : list
-        List of special characters to be double escaped
-    
-    Returns
-    -------
-    x : str
-        Input string with special characters double escaped
-    """
+    """Double escape reserved and special characters in x."""
     # set custom reserved characters list
     if chars is None:
         chars = [':', ';', '|']
@@ -94,19 +79,7 @@ _special_chars_map = {i: '\\' + chr(i) for i in b'()[]{}?*+-|:;^$\\.&~#\t\n\r\v\
 
 
 def re_escape(pattern):
-    """
-    Escape special characters in a string. Sourced from 're' Python package.
-
-    Parameters
-    ----------
-    pattern : str
-        String to escape special characters
-    
-    Returns
-    -------
-    x : str
-        Input string with special characters escaped
-    """
+    """Escape special characters in a string. Sourced from 're' Python package."""
     if isinstance(pattern, str):
         return pattern.translate(_special_chars_map)
     else:
