@@ -9,5 +9,5 @@ from cubist import Cubist
     ]
 )
 def test_spam(expected_output):
-    mdl = Cubist()
-    assert isinstance(mdl, Cubist) == expected_output
+    model = Cubist()
+    assert isinstance(model, Cubist) == expected_output

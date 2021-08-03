@@ -22,7 +22,8 @@ def split_to_groups(x, f):
     return groups
 
 
-def get_rules_and_coefficients(model, x):
+def parse_cubist_model(model, x):
+    print(model)
     # split on newline
     model = model.split("\n")
     # remove empty strings
@@ -34,7 +35,7 @@ def get_rules_and_coefficients(model, x):
     com_num = [None] * model_len
     rule_num = [None] * model_len
     cond_num = [None] * model_len
-    com_idx, r_idx = 0, 0
+    com_idx = r_idx = 0
 
     # loop through model and indicate
     for i, row in enumerate(model):
@@ -120,7 +121,14 @@ def get_rules_and_coefficients(model, x):
     out = pd.DataFrame(coefs)
     out["committee"] = [com_num[i] for i in is_eqn]
     out["rule"] = [rule_num[i] for i in is_eqn]
-    return split_data, out
+
+    # get maxd
+    tmp = [c for c in model if "maxd" in c][0]
+    tmp = tmp.split("\"")
+    maxd_i = [i for i, c in enumerate(tmp) if "maxd" in c][0]
+    maxd = tmp[maxd_i + 1]
+    print(split_data, out, maxd)
+    return split_data, out, float(maxd)
 
 
 def type3(x):
@@ -189,6 +197,7 @@ def eqn(x, var_names=None):
 
 
 def make_parsed_dict(x):
+    """"""
     x = x.split("=")
     if len(x) > 1:
         return {x[0]: x[1]}
@@ -197,15 +206,7 @@ def make_parsed_dict(x):
 
 
 def parser(x):
+    """"""
     x = x.split(" ")
     x = [make_parsed_dict(c) for c in x]
     return x
-
-
-def get_maxd_value(model):
-    tmp = model.split("\n")
-    tmp = [c for c in tmp if "maxd" in c][0]
-    tmp = tmp.split("\"")
-    maxd_i = [i for i, c in enumerate(tmp) if "maxd" in c][0]
-    maxd = tmp[maxd_i + 1]
-    return maxd

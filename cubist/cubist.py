@@ -6,7 +6,7 @@ from sklearn.base import RegressorMixin, BaseEstimator
 
 from ._make_names_string import make_names_string
 from ._make_data_string import make_data_string, validate_x
-from ._parse_cubist_model import get_rules_and_coefficients, get_maxd_value
+from ._parse_cubist_model import parse_cubist_model
 from ._variable_usage import get_variable_usage
 from _cubist import _cubist, _predictions
 
@@ -205,13 +205,9 @@ class Cubist(RegressorMixin, BaseEstimator):
 
         # validate input data
         # X, y = self._validate_data(X, y)
-        validate_x(X)
-
-        # for safety ensure the indices are reset
+        X = validate_x(X)
         X = X.reset_index(drop=True)
         y = y.reset_index(drop=True)
-
-        # get input column names
         X_columns = list(X.columns)
 
         # create the names and data strings required for cubist
@@ -232,13 +228,12 @@ class Cubist(RegressorMixin, BaseEstimator):
                                      b"1",
                                      b"1")
 
-        # convert output to strings
+        # convert output from raw to strings
         self.model = self.model.decode()
         output = output.decode()
 
         # replace "__Sample" with "sample" if this is used in the model
         if "\n__Sample" in self.names_string:
-            # replace "__Sample" with "sample"
             output = output.replace("__Sample", "sample")
             self.model = self.model.replace("__Sample", "sample")
             # clean model string to fix breaking predictions when using reserved sample name
@@ -253,12 +248,10 @@ class Cubist(RegressorMixin, BaseEstimator):
             print(output)
 
         # get dataframes containing the rules and coefficients
-        self.rules, self.coefficients = get_rules_and_coefficients(self.model, X)
+        self.rules, self.coefficients, self.maxd = parse_cubist_model(self.model, X)
 
         # extract the maxd value and remove the preceding text from the model string
-        maxd = get_maxd_value(self.model)
-        self.model = self.model.replace(f'insts=\"1\" nn=\"1\" maxd=\"{maxd}\"', 'insts=\"0\"')
-        self.maxd = float(maxd)
+        self.model = self.model.replace(f'insts=\"1\" nn=\"1\" maxd=\"{int(self.maxd)}\"', 'insts=\"0\"')
 
         # get the input data variable usage
         self.variable_usage = get_variable_usage(output, X)
@@ -294,9 +287,7 @@ class Cubist(RegressorMixin, BaseEstimator):
             The predicted values.
         """
         # validate input data
-        validate_x(X)
-
-        # for safety ensure indices are reset
+        X = validate_x(X)
         X = X.reset_index(drop=True)
 
         if self.neighbors > 0:
