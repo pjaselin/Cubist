@@ -23,7 +23,6 @@ def split_to_groups(x, f):
 
 
 def parse_cubist_model(model, x):
-    print(model)
     # split on newline
     model = model.split("\n")
     # remove empty strings
@@ -93,28 +92,28 @@ def parse_cubist_model(model, x):
         split_cats[i] = categorical_split["val"]
 
     if is_type2 == [] and is_type3 == []:
-        return None
+        split_data = None
+    else:
+        split_data = pd.DataFrame({
+            "committee": com_num,
+            "rule": rule_num,
+            "variable": split_var,
+            "dir": split_dir,
+            "value": split_val,
+            "category": split_cats,
+            "type": split_type
+        })
+        split_data = split_data.dropna(subset=['variable'])
+        split_data = split_data.reset_index(drop=True)
 
-    split_data = pd.DataFrame({
-        "committee": com_num,
-        "rule": rule_num,
-        "variable": split_var,
-        "dir": split_dir,
-        "value": split_val,
-        "category": split_cats,
-        "type": split_type
-    })
-    split_data = split_data.dropna(subset=['variable'])
-    split_data = split_data.reset_index(drop=True)
+        # get the rule by rule percentiles (?)
+        nrows = x.shape[0]
+        for i in range(split_data.shape[0]):
+            var = split_data.loc[i, "value"]
+            if not np.isnan(var):
+                x_col = pd.to_numeric(x[split_data.loc[i, "variable"]])
+                split_data.loc[i, "percentile"] = sum([c <= var for c in x_col]) / nrows
 
-    # get the rule by rule percentiles (?)
-    nrows = x.shape[0]
-    for i in range(split_data.shape[0]):
-        var = split_data.loc[i, "value"]
-        if not np.isnan(var):
-            x_col = pd.to_numeric(x[split_data.loc[i, "variable"]])
-            split_data.loc[i, "percentile"] = sum([c <= var for c in x_col]) / nrows
-    
     # get coefficients
     is_eqn = [i for i, c in enumerate(model) if "coeff=" in c]
     coefs = [eqn(model[i], var_names=list(x.columns)) for i in is_eqn]
@@ -127,7 +126,6 @@ def parse_cubist_model(model, x):
     tmp = tmp.split("\"")
     maxd_i = [i for i, c in enumerate(tmp) if "maxd" in c][0]
     maxd = tmp[maxd_i + 1]
-    print(split_data, out, maxd)
     return split_data, out, float(maxd)
 
 

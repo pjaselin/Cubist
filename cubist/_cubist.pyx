@@ -13,7 +13,6 @@ cdef extern from "src/top.c":
 def _cubist(namesv_, datav_, unbiased_, compositev_, neighbors_, committees_, sample_, seed_, rules_, extrapolation_, modelv_, outputv_):
     """
     Train and retun Cubist model and output from C code
-    Reference: 
     """
     cdef char *namesv = namesv_;
     cdef char *datav = datav_;
