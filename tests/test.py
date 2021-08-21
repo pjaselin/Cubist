@@ -5,14 +5,14 @@ from sklearn.ensemble import RandomForestRegressor
 from sklearn.linear_model import LinearRegression
 from cubist import Cubist
 
-# iris = pd.read_csv('https://raw.githubusercontent.com/mwaskom/seaborn-data/master/iris.csv')
-# y = iris["petal_width"]
-# X = iris.drop(["petal_width"], axis=1)
+iris = pd.read_csv('https://raw.githubusercontent.com/mwaskom/seaborn-data/master/iris.csv')
+y = iris["petal_width"]
+X = iris.drop(["petal_width"], axis=1)
 
-titanic = pd.read_csv("https://raw.githubusercontent.com/mwaskom/seaborn-data/master/raw/titanic.csv")
-titanic = titanic.drop(["name", "ticket"], axis=1)
-y = titanic["fare"]
-X = titanic.drop(["fare"], axis=1)
+# titanic = pd.read_csv("https://raw.githubusercontent.com/mwaskom/seaborn-data/master/raw/titanic.csv")
+# titanic = titanic.drop(["name", "ticket"], axis=1)
+# y = titanic["fare"]
+# X = titanic.drop(["fare"], axis=1)
 
 # X, y = load_diabetes(return_X_y=True, as_frame=True)
 

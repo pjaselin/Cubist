@@ -40,9 +40,8 @@ def parse_cubist_model(model, x):
     for i, row in enumerate(model):
         # break each row of x into dicts for each key/value pair
         tt = parser(row)
-
         # get the first key in the first entry of tt
-        first_key = list(tt[0].keys())[0]
+        first_key = list(tt[0])[0]
 
         # start of a new rule
         if first_key == "rules":
@@ -59,27 +58,16 @@ def parse_cubist_model(model, x):
         if first_key == "type":
             c_idx += 1
             cond_num[i] = c_idx
-    
-    # get the number of committees
-    num_com = len([c for c in model if re.search("^rules=", c)])
 
-    # apply the analogous R split function to get a dict
-    rules_per_com = split_to_groups(rule_num, com_num)
-
-    rules_per_com = {a: max(rules_per_com[a]) for a in rules_per_com}
-    rules_per_com = {a: rules_per_com[a] for a in rules_per_com if rules_per_com[a] > 0}
-    if rules_per_com and num_com > 0:
-        rules_per_com = {f'Com {i + 1}': rules_per_com[a] for i, a in enumerate(list(rules_per_com.keys()))}
-    
     split_var = [None] * model_len
     split_val = [None] * model_len
     split_cats = [""] * model_len
     split_dir = [""] * model_len
     split_type = [""] * model_len
-
+    
     is_type2 = [i for i, c in enumerate(model) if re.search("^type=\"2\"", c)]
     for i in is_type2:
-        split_type[i] = "type2"
+        split_type[i] = "continuous"
         continuous_split = type2(model[i])
         split_var[i] = continuous_split["var"].replace('\"', "")
         split_dir[i] = continuous_split["rslt"]
@@ -88,6 +76,7 @@ def parse_cubist_model(model, x):
     is_type3 = [i for i, c in enumerate(model) if re.search("^type=\"3\"", c)]
     for i in is_type3:
         categorical_split = type3(model[i])
+        split_type[i] = "categorical"
         split_var[i] = categorical_split["var"]
         split_cats[i] = categorical_split["val"]
 
@@ -106,15 +95,19 @@ def parse_cubist_model(model, x):
         split_data = split_data.dropna(subset=['variable'])
         split_data = split_data.reset_index(drop=True)
 
-        # get the rule by rule percentiles (?)
+        # get the percentage of data covered by this rule
         nrows = x.shape[0]
         for i in range(split_data.shape[0]):
-            var = split_data.loc[i, "value"]
-            if not np.isnan(var):
+            # get the current value threshold and comparison operator
+            var_value = split_data.loc[i, "value"]
+            comp_operator = split_data.loc[i, "dir"]
+            if not np.isnan(var_value):
+                # convert the data to numeric
                 x_col = pd.to_numeric(x[split_data.loc[i, "variable"]])
-                split_data.loc[i, "percentile"] = sum([c <= var for c in x_col]) / nrows
-
-    # get coefficients
+                # evaluate and get the percentage of data
+                split_data.loc[i, "percentile"] = sum([eval(f"{c} {comp_operator} {var_value}") for c in x_col]) / nrows
+    
+    # get model coefficients
     is_eqn = [i for i, c in enumerate(model) if "coeff=" in c]
     coefs = [eqn(model[i], var_names=list(x.columns)) for i in is_eqn]
     out = pd.DataFrame(coefs)
@@ -206,5 +199,7 @@ def make_parsed_dict(x):
 def parser(x):
     """"""
     x = x.split(" ")
+    print(x)
     x = [make_parsed_dict(c) for c in x]
+    print(x)
     return x

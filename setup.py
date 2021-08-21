@@ -36,7 +36,7 @@ setup(
     name="cubist",
     version=get_version("cubist/__init__.py"),
     author="Patrick Aselin",
-    description="A Python wrapper to Quinlan's Cubist regression model.",
+    description="A Python package for fitting Quinlan's Cubist regression model.",
     long_description=long_description,
     long_description_content_type="text/markdown",
     ext_modules=cythonize(extensions),
@@ -45,7 +45,7 @@ setup(
     install_requires=requires,
     url="https://github.com/pjaselin/Cubist",
     packages=["cubist"],
-    license="LICENSE",
+    license="GPL v3",
     classifiers = [
         "Programming Language :: Python",
         "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",

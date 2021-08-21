@@ -53,7 +53,7 @@ class Cubist(RegressorMixin, BaseEstimator):
     neighbors : int, default=0
         Number between 0 and 9 for how many instances should be used to correct the rule-based prediction.
 
-    verbose : bool, default=False
+    verbose : int, default=0
         Should the Cubist output be printed?
 
     Attributes
@@ -101,7 +101,7 @@ class Cubist(RegressorMixin, BaseEstimator):
                  target_label: str = "outcome",
                  weights=None,
                  neighbors: int = 0,
-                 verbose: bool = False):
+                 verbose: int = 0):
         super().__init__()
 
         # initialize instance variables
