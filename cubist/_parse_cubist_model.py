@@ -4,10 +4,6 @@ import pandas as pd
 import numpy as np
 
 
-def count_rules(x):
-    return
-
-
 def split_to_groups(x, f):
     """Function to convert two lists into a dictionary where the keys are unique values in f and 
     the values are lists of the corresponding values in x. Analogous to the split function in R."""
@@ -188,7 +184,6 @@ def eqn(x, var_names=None):
 
 
 def make_parsed_dict(x):
-    """"""
     x = x.split("=")
     if len(x) > 1:
         return {x[0]: x[1]}
@@ -197,9 +192,6 @@ def make_parsed_dict(x):
 
 
 def parser(x):
-    """"""
     x = x.split(" ")
-    print(x)
     x = [make_parsed_dict(c) for c in x]
-    print(x)
     return x
