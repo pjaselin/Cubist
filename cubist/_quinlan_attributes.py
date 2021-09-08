@@ -1,5 +1,6 @@
 import pandas as pd
-from pandas.api.types import is_string_dtype, is_numeric_dtype, is_datetime64_any_dtype
+from pandas.api.types import is_string_dtype, is_numeric_dtype, \
+    is_datetime64_any_dtype, is_complex_dtype, is_float_dtype
 
 
 def _get_data_format(x: pd.Series):
@@ -22,17 +23,20 @@ def _get_data_format(x: pd.Series):
     # remove NAs from series
     x = x.dropna()
     # for numeric columns
-    if is_numeric_dtype(x):
+    if is_numeric_dtype(x) or all([float == j for j in [type(i) for i in x.values]]):
         return "continuous."
     # for string columns
-    if is_string_dtype(x):
+    elif is_string_dtype(x):
+        x = x.astype(str)
         return f"{','.join(set(x))}."
     # for datetime columns
-    if is_datetime64_any_dtype(x):
+    elif is_datetime64_any_dtype(x):
         return x
     # otherwise the data is not supported here
+    elif is_complex_dtype(x):
+        raise ValueError("Complex data not supported")
     else:
-        raise NotImplementedError
+        raise ValueError(f"Dtype {x.dtype} is not supported")
 
 
 def quinlan_attributes(df: pd.DataFrame) -> dict:

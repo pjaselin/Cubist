@@ -34,7 +34,7 @@ def get_version(rel_path):
 
 setup(
     name="cubist",
-    version=get_version("cubist/__init__.py"),
+    version=get_version("cubist/_version.py"),
     author="Patrick Aselin",
     description="A Python package for fitting Quinlan's Cubist regression model.",
     long_description=long_description,

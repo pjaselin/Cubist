@@ -14,4 +14,7 @@ RegressorMixin and BaseEstimator classes, meaning that Cubist can be dropped
 into existing sklearn-based ML pipelines or scripts for experimenting.
 """
 from .cubist import Cubist
-__version__ = "0.0.11"
+
+from ._version import __version__
+
+__all__ = ['Cubist', '__version__']

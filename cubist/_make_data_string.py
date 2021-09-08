@@ -26,6 +26,9 @@ def r_format(x: float, digits: int = 15) -> str:
     # if x is NA return NA
     if pd.isna(x):
         return x
+    if np.iscomplex(x):
+        raise ValueError("Complex data not supported")
+
     # get the count of whole number digits, i.e. the number of digits to the left of the decimal place
     whole_nums_count = len(str(int(x)))
     # Where there are decimal places that need to be rounded, round to digits - whole_nums_count decimal places
@@ -57,10 +60,8 @@ def make_data_string(x, y=None, w=None):
     x : str
         Input dataset converted to a string and formatted per Cubist's requirements.
     """
-    # copy Pandas objects so they aren't changed outside of this function
     x = x.copy(deep=True)
-    y = y.copy(deep=True)
-
+    
     # apply the escapes function to all string columns
     for col in x:
         if is_string_dtype(x[col]):
@@ -70,6 +71,8 @@ def make_data_string(x, y=None, w=None):
     if y is None:
         y = [np.nan] * x.shape[0]
         y = pd.Series(y)
+    else:
+        y = y.copy(deep=True)
 
     # format the y column for special charactesrs
     y = pd.Series(escapes(y.astype(str)))
