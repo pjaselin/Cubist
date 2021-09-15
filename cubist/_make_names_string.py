@@ -2,6 +2,9 @@ import re
 import sys
 from datetime import datetime
 
+import pandas as pd
+import numpy as np
+
 from ._quinlan_attributes import quinlan_attributes
 
 
@@ -67,11 +70,19 @@ def escapes(x, chars=None):
     # set custom reserved characters list
     if chars is None:
         chars = [':', ';', '|']
-    # apply first escaping
-    for i in chars:
-        x = [c.replace(i, f'\\{i}') for c in x]
-    # apply second escaping
-    x = [re_escape(c) for c in x]
+    # handle list of values or a single value
+    if isinstance(x, (list, pd.Series, np.array)):
+        # apply first escaping
+        for i in chars:
+            x = [c.replace(i, f'\\{i}') for c in x]
+        # apply second escaping
+        x = [re_escape(c) for c in x]
+    else:
+        # apply first escaping
+        for i in chars:
+            x = x.replace(i, f'\\{i}')
+        # apply second escaping
+        x = re_escape(x)
     return x
 
 

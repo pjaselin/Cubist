@@ -1,6 +1,16 @@
 import pandas as pd
 from pandas.api.types import is_string_dtype, is_numeric_dtype, \
-    is_datetime64_any_dtype, is_complex_dtype, is_float_dtype
+    is_datetime64_any_dtype, is_complex_dtype
+
+
+def _is_all_float_dtype(x):
+    """check whether all values are of float dtype"""
+    return all([float == j for j in [type(i) for i in x.values]])
+
+
+def _is_all_int_dtype(x):
+    """check whether all values are of float dtype"""
+    return all([int == j for j in [type(i) for i in x.values]])
 
 
 def _get_data_format(x: pd.Series):
@@ -23,10 +33,10 @@ def _get_data_format(x: pd.Series):
     # remove NAs from series
     x = x.dropna()
     # for numeric columns
-    if is_numeric_dtype(x) or all([float == j for j in [type(i) for i in x.values]]):
+    if is_numeric_dtype(x) or _is_all_float_dtype(x):
         return "continuous."
     # for string columns
-    elif is_string_dtype(x):
+    elif is_string_dtype(x) or _is_all_int_dtype(x):
         x = x.astype(str)
         return f"{','.join(set(x))}."
     # for datetime columns

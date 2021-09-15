@@ -1,10 +1,15 @@
 from random import randint
+from warnings import warn
 
 import numpy as np
 import pandas as pd
-from sklearn.base import RegressorMixin, BaseEstimator
+
 from sklearn.utils import _deprecate_positional_args
-from sklearn.utils.validation import check_is_fitted
+from sklearn.utils.validation import check_array, check_is_fitted, check_X_y, _check_sample_weight, check_is_fitted
+from sklearn.tree._tree import DTYPE, DOUBLE
+from sklearn.exceptions import DataConversionWarning
+from sklearn.base import RegressorMixin, BaseEstimator
+from scipy.sparse import issparse
 
 from ._make_names_string import make_names_string
 from ._make_data_string import make_data_string, validate_x
@@ -153,12 +158,53 @@ class Cubist(RegressorMixin, BaseEstimator):
             self.random_state = self.random_state % 4095
 
         if self.weights is not None and not isinstance(self.weights, (list, np.ndarray)):
+            self.weights = _check_sample_weight(self.weights, X)
             raise ValueError("case weights must be numeric")
 
         if not isinstance(self.neighbors, int):
             raise ValueError("Only an integer value for neighbors is allowed")
         if self.neighbors < 0 or self.neighbors > 10:
             raise ValueError("'neighbors' must be 0 or greater and 10 or less")
+
+        
+        X, y = check_X_y(X, y, force_all_finite=False)
+
+        #         # Validate or convert input data
+        # if issparse(y):
+        #     raise ValueError(
+        #         "sparse multilabel-indicator for y is not supported."
+        #     )
+        # X, y = self._validate_data(X, y, multi_output=True,
+        #                            accept_sparse="csc", dtype=DTYPE)
+        # # if sample_weight is not None:
+        # #     sample_weight = _check_sample_weight(sample_weight, X)
+
+        # if issparse(X):
+        #     # Pre-sort indices to avoid that each individual tree of the
+        #     # ensemble sorts the indices.
+        #     X.sort_indices()
+
+        # # Remap output
+        # self.n_features_ = X.shape[1]
+
+        # y = np.atleast_1d(y)
+        # if y.ndim == 2 and y.shape[1] == 1:
+        #     warn("A column-vector y was passed when a 1d array was"
+        #          " expected. Please change the shape of y to "
+        #          "(n_samples,), for example using ravel().",
+        #          DataConversionWarning, stacklevel=2)
+
+        # if y.ndim == 1:
+        #     # reshape is necessary to preserve the data contiguity against vs
+        #     # [:, np.newaxis] that does not.
+        #     y = np.reshape(y, (-1, 1))
+
+        # self.n_outputs_ = y.shape[1]
+        
+        # y, expanded_class_weight = self._validate_y_class_weight(y)
+
+        # if getattr(y, "dtype", None) != DOUBLE or not y.flags.contiguous:
+        #     y = np.ascontiguousarray(y, dtype=DOUBLE)
 
         # validate input data
         if X is None:
@@ -178,9 +224,6 @@ class Cubist(RegressorMixin, BaseEstimator):
         # create the names and data strings required for cubist
         self.names_string = make_names_string(X, w=self.weights, label=self.target_label)
         self.data_string = make_data_string(X, y, w=self.weights)
-
-        print(self.names_string)
-        print(self.data_string)
 
         # call the C implementation of cubist
         self.model, output = _cubist(self.names_string.encode(),
@@ -241,7 +284,8 @@ class Cubist(RegressorMixin, BaseEstimator):
             )
             self.variables_ = {"all": list(X.columns),
                                "used": list(used_variables)}
-
+        
+        self.is_fitted_ = True
         return self
 
     def predict(self, X):
@@ -258,7 +302,8 @@ class Cubist(RegressorMixin, BaseEstimator):
         y : ndarray of shape (n_samples,)
             The predicted values.
         """
-        check_is_fitted(self)
+        X = check_array(X)
+        check_is_fitted(self, 'is_fitted_')
         # validate input data
         X = validate_x(X)
         X = X.reset_index(drop=True)
@@ -291,3 +336,7 @@ class Cubist(RegressorMixin, BaseEstimator):
         if output:
             print(output.decode())
         return pred
+
+    def _validate_y_class_weight(self, y):
+        # Default implementation
+        return y, None

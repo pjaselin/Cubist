@@ -1,4 +1,4 @@
-import warnings
+from warnings import warn
 
 import pandas as pd
 from pandas.api.types import is_string_dtype, is_numeric_dtype
@@ -15,7 +15,7 @@ def validate_x(x):
         if len(x.shape) != 2:
             raise ValueError("Input NumPy array has more than two dimensions, only a two dimensional matrices " \
                              "are allowed.")
-        warnings.warn("Input data is a NumPy Array, setting column names to default `var0, var1,...`.")
+        warn("Input data is a NumPy Array, setting column names to default `var0, var1,...`.")
         x = pd.DataFrame(x, columns=[f'var{i}' for i in range(x.shape[1])])
     return x
 
