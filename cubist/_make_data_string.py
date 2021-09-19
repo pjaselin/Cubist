@@ -12,9 +12,6 @@ def validate_x(x):
     if not isinstance(x, (pd.DataFrame, np.ndarray)):
         raise ValueError("X must be a Numpy Array or Pandas DataFrame")
     if isinstance(x, np.ndarray):
-        if len(x.shape) != 2:
-            raise ValueError("Input NumPy array has more than two dimensions, only a two dimensional matrices " \
-                             "are allowed.")
         warn("Input data is a NumPy Array, setting column names to default `var0, var1,...`.")
         x = pd.DataFrame(x, columns=[f'var{i}' for i in range(x.shape[1])])
     return x
@@ -82,8 +79,8 @@ def make_data_string(x, y=None, w=None):
 
     # handle weights matrix (?) TODO: validate
     if w is not None:
-        column_names = list(x.columns) + [f"w{i}" for i in range(w.shape[1])]
-        x = pd.concat([x, w], axis=1, ignore_index=True)
+        column_names = list(x.columns) + ["w"] #[f"w{i}" for i in range(x.shape[1])]
+        x = x.assign(w=w)
         x.columns = column_names
 
     # convert all columns to strings
