@@ -64,3 +64,4 @@ pip install --upgrade cubist
 - Continue adding tests
 - Add visualization utilities
 - Enable more features from the C-code model
+- Make Windows-compatible and continue verifying sklearn API integration
