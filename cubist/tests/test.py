@@ -32,6 +32,7 @@ model = Cubist(verbose=True)
 print(model.fit(X_train, y_train).predict(X_test))
 
 print(model.fit(X_train, y_train, sample_weight=np.ones(y_train.shape[0])).predict(X_test))
+print(model.feature_importances_)
 # print(model)
 # print(model.predict(X_test).tolist())
 # print(model.score(X_train, y_train))
