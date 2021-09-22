@@ -54,7 +54,7 @@ jobs:
     # test
     - name: Test with pytest
       run: |
-        pytest cubist --cov=com --cov-report=xml --cov-report=html tests/
+        pytest --cov=com --cov-report=xml --cov-report=html tests/ cubist
 
   build_wheels:
     name: Build wheels on ${{ matrix.os }}  - ${{ matrix.vers }}
