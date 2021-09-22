@@ -1,5 +1,17 @@
 import pandas as pd
-from pandas.api.types import is_string_dtype, is_numeric_dtype, is_datetime64_any_dtype
+from pandas.api.types import is_string_dtype, is_numeric_dtype, \
+    is_datetime64_any_dtype, is_complex_dtype
+import numpy as np
+
+
+def _is_all_float_dtype(x: pd.Series):
+    """check whether all values are of float dtype"""
+    return all([j == float or np.issubdtype(j, np.floating) for j in [type(i) for i in x.values]])
+
+
+def _is_all_int_dtype(x: pd.Series):
+    """check whether all values are of float dtype"""
+    return all([j == int or np.issubdtype(j, np.integer) for j in [type(i) for i in x.values]])
 
 
 def _get_data_format(x: pd.Series):
@@ -21,18 +33,20 @@ def _get_data_format(x: pd.Series):
     """
     # remove NAs from series
     x = x.dropna()
+    if is_complex_dtype(x):
+        raise ValueError("Complex data not supported")
     # for numeric columns
-    if is_numeric_dtype(x):
+    elif is_numeric_dtype(x) or _is_all_float_dtype(x) or _is_all_int_dtype(x):
         return "continuous."
     # for string columns
-    if is_string_dtype(x):
+    elif is_string_dtype(x):
+        x = x.astype(str)
         return f"{','.join(set(x))}."
     # for datetime columns
-    if is_datetime64_any_dtype(x):
+    elif is_datetime64_any_dtype(x):
         return x
-    # otherwise the data is not supported here
     else:
-        raise NotImplementedError
+        raise ValueError(f"Dtype {x.dtype} is not supported")
 
 
 def quinlan_attributes(df: pd.DataFrame) -> dict:
