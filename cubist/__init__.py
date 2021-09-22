@@ -2,7 +2,7 @@
 cubist: Cubist regression model for Python
 ==========================================
 
-cubist is a Python module that wraps the C implementation of JR Quinlan's 
+cubist is a Python module that wraps the C implementation of Quinlan's 
 regression model of the same name. In the module, "Cubist" is the name of the 
 model class. 
 
@@ -14,4 +14,7 @@ RegressorMixin and BaseEstimator classes, meaning that Cubist can be dropped
 into existing sklearn-based ML pipelines or scripts for experimenting.
 """
 from .cubist import Cubist
-__version__ = "0.0.11"
+
+from ._version import __version__
+
+__all__ = ['Cubist', '__version__']

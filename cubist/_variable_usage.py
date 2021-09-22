@@ -3,7 +3,9 @@ import pandas as pd
 
 def get_variable_usage(output, x):
     output = output.split("\n")
+    # get the attribute usage section of the model output
     start_vars = [i for i, c in enumerate(output) if '\tAttribute usage' in c]
+    # if not present raise an error
     if len(start_vars) != 1:
         raise ValueError("cannot find attribute usage data")
     output = output[start_vars[0]:(len(output))-2]
