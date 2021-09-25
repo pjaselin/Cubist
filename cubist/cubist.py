@@ -3,7 +3,6 @@ import zlib
 import numpy as np
 import pandas as pd
 
-from sklearn.utils import _deprecate_positional_args
 from sklearn.utils.validation import check_array, check_is_fitted, \
     check_X_y, check_is_fitted, check_random_state, _check_sample_weight
 from sklearn.base import RegressorMixin, BaseEstimator
@@ -17,7 +16,7 @@ from _cubist import _cubist, _predictions
 
 class Cubist(BaseEstimator, RegressorMixin):
     """
-    Cubist Regression Model (Public v2.07) developed by JR Quinlan.
+    Cubist Regression Model (Public v2.07) developed by Quinlan.
 
     References:
     - https://www.rdocumentation.org/packages/Cubist/versions/0.3.0
@@ -103,9 +102,10 @@ class Cubist(BaseEstimator, RegressorMixin):
     >>> model.predict(X_test)
     >>> model.score(X_test, y_test)
     """
-    @_deprecate_positional_args
+
     def __init__(self,
                  n_rules: int = 500,
+                 *,
                  n_committees: int = 1,
                  neighbors: int = 1,
                  unbiased: bool = False,
@@ -183,13 +183,7 @@ class Cubist(BaseEstimator, RegressorMixin):
                          y_numeric=True,
                          ensure_min_samples=2)
 
-        # validate input data
-        if X is None:
-            raise ValueError("No training data passed to parameter X")
-        if y is None:
-            raise ValueError("No target/outcome data passed to parameter y")
-        if not isinstance(y, (list, pd.Series, np.ndarray)):
-            raise ValueError("Cubist requires a numeric target outcome")
+        # validate target data type for Cubist
         if not isinstance(y, pd.Series):
             y = pd.Series(y)
 
