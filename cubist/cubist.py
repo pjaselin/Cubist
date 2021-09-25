@@ -78,7 +78,12 @@ class Cubist(BaseEstimator, RegressorMixin):
         Distance between instances.
 
     feature_importances_ : pd.DataFrame
-        Table of how training data variables are used in the Cubist model.
+        Table of how training data variables are used in the Cubist model. The 
+        first column for "Conditions" shows the approximate percentage of cases 
+        for which the named attribute appears in a condition of an applicable 
+        rule, while the second column "Attributes" gives the percentage of cases 
+        for which the attribute appears in the linear formula of an applicable 
+        rule.
 
     rules_ : pd.DataFrame
         Table of the rules built by the Cubist model.
