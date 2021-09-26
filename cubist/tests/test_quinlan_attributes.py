@@ -5,7 +5,7 @@ import pandas as pd
 import numpy as np
 import pytest
 
-from cubist._quinlan_attributes import quinlan_attributes, _get_data_format, \
+from .._quinlan_attributes import quinlan_attributes, _get_data_format, \
     _is_all_float_dtype, _is_all_int_dtype
 
 
