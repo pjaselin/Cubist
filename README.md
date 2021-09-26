@@ -6,17 +6,17 @@ A Python package for fitting Quinlan's [Cubist](https://www.rulequest.com/cubist
 Cubist is a regression algorithm develped by John Ross Quinlan for generating rule-based predictive models. This has been available in the R world thanks to the work of Max Kuhn and his colleagues. With this package it is introduced to the Python ecosystem and made scikit-learn compatible for easy use with existing data and model pipelines.
 
 ## Advantages
-Unlike other ensemble models such as RandomForest and XGBoost, Cubist generates a set of rules, making it easy to understand precisely how the model makes it's predictive decisions. Thus tools such as SHAP and LIME are no needed as Cubist doesn't exhibit black box behavior. Like XGBoost, Cubist can perform boosting by the addition of more models (here called committees) that correct for the error of prior models (i.e. the second model created corrects for the prediction error of the first, the third for the error of the second, etc.). In addition to boosting, the model can perform instance-based (nearest-neighbor) corrections to create composite models, thus combining the advantages of these two methods.
+Unlike other ensemble models such as RandomForest and XGBoost, Cubist generates a set of rules, making it easy to understand precisely how the model makes it's predictive decisions. Thus tools such as SHAP and LIME are not needed as Cubist doesn't exhibit black box behavior. Like XGBoost, Cubist can perform boosting by the addition of more models (here called committees) that correct for the error of prior models (i.e. the second model created corrects for the prediction error of the first, the third for the error of the second, etc.). In addition to boosting, the model can perform instance-based (nearest-neighbor) corrections to create composite models, thus combining the advantages of these two methods.
 
 ## Use
 ```python
-    >>> from sklearn.datasets import load_boston
-    >>> from cubist import Cubist
-    >>> X, y = load_boston(return_X_y=True)
-    >>> model = Cubist()
-    >>> model.fit(X, y)
-    >>> model.predict(X)
-    >>> model.score(X, y)
+>>> from sklearn.datasets import load_boston
+>>> from cubist import Cubist
+>>> X, y = load_boston(return_X_y=True)
+>>> model = Cubist()
+>>> model.fit(X, y)
+>>> model.predict(X)
+>>> model.score(X, y)
 ```
 
 ## Model Parameters
@@ -60,7 +60,7 @@ pip install --upgrade cubist
 - https://www.rulequest.com/cubist-pubs.html
 - https://www.linkedin.com/pulse/machine-learning-example-r-using-cubist-kirk-mettler
 
-## To DO
+## To Do
 - Continue adding tests
 - Add visualization utilities
 - Enable more features from the C-code model

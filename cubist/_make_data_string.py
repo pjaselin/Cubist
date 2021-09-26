@@ -1,5 +1,3 @@
-from warnings import warn
-
 import pandas as pd
 from pandas.api.types import is_string_dtype, is_numeric_dtype
 import numpy as np
@@ -12,7 +10,6 @@ def validate_x(x):
     if not isinstance(x, (pd.DataFrame, np.ndarray)):
         raise ValueError("X must be a Numpy Array or Pandas DataFrame")
     if isinstance(x, np.ndarray):
-        warn("Input data is a NumPy Array, setting column names to default `var0, var1,...`.")
         x = pd.DataFrame(x, columns=[f'var{i}' for i in range(x.shape[1])])
     return x
 
