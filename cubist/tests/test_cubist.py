@@ -3,7 +3,7 @@ import pytest
 
 import pandas as pd
 
-from cubist import Cubist
+from ..cubist import Cubist
 
 titanic = pd.read_csv("https://raw.githubusercontent.com/mwaskom/seaborn-data/master/raw/titanic.csv")
 titanic = titanic.drop(["name", "ticket"], axis=1)
