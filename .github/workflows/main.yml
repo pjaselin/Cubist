@@ -21,7 +21,7 @@ on:
       - created
 
 jobs:
-  test:
+  build:
     name: Test and build on Python ${{ matrix.python_version }} and ${{ matrix.os }}
     strategy:
       matrix:
@@ -142,7 +142,8 @@ jobs:
   release:
     # release only tagged commits to pypi / github
     name: release distribution
-    needs: [build_wheels, build_sdist]
+    needs: build
+    # needs: [build_wheels, build_sdist]
     if: github.event_name == 'release' && startsWith(github.ref, 'refs/tags')
     strategy:
       matrix:
