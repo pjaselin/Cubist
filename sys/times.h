@@ -40,10 +40,10 @@ struct timezone {
     int tz_dsttime; /* type of DST correction */
 };
 
-struct timespec {
-    time_t tv_sec; /* seconds */
-    long tv_nsec; /* and nanoseconds */
-};
+// struct timespec {
+//     time_t tv_sec; /* seconds */
+//     long tv_nsec; /* and nanoseconds */
+// };
 
 
 #endif
