@@ -66,8 +66,16 @@ jobs:
     
     - name: Build wheel
       run: |
+        GCC_COMPILER=`"${R_HOME}/bin/R" CMD config CC | grep "gcc"`
+        if test -n "$GCC_COMPILER"; then
+          echo "PKG_CFLAGS = -g" > src/Makevars.win
+        else
+          echo "PKG_CFLAGS = -g" > src/Makevars.win
+        fi
+        echo "PKG_CPPFLAGS = -DNDEBUG"
         pip install pep517 wheel
         python -m pep517.build --source --binary --out-dir dist/ .
+        rm -f src/Makevars.win
     
     - name: Upload wheel
       uses: actions/upload-artifact@v2
