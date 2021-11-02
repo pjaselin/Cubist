@@ -42,18 +42,16 @@ jobs:
     - name: Enable Developer Command Prompt for Windows
       if: matrix.os == 'windows-latest'
       uses: ilammy/msvc-dev-cmd@v1
-      # with:
-      #   toolset: 14.0
     
     - name: Add sys/time.h for Windows
       if: matrix.os == 'windows-latest'
       run: |
         mv winsys/ cubist/sys
       
-      - name: Add sys/time.h for Windows
-        if: matrix.os != 'windows-latest'
-        run: |
-          rm -r winsys/
+    - name: Remove winsys folder for non-Windows OSes
+      if: matrix.os != 'windows-latest'
+      run: |
+        rm -r winsys/
     
     - name: Install dependencies
       run: |
@@ -61,7 +59,6 @@ jobs:
         pip3 install setuptools wheel build cython
         pip3 install flake8 pytest pytest-cov numpy
 
-    # # lint syntax errors
     - name: Lint with flake8
       run: |
         pip install flake8
@@ -70,7 +67,6 @@ jobs:
         # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
         flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
 
-    # test
     - name: Test with pytest
       run: |
         pip install pytest
