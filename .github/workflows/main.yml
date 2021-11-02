@@ -16,7 +16,7 @@ on:
       - dev
   release:
     branches:
-      - release
+      - master
     types:
       - created
 
