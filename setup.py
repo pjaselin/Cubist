@@ -7,19 +7,11 @@ import sys
 
 import numpy as np
 
-if sys.platform in ['darwin', 'linux', 'bsd']:
-    extra_compile_args = ['-O3']
-elif sys.platform in ['win32']:
-    extra_compile_args = ['/Ox']
-else:
-    extra_compile_args = []
-
 extensions = [
     Extension(
         name='_cubist',
         sources=["cubist/_cubist.pyx"] + glob.glob("cubist/src/*.c"),
-        include_dirs=["cubist/src", np.get_include()],
-        extra_compile_args=extra_compile_args
+        include_dirs=["cubist/src", np.get_include()]
     )
 ]
 
