@@ -42,7 +42,7 @@ jobs:
       if: matrix.os == 'windows-latest'
       uses: ilammy/msvc-dev-cmd@v1.7.0
       run: |
-        cp sys cubist/
+        mv sys cubist/
     
     - name: Install dependencies
       run: |
