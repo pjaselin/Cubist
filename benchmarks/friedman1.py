@@ -15,6 +15,7 @@ from time import time
 import os
 
 import numpy as np
+import pandas as pd
 
 from mlens.ensemble import SuperLearner
 from mlens.utils import safe_print
@@ -35,25 +36,9 @@ from cubist import Cubist
 from sklearn.linear_model import LinearRegression
 from lineartree import LinearTreeRegressor
 
-from modeltree import ModelTree
-
 from sklearn.metrics import mean_squared_error
 import warnings
 warnings.filterwarnings(action="ignore", module="scipy", message="^internal gelsd")
-
-class linear_regr:
-
-    def __init__(self):
-        self.model = LinearRegression()
-
-    def fit(self, X, y):
-        self.model.fit(X, y)
-
-    def predict(self, X):
-        return self.model.predict(X)
-
-    def loss(self, X, y, y_pred):
-        return mean_squared_error(y, y_pred)
 
 
 def build_ensemble(**kwargs):
@@ -106,8 +91,7 @@ if __name__ == '__main__':
                   '     GBM': GradientBoostingRegressor(),
                   '     KNN': KNeighborsRegressor(n_jobs=-1),
                   '  Cubist': Cubist(),
-                  'LineTree': LinearTreeRegressor(base_estimator=LinearRegression()),
-                  'ModelTre': ModelTree(linear_regr())}
+                  'LineTree': LinearTreeRegressor(base_estimator=LinearRegression())}
 
     names = {k.strip(' '): k for k in ESTIMATORS}
     times = {e: [] for e in ESTIMATORS}
@@ -177,4 +161,6 @@ if __name__ == '__main__':
             safe_print('%5d:%02d' % (m, s), end=' | ')
         safe_print()
     
+    times = pd.DataFrame(times)
+    scores = pd.DataFrame(scores)
     
