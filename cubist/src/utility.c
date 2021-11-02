@@ -30,7 +30,7 @@
 /*************************************************************************/
 
 #define _CRT_SECURE_NO_WARNINGS
-
+#include <sys/time.h>
 #include "defns.h"
 #include "extern.h"
 
@@ -39,7 +39,7 @@
 #include "redefine.h"
 #include "transform.h"
 
-#include <sys/time.h>
+
 
 #define NAME T_Cubist
 
