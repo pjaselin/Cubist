@@ -79,8 +79,8 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
-    # env:
-    #   CIBW_SKIP: "pp* *-win32"
+    env:
+      CIBW_SKIP: "*-win32"
     steps:
       - uses: actions/checkout@v2
 
