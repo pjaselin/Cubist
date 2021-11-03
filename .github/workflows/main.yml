@@ -21,7 +21,7 @@ on:
       - created
 
 jobs:
-  test:
+  build:
     name: Test and lint on Python ${{ matrix.python_version }} and ${{ matrix.os }}
     strategy:
       matrix:
