@@ -92,8 +92,8 @@ jobs:
     
     - name: Upload artifact
       uses: actions/upload-artifact@v2
-        with:
-          path: dist/*.tar.gz
+      with:
+        path: dist/*.tar.gz
     
     # - name: Upload wheel
     #   uses: actions/upload-artifact@v2
