@@ -21,11 +21,11 @@ on:
       - created
 
 jobs:
-  test:
-    name: Test with pytest
+  build:
+    name: Test and build on Python ${{ matrix.python_version }} and ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest] # [ macos-latest, windows-latest]
+        os: [ubuntu-latest, macos-latest, windows-latest]
         python-version: [3.6, 3.7, 3.8, 3.9]
     runs-on: ${{ matrix.os }}
 
@@ -35,96 +35,59 @@ jobs:
 
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v2
-
+      with:
+        python-version: ${{ matrix.python-version }}
+    
+    - name: Enable Developer Command Prompt for Windows
+      if: matrix.os == 'windows-latest'
+      uses: ilammy/msvc-dev-cmd@v1
+    
+    - name: Add sys/time.h for Windows
+      if: matrix.os == 'windows-latest'
+      run: |
+        mv winsys/ cubist/sys
+      
+    - name: Remove winsys folder for non-Windows OSes
+      if: matrix.os != 'windows-latest'
+      run: |
+        rm -r winsys/
+    
     - name: Install dependencies
       run: |
         pip3 install --upgrade pip
         pip3 install setuptools wheel build cython
         pip3 install flake8 pytest pytest-cov numpy
-        pip3 install .
+        pip install -e .
 
-    # # lint syntax errors
-    # - name: Lint with flake8
-    #   run: |
-    #     # stop the build if there are Python syntax errors or undefined names
-    #     flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
-    #     # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
-    #     flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+    - name: Lint with flake8
+      run: |
+        pip install flake8
+        # stop the build if there are Python syntax errors or undefined names
+        flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+        # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
+        flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
 
-    # test
     - name: Test with pytest
       run: |
+        pip install pytest
         pytest --cov=com --cov-report=xml --cov-report=html
-
-  build_wheels:
-    name: Build wheels on ${{ matrix.os }}  - ${{ matrix.vers }}
-    needs: test
-    strategy:
-      matrix:
-        include:
-          # - vers: i686
-          #   os: ubuntu-20.04
-          # - vers: aarch64
-          #   os: ubuntu-20.04
-          - vers: auto64
-            os: ubuntu-20.04
-          # - vers: arm64
-          #   os: macos-10.15
-          # - vers: auto64
-          #   os: macos-10.15
-          # - vers: auto64
-          #   os: windows-2019
-    runs-on: ${{ matrix.os }}
-    env:
-      CIBW_SKIP: "cp27-* cp34-* cp35-* pp* *-win32"
-
-    steps:
-    - name: Checkout repo
-      uses: actions/checkout@v2
-
-    - name: Install Python
-      uses: actions/setup-python@v2
-      with:
-        python-version: "3.9"
-
-    - name: wheels Linux ${{ matrix.vers }}
-      if: runner.os == 'Linux'
-      uses: joerick/cibuildwheel@v1.10.0
-      env:
-        CIBW_ARCHS_LINUX: ${{ matrix.vers }}
-
-    - name: upload artifact
+    
+    - name: Build wheel
+      run: |
+        pip install pep517 wheel
+        python -m pep517.build --source --binary --out-dir dist/ .
+    
+    - name: Upload wheel
       uses: actions/upload-artifact@v2
       with:
-        path: ./wheelhouse/*.whl
-
-  build_sdist:
-    name: Build source distribution
-    needs: test
-    runs-on: ubuntu-latest
-    steps:
-    - name: Checkout repo
-      uses: actions/checkout@v2
-
-    - name: Set up Python
-      uses: actions/setup-python@v2
-      with:
-        python-version: "3.9"
-
-    - name: Build sdist
-      run: |
-        python -m pip install setuptools wheel build cython numpy
-        python setup.py sdist
-
-    - uses: actions/upload-artifact@v2
-      with:
-        path: dist/*.tar.gz
+        name: dist
+        path: dist
 
   release:
     # release only tagged commits to pypi / github
     name: release distribution
-    needs: [build_wheels, build_sdist]
-    if: github.event_name == 'release' && startsWith(github.ref, 'refs/tags')
+    needs: build
+    if: github.ref == 'refs/heads/release' && startsWith(github.ref, 'refs/tags')
     strategy:
       matrix:
         platform: [ubuntu-latest]
