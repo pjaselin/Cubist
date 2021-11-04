@@ -11,6 +11,8 @@ if sys.platform in ['darwin', 'linux', 'bsd']:
     extra_compile_args = ['-O3']
 elif sys.platform in ['win32']:
     extra_compile_args = ['/Ox']
+else:
+    extra_compile_args = []
 
 extensions = [
     Extension(
