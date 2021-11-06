@@ -80,7 +80,7 @@ jobs:
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
     env:
-      CIBW_SKIP: "*-win32"
+      CIBW_SKIP: "pp* *-win32 cp310-*"
     steps:
       - uses: actions/checkout@v2
 
