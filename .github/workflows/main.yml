@@ -21,12 +21,12 @@ on:
       - created
 
 jobs:
-  build:
-    name: Test and build on Python ${{ matrix.python_version }} and ${{ matrix.os }}
+  test:
+    name: Test and lint on Python ${{ matrix.python_version }} and ${{ matrix.os }}
     strategy:
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
-        python-version: [3.6, 3.7, 3.8, 3.9]
+        python-version: [3.6, 3.7, 3.8, 3.9, 3.10]
     runs-on: ${{ matrix.os }}
 
     steps:
@@ -47,7 +47,7 @@ jobs:
       run: |
         mv winsys/ cubist/sys
       
-    - name: Remove winsys folder for non-Windows OSes
+    - name: Remove winsys folder for non-Windows OS
       if: matrix.os != 'windows-latest'
       run: |
         rm -r winsys/
@@ -71,28 +71,72 @@ jobs:
       run: |
         pip install pytest
         pytest --cov=com --cov-report=xml --cov-report=html
-    
-    - name: Build wheel
+
+  build_wheels:
+    needs: test
+    name: Build wheels on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    env:
+      CIBW_SKIP: "pp* *-win32"
+    steps:
+      - uses: actions/checkout@v2
+
+      - uses: actions/setup-python@v2
+        name: Install Python
+        with:
+          python-version: '3.9'
+
+      - name: Enable Developer Command Prompt for Windows
+        if: matrix.os == 'windows-latest'
+        uses: ilammy/msvc-dev-cmd@v1
+
+      - name: Add sys/time.h for Windows
+        if: matrix.os == 'windows-latest'
+        run: |
+          mv winsys/ cubist/sys
+
+      - name: Remove winsys folder for non-Windows OS
+        if: matrix.os != 'windows-latest'
+        run: |
+          rm -r winsys/
+
+      - name: Build wheels
+        uses: pypa/cibuildwheel@v2.2.2
+      
+      - uses: actions/upload-artifact@v2
+        with:
+          path: ./wheelhouse/*.whl
+
+  build_sdist:
+    name: Build source distribution
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v2
+
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: "3.9"
+
+    - name: Build sdist
       run: |
         python -m pip install setuptools wheel build cython numpy
         python setup.py sdist
-    
-    - name: Upload wheel
-      uses: actions/upload-artifact@v2
+    - uses: actions/upload-artifact@v2
       with:
-        name: dist
-        path: dist
-
+        path: dist/*.tar.gz
+  
   release:
     # release only tagged commits to pypi / github
     name: release distribution
-    needs: build
+    needs: [build_wheels, build_sdist]
     if: github.event_name == 'release' && startsWith(github.ref, 'refs/tags')
-    strategy:
-      matrix:
-        platform: [ubuntu-latest]
-        python-version: [3.9]
-    runs-on: ${{ matrix.platform }}
+    runs-on: ubuntu-latest
 
     steps:
     - name: mkdir
@@ -104,10 +148,6 @@ jobs:
       with:
         name: artifact
         path: dist
-
-    - name: ls
-      run: |
-        ls dist/
 
     # test publish to pypi
     - name: Publish distribution 📦 to Test PyPI
