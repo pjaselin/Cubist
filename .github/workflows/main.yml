@@ -79,29 +79,30 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
-    
+    # env:
+    #   CIBW_SKIP: "pp* *-win32"
     steps:
       - uses: actions/checkout@v2
 
       - uses: actions/setup-python@v2
         name: Install Python
         with:
-          python-version: '3.8'
+          python-version: '3.9'
 
       - name: Enable Developer Command Prompt for Windows
         if: matrix.os == 'windows-latest'
         uses: ilammy/msvc-dev-cmd@v1
-      
+
       - name: Add sys/time.h for Windows
         if: matrix.os == 'windows-latest'
         run: |
           mv winsys/ cubist/sys
-        
+
       - name: Remove winsys folder for non-Windows OS
         if: matrix.os != 'windows-latest'
         run: |
           rm -r winsys/
-        
+
       - name: Build wheels
         uses: pypa/cibuildwheel@v2.2.2
       
@@ -120,7 +121,7 @@ jobs:
     - name: Set up Python
       uses: actions/setup-python@v2
       with:
-        python-version: "3.8"
+        python-version: "3.9"
 
     - name: Build sdist
       run: |
