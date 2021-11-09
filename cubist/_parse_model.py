@@ -134,12 +134,7 @@ def parse_model(model, x):
     # get the rule number for the committee
     out["rule"] = [rule_num[i] for i in is_eqn]
 
-    # get the value for maxd
-    tmp = [c for c in model if "maxd" in c][0]
-    tmp = tmp.split("\"")
-    maxd_i = [i for i, c in enumerate(tmp) if "maxd" in c][0]
-    maxd = tmp[maxd_i + 1]
-    return split_data, out, float(maxd)
+    return split_data, out
 
 
 def type2(x, dig=3):

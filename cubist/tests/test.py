@@ -1,9 +1,8 @@
 import pandas as pd
-from sklearn.datasets import load_boston, load_diabetes, load_linnerud
+from sklearn.datasets import fetch_california_housing, load_diabetes, load_linnerud
 from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.linear_model import LinearRegression
-from xgboost import XGBRegressor
 from cubist import Cubist
 import numpy as np
 
@@ -28,7 +27,7 @@ X = iris.drop(["petal_width"], axis=1)
 # X = titanic.drop(["fare"], axis=1)
 
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
-model = Cubist(verbose=True)
+model = Cubist(verbose=True, neighbors=5, composite=True, cv=0)
 model.fit(X_train, y_train)
 print("score", model.score(X_train, y_train))
 
@@ -37,7 +36,7 @@ print("score", model.score(X_train, y_train))
 # print(model)
 # print(model.predict(X_test).tolist())
 # print(model.score(X_train, y_train))
-# print(model.score(X_test, y_test))
+print(model.score(X_test, y_test))
 
 # test = make_data_file(X, y)
 # print(test)

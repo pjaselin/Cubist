@@ -90,3 +90,38 @@ def test_sample_fail():
     with pytest.raises(ValueError):
         model.fit(X, y)
         assert model.is_fitted_
+
+def test_cv():
+    model = Cubist(cv=10)
+    model.fit(X, y)
+    assert model.is_fitted_
+
+
+def test_cv_fail1():
+    model = Cubist(cv=-0.1)
+    with pytest.raises(ValueError):
+        model.fit(X, y)
+        assert model.is_fitted_
+
+def test_cv_fail2():
+    model = Cubist(cv=-1)
+    with pytest.raises(ValueError):
+        model.fit(X, y)
+        assert model.is_fitted_
+
+@pytest.mark.parametrize("test_input,expected", 
+                        [(True, True), 
+                         (False, True), 
+                         ('auto', True)])
+def test_is_all_int_dtype(test_input, expected):
+    model = Cubist(composite=test_input)
+    model.fit(X, y)
+    with pytest.raises(ValueError):
+        model.fit(X, y)
+        assert model.is_fitted_
+
+def test_composite_fail():
+    model = Cubist(composite="1234")
+    with pytest.raises(ValueError):
+        model.fit(X, y)
+        assert model.is_fitted_

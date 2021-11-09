@@ -10,13 +10,13 @@ Unlike other ensemble models such as RandomForest and XGBoost, Cubist generates 
 
 ## Use
 ```python
->>> from sklearn.datasets import load_boston
->>> from cubist import Cubist
->>> X, y = load_boston(return_X_y=True)
->>> model = Cubist()
->>> model.fit(X, y)
->>> model.predict(X)
->>> model.score(X, y)
+from sklearn.datasets import fetch_california_housing
+from cubist import Cubist
+X, y = fetch_california_housing(return_X_y=True, as_frame=True)
+model = Cubist()
+model.fit(X, y)
+model.predict(X)
+model.score(X, y)
 ```
 
 ## Model Parameters
