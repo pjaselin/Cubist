@@ -165,7 +165,7 @@ class Cubist(BaseEstimator, RegressorMixin):
         if not isinstance(self.neighbors, int):
             raise ValueError("Only an integer value for neighbors is allowed")
         if self.neighbors < 1 or self.neighbors > 9:
-            raise ValueError("'neighbors' must be 1 or greater and 9 or less")
+            raise ValueError("'neighbors' must be between and including 1 and 9")
 
         if self.extrapolation < 0.0 or self.extrapolation > 1.0:
             raise ValueError("extrapolation percentage must be between 0.0 and 1.0")
@@ -206,18 +206,23 @@ class Cubist(BaseEstimator, RegressorMixin):
         self.data_string_ = make_data_string(X, y, w=sample_weight)
         
         # call the C implementation of cubist
-        self.model_, output = _cubist(self.names_string_.encode(),
-                                      self.data_string_.encode(),
-                                      self.unbiased,
-                                      b"yes",
-                                      1,
-                                      self.n_committees,
-                                      self.sample,
-                                      self.random_state_.randint(0, 4095) % 4096,
-                                      self.n_rules,
-                                      self.extrapolation,
-                                      b"1",
-                                      b"1")
+        # TODO: implement remaining options
+        ### -u	generate unbiased rules
+        # -i	definitely use composite models
+        # -a	allow the use of composite models
+        # -X folds	carry out a cross-validation (recommended value 10)
+        self.model_, output = _cubist(namesv_=self.names_string_.encode(),
+                                      datav_=self.data_string_.encode(),
+                                      unbiased_=self.unbiased,
+                                      compositev_=b"yes",
+                                      neighbors_=self.neighbors,
+                                      committees_=self.n_committees,
+                                      sample_=self.sample,
+                                      seed_=self.random_state_.randint(0, 4095) % 4096,
+                                      rules_=self.n_rules,
+                                      extrapolation_=self.extrapolation,
+                                      modelv_=b"1",
+                                      outputv_=b"1")
 
         # convert output from raw to strings
         self.model_ = self.model_.decode()
