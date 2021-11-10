@@ -10,8 +10,7 @@ extensions = [
     Extension(
         name='_cubist',
         sources=["cubist/_cubist.pyx"] + glob.glob("cubist/src/*.c"),
-        include_dirs=["cubist/src", np.get_include()],
-        extra_compile_args=["-O0"]
+        include_dirs=["cubist/src", np.get_include()]
     )
 ]
 

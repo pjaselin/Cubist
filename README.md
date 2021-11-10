@@ -61,7 +61,4 @@ pip install --upgrade cubist
 - https://www.linkedin.com/pulse/machine-learning-example-r-using-cubist-kirk-mettler
 
 ## To Do
-- Continue adding tests
 - Add visualization utilities
-- Enable more features from the C-code model
-- Make Windows-compatible and continue verifying sklearn API integration

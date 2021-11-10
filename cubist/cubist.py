@@ -199,10 +199,10 @@ class Cubist(BaseEstimator, RegressorMixin):
         
         if not isinstance(self.cv, int):
             raise ValueError("Number of cross-validation folds must be an integer")
-        elif self.cv < 0:
-            raise ValueError("Number of cross-validation folds must be 0 or greater.")
+        elif self.cv <= 1 and self.cv != 0:
+            raise ValueError("Number of cross-validation folds must be greater than 1.")
 
-        self.random_state_ = check_random_state(self.random_state)
+        random_state = check_random_state(self.random_state)
 
         if sample_weight is not None:
             sample_weight = _check_sample_weight(sample_weight, X)
@@ -230,36 +230,28 @@ class Cubist(BaseEstimator, RegressorMixin):
         self.n_features_in_ = X.shape[1]
 
         # create the names and data strings required for cubist
-        self.names_string_ = make_names_string(X, w=sample_weight, 
-                                               label=self.target_label)
-        self.data_string_ = make_data_string(X, y, w=sample_weight)
+        names_string = make_names_string(X, w=sample_weight,
+                                         label=self.target_label)
+        data_string = make_data_string(X, y, w=sample_weight)
         
         # call the C implementation of cubist
-        self.model_, output = _cubist(namesv_=self.names_string_.encode(),
-                                      datav_=self.data_string_.encode(),
-                                      unbiased_=self.unbiased,
-                                      compositev_=self.composite.encode(),
-                                      neighbors_=self.neighbors,
-                                      committees_=self.n_committees,
-                                      sample_=self.sample,
-                                      seed_=self.random_state_.randint(0, 4095) % 4096,
-                                      rules_=self.n_rules,
-                                      extrapolation_=self.extrapolation,
-                                      cv_=self.cv,
-                                      modelv_=b"1",
-                                      outputv_=b"1")
+        model, output = _cubist(namesv_=names_string.encode(),
+                                datav_=data_string.encode(),
+                                unbiased_=self.unbiased,
+                                compositev_=self.composite.encode(),
+                                neighbors_=self.neighbors,
+                                committees_=self.n_committees,
+                                sample_=self.sample,
+                                seed_=random_state.randint(0, 4095) % 4096,
+                                rules_=self.n_rules,
+                                extrapolation_=self.extrapolation,
+                                cv_=self.cv,
+                                modelv_=b"1",
+                                outputv_=b"1")
 
         # convert output from raw to strings
-        self.model_ = self.model_.decode()
+        self.model_ = model.decode()
         output = output.decode()
-
-        # replace "__Sample" with "sample" if this is used in the model
-        if "\n__Sample" in self.names_string_:
-            output = output.replace("__Sample", "sample")
-            self.model_ = self.model_.replace("__Sample", "sample")
-            # clean model string when using reserved sample name
-            self.model_ = self.model_[:self.model_.index("sample")] + \
-                          self.model_[self.model_.index("entries"):]
 
         # raise cubist errors
         if "Error" in output:
@@ -273,9 +265,21 @@ class Cubist(BaseEstimator, RegressorMixin):
         if self.verbose:
             print(output)
         
+        # if the model returned nothing, we're doing cross-validation so stop
+        if self.model_ == "1":
+            return self
+
+        # replace "__Sample" with "sample" if this is used in the model
+        if "\n__Sample" in names_string:
+            output = output.replace("__Sample", "sample")
+            self.model_ = self.model_.replace("__Sample", "sample")
+            # clean model string when using reserved sample name
+            self.model_ = self.model_[:self.model_.index("sample")] + \
+                          self.model_[self.model_.index("entries"):]
+        
         # compress descriptors and training data
-        self.names_string_ = zlib.compress(self.names_string_.encode())
-        self.data_string_ = zlib.compress(self.data_string_.encode())
+        self.names_string_ = zlib.compress(names_string.encode())
+        self.data_string_ = zlib.compress(data_string.encode())
 
         # parse model contents and store useful information
         self.rules_, self.coeff_ = parse_model(self.model_, X)
@@ -298,8 +302,6 @@ class Cubist(BaseEstimator, RegressorMixin):
             )
             self.variables_ = {"all": list(X.columns),
                                "used": list(used_variables)}
-        
-        self.is_fitted_ = True
         return self
 
     def predict(self, X):
@@ -316,7 +318,8 @@ class Cubist(BaseEstimator, RegressorMixin):
         y : ndarray of shape (n_samples,)
             The predicted values.
         """
-        check_is_fitted(self)
+        check_is_fitted(self, attributes=["model_", "rules_", "coeff_", 
+                                          "feature_importances_"])
 
         # validate input data
         X = check_array(X, dtype=None, force_all_finite="allow-nan")
