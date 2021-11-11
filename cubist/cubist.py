@@ -34,7 +34,7 @@ class Cubist(BaseEstimator, RegressorMixin):
         and beyond the first tries to correct the prediction errors of the prior 
         constructed model. Recommended value is 5.
 
-    neighbors : int, default=1
+    neighbors : int, default=0
         Number between 1 and 9 for how many instances should be used to correct 
         the rule-based prediction. Only used when composite is True or 'auto'.
 
@@ -45,7 +45,7 @@ class Cubist(BaseEstimator, RegressorMixin):
         frequent occurrences of the same value in a training dataset. Note that 
         MAE may be slightly higher.
     
-    composite : {True, False, 'auto'}, default=True
+    composite : {True, False, 'auto'}, default=False
         A composite model is a combination of Cubist's rule-based model and 
         instance-based or nearest-neighbor models to improve the predictive
         performance of the returned model. A value of True requires Cubist to
@@ -121,9 +121,9 @@ class Cubist(BaseEstimator, RegressorMixin):
                  n_rules: int = 500,
                  *,
                  n_committees: int = 1,
-                 neighbors: int = 1,
+                 neighbors: int = 0,
                  unbiased: bool = False,
-                 composite: bool = True,
+                 composite: str or bool = False,
                  extrapolation: float = 0.05,
                  sample: float = 0.0,
                  cv: int = 0,
@@ -170,40 +170,43 @@ class Cubist(BaseEstimator, RegressorMixin):
         """
         # validate model parameters
         if self.n_rules < 1 or self.n_rules > 1000000:
-            raise ValueError("number of rules must be between 1 and 1000000")
+            raise ValueError("Number of rules must be between 1 and 1000000")
 
         if self.n_committees < 1 or self.n_committees > 100:
-            raise ValueError("number of committees must be between 1 and 100")
+            raise ValueError("Number of committees must be between 1 and 100")
         
         if self.neighbors:
-            if self.composite is False:
-                self.neighbors = 0
+            if self.composite is False and self.neighbors !=0:
+                raise ValueError("`neighbors` should not be set when `composite` is False")
             elif not isinstance(self.neighbors, int):
                 raise ValueError("Only an integer value for neighbors is allowed")
             elif self.neighbors < 1 or self.neighbors > 9:
-                raise ValueError("'neighbors' must be between and including 1 and 9")
+                raise ValueError("'neighbors' must be between 1 and 9")
         
         if self.composite not in [True, False, 'auto']:
-            raise ValueError("'composite' must be one of [True, False, 'auto']")
+            raise ValueError(f"Wrong input for parameter `composite`. Expected True, False, or 'auto', got {self.composite}")
         else:
             if self.composite is True:
-                self.composite = 'yes'
+                self.composite_ = 'yes'
             elif self.composite is False:
-                self.composite = 'no'
+                self.composite_ = 'no'
+            else:
+                self.composite_ = self.composite
 
         if self.extrapolation < 0.0 or self.extrapolation > 1.0:
-            raise ValueError("extrapolation percentage must be between 0.0 and 1.0")
+            raise ValueError("Extrapolation percentage must be between 0.0 and 1.0")
 
         if self.sample < 0.0 or self.sample > 1.0:
-            raise ValueError("sampling percentage must be between 0.0 and 1.0")
+            raise ValueError("Sampling percentage must be between 0.0 and 1.0")
         
         if not isinstance(self.cv, int):
             raise ValueError("Number of cross-validation folds must be an integer")
         elif self.cv <= 1 and self.cv != 0:
-            raise ValueError("Number of cross-validation folds must be greater than 1.")
+            raise ValueError("Number of cross-validation folds must be greater than 1")
 
         random_state = check_random_state(self.random_state)
 
+        # check and apply sample weighting
         if sample_weight is not None:
             sample_weight = _check_sample_weight(sample_weight, X)
             self.is_sample_weighted_ = True
@@ -238,7 +241,7 @@ class Cubist(BaseEstimator, RegressorMixin):
         model, output = _cubist(namesv_=names_string.encode(),
                                 datav_=data_string.encode(),
                                 unbiased_=self.unbiased,
-                                compositev_=self.composite.encode(),
+                                compositev_=self.composite_.encode(),
                                 neighbors_=self.neighbors,
                                 committees_=self.n_committees,
                                 sample_=self.sample,

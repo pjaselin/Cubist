@@ -1,8 +1,18 @@
 import re
 import math 
+import operator
 
 import pandas as pd
 import numpy as np
+
+
+OPERATORS = {
+    "<": operator.lt,
+    "<=": operator.le,
+    ">": operator.gt,
+    ">=": operator.ge,
+    "==": operator.eq
+}
 
 
 def split_to_groups(x, f):
@@ -122,7 +132,8 @@ def parse_model(model, x):
                     # convert the data to numeric and remove NaNs
                     x_col = pd.to_numeric(x[split_data.loc[i, "variable"]]).dropna()
                     # evaluate and get the percentage of data
-                    split_data.loc[i, "percentile"] = sum([eval(f"{c} {comp_operator} {var_value}") for c in x_col]) / nrows
+                    comp_total = OPERATORS[comp_operator](x_col, var_value).sum()
+                    split_data.loc[i, "percentile"] = comp_total / nrows
     
     # get the indices of rows in model that contain model coefficients
     is_eqn = [i for i, c in enumerate(model) if "coeff=" in c]

@@ -49,7 +49,7 @@ def test_n_committees_fail():
 
 
 def test_neighbors():
-    model = Cubist(neighbors=5)
+    model = Cubist(neighbors=5, composite='auto')
     model.fit(X, y)
     check_is_fitted(model)
 
@@ -113,7 +113,8 @@ def test_cv_fail2():
 @pytest.mark.parametrize("test_input,expected", 
                         [(True, True), 
                          (False, True), 
-                         ('auto', True)])
+                         ('auto', True)
+                         ])
 def test_composite(test_input, expected):
     model = Cubist(composite=test_input)
     model.fit(X, y)
