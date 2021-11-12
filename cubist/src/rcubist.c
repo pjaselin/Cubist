@@ -63,7 +63,7 @@ int cubistmain()
   if (!(F = GetFile(".data", "r")))
     Error(NOFILE, "", "");
   GetData(F, true, false);
-  fprintf(Of, TX_ReadData(MaxCase + 1, MaxAtt, FileStem));
+  fprintf(Of, TX_ReadData(MaxCase + 1, MaxAtt));
 
   if (XVAL && (F = GetFile(".test", "r"))) {
     SaveMaxCase = MaxCase;

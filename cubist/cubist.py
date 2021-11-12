@@ -1,15 +1,15 @@
 import zlib
-import warnings
+from warnings import warn
 
 import numpy as np
 import pandas as pd
 
-from sklearn.utils.validation import check_array, check_is_fitted, \
-    check_X_y, check_random_state, _check_sample_weight
+from sklearn.utils.validation import check_is_fitted, check_random_state, \
+    _check_sample_weight
 from sklearn.base import RegressorMixin, BaseEstimator
 
 from ._make_names_string import make_names_string
-from ._make_data_string import make_data_string, validate_x
+from ._make_data_string import make_data_string
 from ._parse_model import parse_model
 from ._variable_usage import get_variable_usage
 from _cubist import _cubist, _predictions
@@ -36,7 +36,9 @@ class Cubist(BaseEstimator, RegressorMixin):
 
     neighbors : int, default=0
         Number between 1 and 9 for how many instances should be used to correct 
-        the rule-based prediction. Only used when composite is True or 'auto'.
+        the rule-based prediction. Only used when composite is True or 'auto'. 
+        If neighbors=0 and composite=False or 'auto', Cubist will choose a value
+        for this parameter.
 
     unbiased : bool, default=False
         Should unbiased rules be used? Since Cubist minimizes the MAE of the 
@@ -45,7 +47,7 @@ class Cubist(BaseEstimator, RegressorMixin):
         frequent occurrences of the same value in a training dataset. Note that 
         MAE may be slightly higher.
     
-    composite : {True, False, 'auto'}, default=False
+    composite : bool or 'auto', default=False
         A composite model is a combination of Cubist's rule-based model and 
         instance-based or nearest-neighbor models to improve the predictive
         performance of the returned model. A value of True requires Cubist to
@@ -147,28 +149,13 @@ class Cubist(BaseEstimator, RegressorMixin):
     def _more_tags(self):
         return {"allow_nan": True,
                 "X_types": ["2darray", "string"]}
+    
+    def _validate_model_parameters(self):
+        """Validate inputs to the Cubist model
 
-    def fit(self, X, y, sample_weight = None):
+        Raises:
+            ValueError for invalid model parameter inputs
         """
-        Build a Cubist regression model from training set (X, y).
-
-        Parameters
-        ----------
-        X : {array-like} of shape (n_samples, n_features)
-            The training input samples.
-
-        y : array-like of shape (n_samples,)
-            The target values (Real numbers in regression).
-
-        sample_weight : array-like of shape (n_samples,)
-            Optional vector of sample weights that is the same length as y for 
-            how much each instance should contribute to the model fit.
-
-        Returns
-        -------
-        self : object
-        """
-        # validate model parameters
         if self.n_rules < 1 or self.n_rules > 1000000:
             raise ValueError("Number of rules must be between 1 and 1000000")
 
@@ -204,33 +191,54 @@ class Cubist(BaseEstimator, RegressorMixin):
         elif self.cv <= 1 and self.cv != 0:
             raise ValueError("Number of cross-validation folds must be greater than 1")
 
-        random_state = check_random_state(self.random_state)
+    def fit(self, X, y, sample_weight = None):
+        """Build a Cubist regression model from training set (X, y).
 
-        # check and apply sample weighting
+        Parameters
+        ----------
+        X : {array-like} of shape (n_samples, n_features)
+            The training input samples.
+
+        y : array-like of shape (n_samples,)
+            The target values (Real numbers in regression).
+
+        sample_weight : array-like of shape (n_samples,)
+            Optional vector of sample weights that is the same length as y for 
+            how much each instance should contribute to the model fit.
+
+        Returns
+        -------
+        self : object
+        """
+        # scikit-learn checks
+        X, y = self._validate_data(X, y, 
+                                   dtype=None,
+                                   force_all_finite='allow-nan', 
+                                   y_numeric=True,
+                                   ensure_min_samples=2)
+        
+        # set the feature names if it hasn't already been done
+        if not hasattr(self, "feature_names_in_"):
+            self.feature_names_in_ = [f'var{i}' for i in range(X.shape[1])]
+        
+        # check sample weighting
         if sample_weight is not None:
             sample_weight = _check_sample_weight(sample_weight, X)
             self.is_sample_weighted_ = True
         else:
             self.is_sample_weighted_ = False
-
         
-        X, y = check_X_y(X, y, 
-                         dtype=None,
-                         force_all_finite='allow-nan', 
-                         y_numeric=True,
-                         ensure_min_samples=2)
-
-        # validate target data type for Cubist
-        if not isinstance(y, pd.Series):
-            y = pd.Series(y)
-
-        # validate input data
-        X = validate_x(X)
-        X = X.reset_index(drop=True)
-        y = y.reset_index(drop=True)
-
-        # report the number of features passed to the fit method
+        # validate model parameters
+        self._validate_model_parameters()
+        
         self.n_features_in_ = X.shape[1]
+        self.n_outputs_ = 1
+
+        # (re)construct a dataframe from X
+        X = pd.DataFrame(X, columns=self.feature_names_in_)
+        y = pd.Series(y)
+
+        random_state = check_random_state(self.random_state)
 
         # create the names and data strings required for cubist
         names_string = make_names_string(X, w=sample_weight,
@@ -262,7 +270,7 @@ class Cubist(BaseEstimator, RegressorMixin):
         
         # inform user that they may want to use rules only
         if "Recommend using rules only" in output:
-            warnings.warn("Cubist recommends using rules only (i.e. set composite=False)")
+            warn("Cubist recommends using rules only (i.e. set composite=False)")
 
         # print model output if using verbose output
         if self.verbose:
@@ -308,8 +316,7 @@ class Cubist(BaseEstimator, RegressorMixin):
         return self
 
     def predict(self, X):
-        """
-        Predict Cubist regression target for X.
+        """Predict Cubist regression target for X.
 
         Parameters
         ----------
@@ -321,13 +328,18 @@ class Cubist(BaseEstimator, RegressorMixin):
         y : ndarray of shape (n_samples,)
             The predicted values.
         """
+        # make sure the model has been fitted
         check_is_fitted(self, attributes=["model_", "rules_", "coeff_", 
                                           "feature_importances_"])
 
         # validate input data
-        X = check_array(X, dtype=None, force_all_finite="allow-nan")
-        X = validate_x(X)
-        X = X.reset_index(drop=True)
+        X = self._validate_data(X, 
+                                dtype=None, 
+                                force_all_finite='allow-nan', 
+                                reset=False)
+
+        # (re)construct a dataframe from X
+        X = pd.DataFrame(X, columns=self.feature_names_in_)
 
         # If there are case weights used during training, the C code will expect 
         # a column of weights in the new data but the values will be ignored.

@@ -75,9 +75,9 @@ if __name__ == '__main__':
     SEED = 2017
     np.random.seed(SEED)
 
-    step = 4000
+    step = 40000
     mi = step
-    mx = 40000 + step
+    mx = 400000 + step
 
     ens_multi = build_ensemble(folds=2, shuffle=False, n_jobs=-1)
 
