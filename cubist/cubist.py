@@ -288,9 +288,14 @@ class Cubist(BaseEstimator, RegressorMixin):
             self.model_ = self.model_[:self.model_.index("sample")] + \
                           self.model_[self.model_.index("entries"):]
         
-        # compress descriptors and training data
+        # compress and save descriptors
         self.names_string_ = zlib.compress(names_string.encode())
-        self.data_string_ = zlib.compress(data_string.encode())
+
+        # TODO: check to see when a composite model has been used
+        # compress and save training data if using a composite model
+        if self.composite is True or "nearest neighbors" in output \
+            or self.neighbors > 0:
+            self.data_string_ = zlib.compress(data_string.encode())
 
         # parse model contents and store useful information
         self.rules_, self.coeff_ = parse_model(self.model_, X)
@@ -348,11 +353,17 @@ class Cubist(BaseEstimator, RegressorMixin):
 
         # make data string for predictions
         data_string = make_data_string(X)
+
+        # if a composite model was used, get the training data
+        if hasattr(self, "data_string_"):
+            training_data_string = zlib.decompress(self.data_string_)
+        else:
+            training_data_string = b"1"
         
         # get cubist predictions from trained model
         pred, output = _predictions(data_string.encode(),
                                     zlib.decompress(self.names_string_),
-                                    zlib.decompress(self.data_string_),
+                                    training_data_string,
                                     self.model_.encode(),
                                     np.zeros(X.shape[0]),
                                     b"1")
