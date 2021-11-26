@@ -84,10 +84,10 @@
   "\t-C <members>\tcommittee model\n"                                          \
   "\t-h\t\tprint this message\n"
 #define T_TargetAtt "\n    Target attribute `%s'\n"
-#define TX_ReadData(c, a, f)                                                   \
-  "\nRead %d cases (%d attributes) from"                                       \
-  " %s.data\n",                                                                \
-      c, a, f
+#define TX_ReadData(c, a)                                                   \
+  "\nRead %d cases (%d attributes)"                                       \
+  "\n",                                                                \
+      c, a
 #define TX_ReadTest(c, f) "Read %d cases from %s.test\n", c, f
 #define T_CWtAtt "Using relative case weighting\n"
 #define T_AttributesIn "\nAttributes included:\n"

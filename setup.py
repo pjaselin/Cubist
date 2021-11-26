@@ -3,7 +3,6 @@ from Cython.Build import cythonize
 import glob
 import os.path
 import codecs
-import sys
 
 import numpy as np
 

@@ -6,13 +6,13 @@ cdef extern from "src/top.c":
     void cubist(char **namesv, char **datav, int *unbiased,
                 char **compositev, int *neighbors, int *committees,
                 double *sample, int *seed, int *rules, double *extrapolation,
-                char **modelv, char **outputv)
+                int *cv, char **modelv, char **outputv)
     void predictions(char **casev, char **namesv, char **datav, char **modelv, 
                      double *predv, char **outputv)
 
 # define the Python functions that interface with the C functions
 def _cubist(namesv_, datav_, unbiased_, compositev_, neighbors_, committees_, 
-            sample_, seed_, rules_, extrapolation_, modelv_, outputv_):
+            sample_, seed_, rules_, extrapolation_, cv_, modelv_, outputv_):
     """
     Train and retun Cubist model and output from C code
     """
@@ -26,10 +26,11 @@ def _cubist(namesv_, datav_, unbiased_, compositev_, neighbors_, committees_,
     cdef int seed = seed_;
     cdef int rules = rules_;
     cdef double extrapolation = extrapolation_;
+    cdef int cv = cv_;
     cdef char *modelv = modelv_;
     cdef char *outputv = outputv_;
     cubist(&namesv, &datav, &unbiased, &compositev, &neighbors, &committees, 
-           &sample, &seed, &rules, &extrapolation, &modelv, &outputv);
+           &sample, &seed, &rules, &extrapolation, &cv, &modelv, &outputv);
     return (modelv, outputv)
 
 
