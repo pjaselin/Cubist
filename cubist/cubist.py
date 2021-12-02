@@ -1,5 +1,6 @@
 import zlib
 from warnings import warn
+from typing import Type, Union
 
 import numpy as np
 import pandas as pd
@@ -26,15 +27,15 @@ class Cubist(BaseEstimator, RegressorMixin):
     Parameters
     ----------
     n_rules : int, default=500
-        Limit of the number of rules Cubist will build. Recommended value is 
-        500.
+        Limit of the number of rules Cubist will build. Recommended and default
+        value is 500.
 
     n_committees : int, default=1
         Number of committees to construct. Each committee is a rule based model 
         and beyond the first tries to correct the prediction errors of the prior 
         constructed model. Recommended value is 5.
 
-    neighbors : int, default=0
+    neighbors : int or None, default=None
         Number between 1 and 9 for how many instances should be used to correct 
         the rule-based prediction. Only used when composite is True or 'auto'. 
         If neighbors=0 and composite=False or 'auto', Cubist will choose a value
@@ -51,8 +52,8 @@ class Cubist(BaseEstimator, RegressorMixin):
         A composite model is a combination of Cubist's rule-based model and 
         instance-based or nearest-neighbor models to improve the predictive
         performance of the returned model. A value of True requires Cubist to
-        include the nearest-neighbor model, False will only allow Cubist to
-        generate a rule-based model, and 'auto' allows the algorithm to choose
+        include the nearest-neighbor model, False will ensure Cubist only
+        generates a rule-based model, and 'auto' allows the algorithm to choose
         whether to use nearest-neighbor corrections.
 
     extrapolation : float, default=0.05
@@ -62,10 +63,10 @@ class Cubist(BaseEstimator, RegressorMixin):
     sample : float, default=0.0
         Percentage of the data set to be randomly selected for model building.
     
-    cv : int, default=0
+    cv : int or None, default=None
         Whether to carry out cross-validation (recommended value is 10)
 
-    random_state : int, default=randint(0, 4095)
+    random_state : int, default=None
         An integer to set the random seed for the C Cubist code.
 
     target_label : str, default="outcome"
@@ -123,12 +124,12 @@ class Cubist(BaseEstimator, RegressorMixin):
                  n_rules: int = 500,
                  *,
                  n_committees: int = 1,
-                 neighbors: int = 0,
+                 neighbors: int = None,
                  unbiased: bool = False,
-                 composite: str or bool = False,
+                 composite: Union[bool, 'auto'] = False,
                  extrapolation: float = 0.05,
                  sample: float = 0.0,
-                 cv: int = 0,
+                 cv: int = None,
                  random_state: int = None,
                  target_label: str = "outcome",
                  verbose: int = 0):
@@ -156,19 +157,27 @@ class Cubist(BaseEstimator, RegressorMixin):
         Raises:
             ValueError for invalid model parameter inputs
         """
-        if self.n_rules < 1 or self.n_rules > 1000000:
+        if not isinstance(self.n_rules, int):
+            raise TypeError("Number of rules must be an integer")
+        elif self.n_rules < 1 or self.n_rules > 1000000:
             raise ValueError("Number of rules must be between 1 and 1000000")
 
-        if self.n_committees < 1 or self.n_committees > 100:
-            raise ValueError("Number of committees must be between 1 and 100")
+        if not isinstance(self.n_committees, int):
+            raise TypeError("Number of committees must be an integer")
+        elif self.n_committees < 1 or self.n_committees > 100:
+            raise ValueError("Number of committees must be 1 or greater")
         
         if self.neighbors:
-            if self.composite is False and self.neighbors !=0:
+            if self.composite is False:
                 raise ValueError("`neighbors` should not be set when `composite` is False")
             elif not isinstance(self.neighbors, int):
-                raise ValueError("Only an integer value for neighbors is allowed")
+                raise TypeError("Number of neighbors must be an integer")
             elif self.neighbors < 1 or self.neighbors > 9:
                 raise ValueError("'neighbors' must be between 1 and 9")
+            else:
+                self.neighbors_ = self.neighbors
+        else:
+            self.neighbors_ = 0
         
         if self.composite not in [True, False, 'auto']:
             raise ValueError(f"Wrong input for parameter `composite`. Expected True, False, or 'auto', got {self.composite}")
@@ -178,18 +187,27 @@ class Cubist(BaseEstimator, RegressorMixin):
             elif self.composite is False:
                 self.composite_ = 'no'
             else:
-                self.composite_ = self.composite
+                self.composite_ = 'auto'
 
-        if self.extrapolation < 0.0 or self.extrapolation > 1.0:
+        if not isinstance(self.extrapolation, float):
+            raise TypeError("Extrapolation percentage must be a float")
+        elif self.extrapolation < 0.0 or self.extrapolation > 1.0:
             raise ValueError("Extrapolation percentage must be between 0.0 and 1.0")
 
+        if not isinstance(self.sample, float):
+            raise TypeError("Sampling percentage must be a float")
         if self.sample < 0.0 or self.sample > 1.0:
             raise ValueError("Sampling percentage must be between 0.0 and 1.0")
         
-        if not isinstance(self.cv, int):
-            raise ValueError("Number of cross-validation folds must be an integer")
-        elif self.cv <= 1 and self.cv != 0:
-            raise ValueError("Number of cross-validation folds must be greater than 1")
+        if not isinstance(self.cv, (int, type(None))):
+            raise TypeError("Number of cross-validation folds must be an integer or None")
+        if isinstance(self.cv, int):
+            if self.cv <= 1 and self.cv != 0:
+                raise ValueError("Number of cross-validation folds must be greater than 1")
+            else:
+                self.cv_ = self.cv
+        else:
+            self.cv_ = 0
 
     def fit(self, X, y, sample_weight = None):
         """Build a Cubist regression model from training set (X, y).
@@ -250,13 +268,13 @@ class Cubist(BaseEstimator, RegressorMixin):
                                 datav_=data_string.encode(),
                                 unbiased_=self.unbiased,
                                 compositev_=self.composite_.encode(),
-                                neighbors_=self.neighbors,
+                                neighbors_=self.neighbors_,
                                 committees_=self.n_committees,
                                 sample_=self.sample,
                                 seed_=random_state.randint(0, 4095) % 4096,
                                 rules_=self.n_rules,
                                 extrapolation_=self.extrapolation,
-                                cv_=self.cv,
+                                cv_=self.cv_,
                                 modelv_=b"1",
                                 outputv_=b"1")
 
@@ -294,7 +312,7 @@ class Cubist(BaseEstimator, RegressorMixin):
         # TODO: check to see when a composite model has been used
         # compress and save training data if using a composite model
         if self.composite is True or "nearest neighbors" in output \
-            or self.neighbors > 0:
+            or self.neighbors_ > 0:
             self.data_string_ = zlib.compress(data_string.encode())
 
         # parse model contents and store useful information
