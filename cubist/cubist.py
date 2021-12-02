@@ -126,7 +126,7 @@ class Cubist(BaseEstimator, RegressorMixin):
                  n_committees: int = 1,
                  neighbors: int = None,
                  unbiased: bool = False,
-                 composite: Union[bool, 'auto'] = False,
+                 composite: Union[bool, str] = False,
                  extrapolation: float = 0.05,
                  sample: float = 0.0,
                  cv: int = None,
