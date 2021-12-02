@@ -28,11 +28,11 @@ def test_n_rules():
     check_is_fitted(model)
 
 
-def test_n_rules_fail():
-    model = Cubist(n_rules=10000000)
-    with pytest.raises(ValueError):
-        model.fit(X, y)
-        check_is_fitted(model)
+# def test_n_rules_fail():
+#     model = Cubist(n_rules=10000000)
+#     with pytest.raises(ValueError):
+#         model.fit(X, y)
+#         check_is_fitted(model)
 
 
 def test_n_committees():
@@ -41,9 +41,16 @@ def test_n_committees():
     check_is_fitted(model)
 
 
-def test_n_committees_fail():
-    model = Cubist(n_committees=101)
+def test_n_committees_fail1():
+    model = Cubist(n_committees=-1)
     with pytest.raises(ValueError):
+        model.fit(X, y)
+        check_is_fitted(model)
+
+
+def test_n_committees_fail2():
+    model = Cubist(n_committees="sdfa")
+    with pytest.raises(TypeError):
         model.fit(X, y)
         check_is_fitted(model)
 
@@ -100,7 +107,7 @@ def test_cv():
 
 def test_cv_fail1():
     model = Cubist(cv=-0.1)
-    with pytest.raises(ValueError):
+    with pytest.raises(TypeError):
         model.fit(X, y)
         check_is_fitted(model)
 

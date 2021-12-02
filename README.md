@@ -37,15 +37,12 @@ The above image is a sample of the verbose output produced by Cubist. It first r
 The following parameters can be passed as arguments to the ```Cubist()``` class instantiation:
 - n_rules (int, default=500): Limit of the number of rules Cubist will build. Recommended value is 500.
 - n_committees (int, default=0): Number of committees to construct. Each committee is a rule based model and beyond the first tries to correct the prediction errors of the prior constructed model. Recommended value is 5.
-- neighbors (int, default=1): Number between 1 and 9 for how many instances should be used to correct the rule-based prediction.
-- unbiased (bool, default=False): Should unbiased rules be used? Since Cubist minimizes the MAE of the 
-        predicted values, the rules may be biased and the mean predicted value may differ from the actual mean. This is recommended when there are frequent occurrences of the same value in a training dataset. Note that MAE may be slightly higher.
-- composite (True, False, or'auto', default=False):
-        A composite model is a combination of Cubist's rule-based model and instance-based or nearest-neighbor models to improve the predictive
-        performance of the returned model. A value of True requires Cubist to include the nearest-neighbor model, False will only allow Cubist to generate a rule-based model, and 'auto' allows the algorithm to choose whether to use nearest-neighbor corrections.
+- neighbors (int, default=None): Number between 1 and 9 for how many instances should be used to correct the rule-based prediction.
+- unbiased (bool, default=False): Should unbiased rules be used? Since Cubist minimizes the MAE of the predicted values, the rules may be biased and the mean predicted value may differ from the actual mean. This is recommended when there are frequent occurrences of the same value in a training dataset. Note that MAE may be slightly higher.
+- composite (True, False, or 'auto', default=False): A composite model is a combination of Cubist's rule-based model and instance-based or nearest-neighbor models to improve the predictive performance of the returned model. A value of True requires Cubist to include the nearest-neighbor model, False will ensure Cubist only generates a rule-based model, and 'auto' allows the algorithm to choose whether to use nearest-neighbor corrections.
 - extrapolation (float, default=0.05): Adjusts how much rule predictions are adjusted to be consistent with the training dataset. Recommended value is 5% as a decimal (0.05)
 - sample (float, default=0.0): Percentage of the data set to be randomly selected for model building.
-- cv (int, default=0): Whether to carry out cross-validation (recommended value is 10)
+- cv (int, default=None): Whether to carry out cross-validation (recommended value is 10)
 - random_state (int, default=randint(0, 4095)): An integer to set the random seed for the C Cubist code.
 - target_label (str, default="outcome"): A label for the outcome variable. This is only used for printing rules.
 - verbose (int, default=0) Should the Cubist output be printed? 1 if yes, 0 if no.
