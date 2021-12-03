@@ -5,15 +5,6 @@ import numpy as np
 from ._make_names_string import escapes
 
 
-def validate_x(x):
-    """Ensure input dataset is of a valid type and format"""
-    if not isinstance(x, (pd.DataFrame, np.ndarray)):
-        raise ValueError("X must be a Numpy Array or Pandas DataFrame")
-    if isinstance(x, np.ndarray):
-        x = pd.DataFrame(x, columns=[f'var{i}' for i in range(x.shape[1])])
-    return x
-
-
 def r_format(x: float, digits: int = 15) -> str:
     """Python version of the R format function to return a number formatted as a 
     string rounded to `digits` number of digits from the left."""
