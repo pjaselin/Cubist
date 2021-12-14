@@ -196,7 +196,7 @@ class Cubist(BaseEstimator, RegressorMixin):
 
         if not isinstance(self.sample, float):
             raise TypeError("Sampling percentage must be a float")
-        if self.sample < 0.0 or self.sample > 1.0:
+        if self.sample < 0.0 or self.sample >= 1.0:
             raise ValueError("Sampling percentage must be between 0.0 and 1.0")
         
         if not isinstance(self.cv, (int, type(None))):
@@ -228,6 +228,12 @@ class Cubist(BaseEstimator, RegressorMixin):
         -------
         self : object
         """
+        # get column name from y if it is a Pandas Series
+        if isinstance(y, pd.Series):
+            target_label_ = y.name
+        else:
+            target_label_ = None
+
         # scikit-learn checks
         X, y = self._validate_data(X, y, 
                                    dtype=None,
@@ -258,9 +264,14 @@ class Cubist(BaseEstimator, RegressorMixin):
 
         random_state = check_random_state(self.random_state)
 
+        # if a Pandas series wasn't used or it has no name,
+        # use the passed target_label feature, otherwise use
+        # the name of the Pandas series
+        self.target_label_ = target_label_ or self.target_label
+
         # create the names and data strings required for cubist
         names_string = make_names_string(X, w=sample_weight,
-                                         label=self.target_label)
+                                         label=self.target_label_)
         data_string = make_data_string(X, y, w=sample_weight)
         
         # call the C implementation of cubist
