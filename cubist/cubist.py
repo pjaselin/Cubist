@@ -302,8 +302,9 @@ class Cubist(BaseEstimator, RegressorMixin):
             raise Exception(output)
         
         # inform user that they may want to use rules only
+        # TODO: make sure I'm using warnings correctly here
         if "Recommend using rules only" in output:
-            warn("Cubist recommends using rules only (i.e. set composite=False)")
+            warn("Cubist recommends using rules only (i.e. set composite=False)", UserWarning)
 
         # print model output if using verbose output
         if self.verbose:
@@ -400,12 +401,15 @@ class Cubist(BaseEstimator, RegressorMixin):
                                     np.zeros(X.shape[0]),
                                     b"1")
         
+        # decode output
+        output = output.decode()
+
         # raise Cubist prediction errors
         # TODO add CubistError class
         if "prediction code called exit" in output or "Error" in output:
             raise Exception(output)
         
         if output:
-            print(output.decode())
+            print(output)
         
         return pred
