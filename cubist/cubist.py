@@ -301,6 +301,9 @@ class Cubist(BaseEstimator, RegressorMixin):
         if "Error" in output:
             raise Exception(output)
         
+        if "cubist code called exit" in output:
+            raise Exception(output)
+        
         # inform user that they may want to use rules only
         if "Recommend using rules only" in output:
             warn("Cubist recommends using rules only (i.e. set composite=False)")
@@ -324,8 +327,7 @@ class Cubist(BaseEstimator, RegressorMixin):
         # compress and save descriptors
         self.names_string_ = zlib.compress(names_string.encode())
 
-        # TODO: check to see when a composite model has been used
-        # compress and save training data if using a composite model
+        # when a composite model has been used compress and save training data
         if self.composite is True or "nearest neighbors" in output \
             or self.neighbors_ > 0:
             self.data_string_ = zlib.compress(data_string.encode())
@@ -400,8 +402,11 @@ class Cubist(BaseEstimator, RegressorMixin):
                                     self.model_.encode(),
                                     np.zeros(X.shape[0]),
                                     b"1")
-
-        # TODO: parse and handle errors in output
+        # TODO add CubistError class
+        if "prediction code called exit with value" in output:
+            raise Exception(output)
+        
         if output:
             print(output.decode())
+        
         return pred

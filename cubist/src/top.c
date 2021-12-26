@@ -66,7 +66,7 @@ static void cubist(char **namesv, char **datav, int *unbiased,
       *modelv = model;
     }
   } else {
-    printf("cubist code called exit with value %d\n", val - JMP_OFFSET);
+    printf("training code called exit with value %d\n", val - JMP_OFFSET);
   }
 
   // Close file object "Of", and return its contents via argument outputv
@@ -118,7 +118,7 @@ static void predictions(char **casev, char **namesv, char **datav,
     samplemain(predv);
 
   } else {
-    printf("sample code called exit with value %d\n", val - JMP_OFFSET);
+    printf("prediction code called exit with value %d\n", val - JMP_OFFSET);
   }
 
   // Close file object "Of", and return its contents via argument outputv
