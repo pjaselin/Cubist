@@ -60,7 +60,7 @@ class Cubist(BaseEstimator, RegressorMixin):
         Adjusts how much rule predictions are adjusted to be consistent with 
         the training dataset. Recommended value is 5% as a decimal (0.05)
 
-    sample : float, default=0.0
+    sample : float, default=None
         Percentage of the data set to be randomly selected for model building.
     
     cv : int or None, default=None
@@ -128,7 +128,7 @@ class Cubist(BaseEstimator, RegressorMixin):
                  unbiased: bool = False,
                  composite: Union[bool, str] = False,
                  extrapolation: float = 0.05,
-                 sample: float = 0.0,
+                 sample: float = None,
                  cv: int = None,
                  random_state: int = None,
                  target_label: str = "outcome",
@@ -194,10 +194,14 @@ class Cubist(BaseEstimator, RegressorMixin):
         elif self.extrapolation < 0.0 or self.extrapolation > 1.0:
             raise ValueError("Extrapolation percentage must be between 0.0 and 1.0")
 
-        if not isinstance(self.sample, float):
-            raise TypeError("Sampling percentage must be a float")
-        if self.sample < 0.0 or self.sample >= 1.0:
-            raise ValueError("Sampling percentage must be between 0.0 and 1.0")
+        if self.sample:
+            if not isinstance(self.sample, float):
+                raise TypeError("Sampling percentage must be a float")
+            if self.sample < 0.0 or self.sample >= 1.0:
+                raise ValueError("Sampling percentage must be between 0.0 and 1.0")
+            self.sample_ = self.sample
+        else:
+            self.sample_ = 0.0
         
         if not isinstance(self.cv, (int, type(None))):
             raise TypeError("Number of cross-validation folds must be an integer or None")
@@ -281,7 +285,7 @@ class Cubist(BaseEstimator, RegressorMixin):
                                 compositev_=self.composite_.encode(),
                                 neighbors_=self.neighbors_,
                                 committees_=self.n_committees,
-                                sample_=self.sample,
+                                sample_=self.sample_,
                                 seed_=random_state.randint(0, 4095) % 4096,
                                 rules_=self.n_rules,
                                 extrapolation_=self.extrapolation,

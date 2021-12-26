@@ -22,7 +22,7 @@ Unlike other ensemble models such as RandomForest and XGBoost, Cubist generates 
 from sklearn.datasets import fetch_california_housing
 from cubist import Cubist
 X, y = fetch_california_housing(return_X_y=True, as_frame=True)
-model = Cubist() # <- model paramters here
+model = Cubist() # <- model parameters here
 model.fit(X, y)
 model.predict(X)
 model.score(X, y)
@@ -41,7 +41,7 @@ The following parameters can be passed as arguments to the ```Cubist()``` class 
 - unbiased (bool, default=False): Should unbiased rules be used? Since Cubist minimizes the MAE of the predicted values, the rules may be biased and the mean predicted value may differ from the actual mean. This is recommended when there are frequent occurrences of the same value in a training dataset. Note that MAE may be slightly higher.
 - composite (True, False, or 'auto', default=False): A composite model is a combination of Cubist's rule-based model and instance-based or nearest-neighbor models to improve the predictive performance of the returned model. A value of True requires Cubist to include the nearest-neighbor model, False will ensure Cubist only generates a rule-based model, and 'auto' allows the algorithm to choose whether to use nearest-neighbor corrections.
 - extrapolation (float, default=0.05): Adjusts how much rule predictions are adjusted to be consistent with the training dataset. Recommended value is 5% as a decimal (0.05)
-- sample (float, default=0.0): Percentage of the data set to be randomly selected for model building.
+- sample (float, default=None): Percentage of the data set to be randomly selected for model building (0.0 or greater but less than 1.0).
 - cv (int, default=None): Whether to carry out cross-validation (recommended value is 10)
 - random_state (int, default=randint(0, 4095)): An integer to set the random seed for the C Cubist code.
 - target_label (str, default="outcome"): A label for the outcome variable. This is only used for printing rules.
