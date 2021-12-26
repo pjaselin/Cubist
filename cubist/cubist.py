@@ -297,11 +297,8 @@ class Cubist(BaseEstimator, RegressorMixin):
         self.model_ = model.decode()
         output = output.decode()
 
-        # raise cubist errors
-        if "Error" in output:
-            raise Exception(output)
-        
-        if "cubist code called exit" in output:
+        # raise Cubist training errors
+        if "Error" in output or "cubist code called exit" in output:
             raise Exception(output)
         
         # inform user that they may want to use rules only
@@ -402,8 +399,10 @@ class Cubist(BaseEstimator, RegressorMixin):
                                     self.model_.encode(),
                                     np.zeros(X.shape[0]),
                                     b"1")
+        
+        # raise Cubist prediction errors
         # TODO add CubistError class
-        if "prediction code called exit with value" in output:
+        if "prediction code called exit" in output or "Error" in output:
             raise Exception(output)
         
         if output:
