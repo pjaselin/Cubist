@@ -28,11 +28,11 @@ def test_n_rules():
     check_is_fitted(model)
 
 
-# def test_n_rules_fail():
-#     model = Cubist(n_rules=10000000)
-#     with pytest.raises(ValueError):
-#         model.fit(X, y)
-#         check_is_fitted(model)
+def test_n_rules_fail():
+    model = Cubist(n_rules=10000000)
+    with pytest.raises(ValueError):
+        model.fit(X, y)
+        check_is_fitted(model)
 
 
 def test_n_committees():

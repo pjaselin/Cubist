@@ -12,10 +12,14 @@ pip install --upgrade cubist
 ```
 
 ## Background
-Cubist is a regression algorithm develped by John Ross Quinlan for generating rule-based predictive models. This has been available in the R world thanks to the work of Max Kuhn and his colleagues. With this package it is introduced to the Python ecosystem and made scikit-learn compatible for easy use with existing data and model pipelines. Additionally, cross-validation and control over whether Cubist creates a composite model is added here.
+Cubist is a regression algorithm develped by John Ross Quinlan for generating rule-based predictive models. This has been available in the R world thanks to the work of Max Kuhn and his colleagues. With this package it is introduced to Python and made scikit-learn compatible for easy use with existing data and model pipelines. Additionally, cross-validation and control over whether Cubist creates a composite model is added here.
 
 ## Advantages
-Unlike other ensemble models such as RandomForest and XGBoost, Cubist generates a set of rules, making it easy to understand precisely how the model makes it's predictive decisions. Thus tools such as SHAP and LIME are not needed as Cubist doesn't exhibit black box behavior. Like XGBoost, Cubist can perform boosting by the addition of more models (here called committees) that correct for the error of prior models (i.e. the second model created corrects for the prediction error of the first, the third for the error of the second, etc.). In addition to boosting, the model can perform instance-based (nearest-neighbor) corrections to create composite models, thus combining the advantages of these two methods. Note that with instance-based correction, model performance may be improved at the expense of some interpretability as the linear regression rules are no longer completely followed. It should also be noted that a composite model might be quite large as the full training dataset must be stored in order to perform instance-based corrections for inferencing. Note that this is not the case when `composite=False`.
+Unlike other ensemble models such as RandomForest and XGBoost, Cubist generates a set of rules, making it easy to understand precisely how the model makes it's predictive decisions. Thus tools such as SHAP and LIME are unnecessary as Cubist doesn't exhibit black box behavior. 
+
+Like XGBoost, Cubist can perform boosting by the addition of more models (here called committees) that correct for the error of prior models (i.e. the second model created corrects for the prediction error of the first, the third for the error of the second, etc.). 
+
+In addition to boosting, the model can perform instance-based (nearest-neighbor) corrections to create composite models, thus combining the advantages of these two methods. Note that with instance-based correction, model accuracy may be improved at the expense of computing time (this extra step takes longer) and some interpretability as the linear regression rules are no longer completely followed. It should also be noted that a composite model might be quite large as the full training dataset must be stored in order to perform instance-based corrections for inferencing. A composite model will be used when `composite=True` or Cubist can be allowed to decide whether to take advantage of this feature with `composite='auto'`.
 
 ## Use
 ```python
@@ -29,7 +33,9 @@ model.score(X, y)
 ```
 
 ## Sample Output
-![Sample Cubist output for Iris dataset](www/iris_cubist_output.png)
+<p align="center">
+    <img src="www/iris_cubist_output.png" alt="[Sample Cubist output for Iris dataset" width="400"/>
+</p>
 
 The above image is a sample of the verbose output produced by Cubist. It first reports the total number of cases (rows) and attributes (columns) in the training dataset. Below that it summarizes the model by committee (if used but not in this sample) and rule where each rule is definined by an if..then statement along with metrics for this rule in the training data and the linear regression equation used for each rule. The 'if' section of each rule identifies the training input columns and feature value ranges for which this rule holds true. The 'then' statement shows the linear regressor for this rule. The model performance is then summarized by the average and relative absolute errors as well as with the Pearson correlation coefficient r. Finally, the output reports the usage of training features in the model and rules as well as the time taken to complete training.
 
@@ -47,6 +53,10 @@ The following parameters can be passed as arguments to the ```Cubist()``` class 
 - target_label (str, default="outcome"): A label for the outcome variable. This is only used for printing rules.
 - verbose (int, default=0) Should the Cubist output be printed? 1 if yes, 0 if no.
 
+## Considerations
+- For small datasets, using the `sample` parameter is probably inadvisable because Cubist won't have enough samples to produce a representative model.
+- If you are looking for fast inferencing and can spare accuracy, skip using a composite model with `composite=False`.
+
 ## Model Attributes
 The following attributes are exposed to understand the Cubist model results:
 - feature_importances_ (pd.DataFrame): Table of how training data variables are used in the Cubist model.
@@ -57,8 +67,7 @@ The following attributes are exposed to understand the Cubist model results:
 ## Benchmarks
 There are many literature examples demonstrating the power of Cubist and comparing it to Random Forest as well as other bootstrapped/boosted models. Some of these are compiled here: https://www.rulequest.com/cubist-pubs.html. To demonstrate this, some benchmark scripts are provided in the respectively named folder.
 
-
-## Literature for Cubist Model
+## Literature for Cubist
 - https://sci2s.ugr.es/keel/pdf/algorithm/congreso/1992-Quinlan-AI.pdf
 - http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.34.6358&rep=rep1&type=pdf
 

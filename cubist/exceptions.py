@@ -1,3 +1,8 @@
-class CubistError(Exception):
-    def __init__(self, *args: object) -> None:
-        super().__init__(*args)
+class Error(Exception):
+    """Base class for exceptions in this module."""
+    pass
+
+
+class CubistError(Error):
+    """Raised when the C Cubist library raises errors"""
+    pass
