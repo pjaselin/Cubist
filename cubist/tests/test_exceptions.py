@@ -9,6 +9,6 @@ X_predict = pd.DataFrame([0.795757],columns=['X'])
 
 def test_cubist_error():
     with pytest.raises(CubistError):
-        tree = Cubist(sample=0.1, verbose=True)
+        tree = Cubist(sample=0.1, verbose=True, random_state=0)
         tree.fit(X_train, y_train)
         tree.predict(X_predict)
