@@ -14,6 +14,7 @@ from ._make_data_string import make_data_string
 from ._parse_model import parse_model
 from ._variable_usage import get_variable_usage
 from _cubist import _cubist, _predictions
+from .exceptions import CubistError
 
 
 class Cubist(BaseEstimator, RegressorMixin):
@@ -60,7 +61,7 @@ class Cubist(BaseEstimator, RegressorMixin):
         Adjusts how much rule predictions are adjusted to be consistent with 
         the training dataset. Recommended value is 5% as a decimal (0.05)
 
-    sample : float, default=0.0
+    sample : float, default=None
         Percentage of the data set to be randomly selected for model building.
     
     cv : int or None, default=None
@@ -113,7 +114,9 @@ class Cubist(BaseEstimator, RegressorMixin):
     >>> from sklearn.datasets import fetch_california_housing
     >>> from sklearn.model_selection import train_test_split
     >>> X, y = fetch_california_housing(return_X_y=True, as_frame=True)
-    >>> X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+    >>> X_train, X_test, y_train, y_test = train_test_split(X, y, 
+                                                            test_size=0.2, 
+                                                            random_state=42)
     >>> model = Cubist()
     >>> model.fit(X_train, y_train)
     >>> model.predict(X_test)
@@ -128,7 +131,7 @@ class Cubist(BaseEstimator, RegressorMixin):
                  unbiased: bool = False,
                  composite: Union[bool, str] = False,
                  extrapolation: float = 0.05,
-                 sample: float = 0.0,
+                 sample: float = None,
                  cv: int = None,
                  random_state: int = None,
                  target_label: str = "outcome",
@@ -165,11 +168,12 @@ class Cubist(BaseEstimator, RegressorMixin):
         if not isinstance(self.n_committees, int):
             raise TypeError("Number of committees must be an integer")
         elif self.n_committees < 1 or self.n_committees > 100:
-            raise ValueError("Number of committees must be 1 or greater")
+            raise ValueError("Number of committees must be between 1 and 100")
         
         if self.neighbors:
             if self.composite is False:
-                raise ValueError("`neighbors` should not be set when `composite` is False")
+                raise ValueError("`neighbors` should not be set when "
+                                 "`composite` is False")
             elif not isinstance(self.neighbors, int):
                 raise TypeError("Number of neighbors must be an integer")
             elif self.neighbors < 1 or self.neighbors > 9:
@@ -177,10 +181,14 @@ class Cubist(BaseEstimator, RegressorMixin):
             else:
                 self.neighbors_ = self.neighbors
         else:
+            if self.composite:
+                warn("Cubist will choose an appropriate value for `neighbor` "
+                     "as this is not set.", stacklevel=2)
             self.neighbors_ = 0
         
         if self.composite not in [True, False, 'auto']:
-            raise ValueError(f"Wrong input for parameter `composite`. Expected True, False, or 'auto', got {self.composite}")
+            raise ValueError(f"Wrong input for parameter `composite`. Expected "
+                             f"True, False, or 'auto', got {self.composite}")
         else:
             if self.composite is True:
                 self.composite_ = 'yes'
@@ -192,18 +200,26 @@ class Cubist(BaseEstimator, RegressorMixin):
         if not isinstance(self.extrapolation, float):
             raise TypeError("Extrapolation percentage must be a float")
         elif self.extrapolation < 0.0 or self.extrapolation > 1.0:
-            raise ValueError("Extrapolation percentage must be between 0.0 and 1.0")
+            raise ValueError("Extrapolation percentage must be between "
+                             "0.0 and 1.0")
 
-        if not isinstance(self.sample, float):
-            raise TypeError("Sampling percentage must be a float")
-        if self.sample < 0.0 or self.sample > 1.0:
-            raise ValueError("Sampling percentage must be between 0.0 and 1.0")
+        if self.sample:
+            if not isinstance(self.sample, float):
+                raise TypeError("Sampling percentage must be a float")
+            if self.sample < 0.0 or self.sample >= 1.0:
+                raise ValueError("Sampling percentage must be between "
+                                 "0.0 and 1.0")
+            self.sample_ = self.sample
+        else:
+            self.sample_ = 0.0
         
         if not isinstance(self.cv, (int, type(None))):
-            raise TypeError("Number of cross-validation folds must be an integer or None")
+            raise TypeError("Number of cross-validation folds must be an \
+                integer or None")
         if isinstance(self.cv, int):
             if self.cv <= 1 and self.cv != 0:
-                raise ValueError("Number of cross-validation folds must be greater than 1")
+                raise ValueError("Number of cross-validation folds must be \
+                    greater than 1")
             else:
                 self.cv_ = self.cv
         else:
@@ -228,6 +244,12 @@ class Cubist(BaseEstimator, RegressorMixin):
         -------
         self : object
         """
+        # get column name from y if it is a Pandas Series
+        if isinstance(y, pd.Series):
+            target_label_ = y.name
+        else:
+            target_label_ = None
+
         # scikit-learn checks
         X, y = self._validate_data(X, y, 
                                    dtype=None,
@@ -248,6 +270,16 @@ class Cubist(BaseEstimator, RegressorMixin):
         
         # validate model parameters
         self._validate_model_parameters()
+
+        # raise warning if sampling a small dataset
+        if self.sample:
+            trained_num_samples = int(round(self.sample * X.shape[0], 0))
+            if trained_num_samples < 10:
+                warn(f"Sampling a dataset with {X.shape[0]} rows and a "
+                     f"sampling percent of {self.sample} means Cubist will "
+                     f"train with {trained_num_samples} rows. This may lead "
+                     f"to incorrect or failing predictions. Please increase "
+                     f"or remove the `sample` parameter.\n", stacklevel=2)
         
         self.n_features_in_ = X.shape[1]
         self.n_outputs_ = 1
@@ -258,9 +290,14 @@ class Cubist(BaseEstimator, RegressorMixin):
 
         random_state = check_random_state(self.random_state)
 
+        # if a Pandas series wasn't used or it has no name,
+        # use the passed target_label feature, otherwise use
+        # the name of the Pandas series
+        self.target_label_ = target_label_ or self.target_label
+
         # create the names and data strings required for cubist
         names_string = make_names_string(X, w=sample_weight,
-                                         label=self.target_label)
+                                         label=self.target_label_)
         data_string = make_data_string(X, y, w=sample_weight)
         
         # call the C implementation of cubist
@@ -270,7 +307,7 @@ class Cubist(BaseEstimator, RegressorMixin):
                                 compositev_=self.composite_.encode(),
                                 neighbors_=self.neighbors_,
                                 committees_=self.n_committees,
-                                sample_=self.sample,
+                                sample_=self.sample_,
                                 seed_=random_state.randint(0, 4095) % 4096,
                                 rules_=self.n_rules,
                                 extrapolation_=self.extrapolation,
@@ -282,13 +319,14 @@ class Cubist(BaseEstimator, RegressorMixin):
         self.model_ = model.decode()
         output = output.decode()
 
-        # raise cubist errors
-        if "Error" in output:
-            raise Exception(output)
+        # raise Cubist training errors
+        if "***" in output or "Error" in output:
+            raise CubistError(output)
         
         # inform user that they may want to use rules only
         if "Recommend using rules only" in output:
-            warn("Cubist recommends using rules only (i.e. set composite=False)")
+            warn("Cubist recommends using rules only "
+                 "(i.e. set composite=False)", stacklevel=2)
 
         # print model output if using verbose output
         if self.verbose:
@@ -309,11 +347,12 @@ class Cubist(BaseEstimator, RegressorMixin):
         # compress and save descriptors
         self.names_string_ = zlib.compress(names_string.encode())
 
-        # TODO: check to see when a composite model has been used
-        # compress and save training data if using a composite model
+        # when a composite model has been used compress and save training data
         if self.composite is True or "nearest neighbors" in output \
             or self.neighbors_ > 0:
             self.data_string_ = zlib.compress(data_string.encode())
+        else:
+            self.data_string_ = zlib.compress("1".encode())
 
         # parse model contents and store useful information
         self.rules_, self.coeff_ = parse_model(self.model_, X)
@@ -372,21 +411,22 @@ class Cubist(BaseEstimator, RegressorMixin):
         # make data string for predictions
         data_string = make_data_string(X)
 
-        # if a composite model was used, get the training data
-        if hasattr(self, "data_string_"):
-            training_data_string = zlib.decompress(self.data_string_)
-        else:
-            training_data_string = b"1"
-        
         # get cubist predictions from trained model
         pred, output = _predictions(data_string.encode(),
                                     zlib.decompress(self.names_string_),
-                                    training_data_string,
+                                    zlib.decompress(self.data_string_),
                                     self.model_.encode(),
                                     np.zeros(X.shape[0]),
                                     b"1")
+        
+        # decode output
+        output = output.decode()
 
-        # TODO: parse and handle errors in output
+        # raise Cubist prediction errors
+        if "***" in output or "Error" in output:
+            raise CubistError(output)
+        
         if output:
-            print(output.decode())
+            print(output)
+        
         return pred
