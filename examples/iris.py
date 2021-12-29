@@ -18,18 +18,18 @@ X = iris.drop(["petal_width"], axis=1)
 
 # X, y = load_diabetes(return_X_y=True, as_frame=True)
 
-# X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 # model = Cubist(verbose=True)
 # model.fit(X, y)
 
 
 # X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
-model = Cubist(composite=True, n_committees=879870, verbose=True)
-model.fit(X, y)
-print("score", model.score(X, y))
-pred_list = model.predict(X).tolist()
-
-print("pearson", pearsonr(pred_list, y.tolist())[0])
+model = Cubist(composite=True, verbose=True, neighbors=1)
+model.fit(X_train, y_train)
+print("score", model.score(X_train, y_train))
+pred_list = model.predict(X_test).tolist()
+print(pred_list)
+print("pearson", pearsonr(pred_list, y_test.tolist())[0])
 # print(model.data_string_)
 # print(model.fit(X_train, y_train, sample_weight=np.ones(y_train.shape[0])).predict(X_test))
 # print(model.feature_importances_)

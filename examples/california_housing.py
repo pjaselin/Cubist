@@ -15,7 +15,7 @@ X, y = fetch_california_housing(return_X_y=True, as_frame=True)
 # model.fit(X, y)
 
 # X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
-model = Cubist(composite=True, neighbors=9, verbose=True)
+model = Cubist(composite=False, verbose=True)
 model.fit(X, y)
 print("score", model.score(X, y))
 pred_list = model.predict(X).tolist()
