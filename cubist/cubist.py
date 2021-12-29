@@ -183,7 +183,7 @@ class Cubist(BaseEstimator, RegressorMixin):
         else:
             if self.composite:
                 warn("Cubist will choose an appropriate value for `neighbor` "
-                     "as this is not set.", stacklevel=2)
+                     "as this is not set.", stacklevel=3)
             self.neighbors_ = 0
         
         if self.composite not in [True, False, 'auto']:
@@ -279,7 +279,7 @@ class Cubist(BaseEstimator, RegressorMixin):
                      f"sampling percent of {self.sample} means Cubist will "
                      f"train with {trained_num_samples} rows. This may lead "
                      f"to incorrect or failing predictions. Please increase "
-                     f"or remove the `sample` parameter.\n", stacklevel=2)
+                     f"or remove the `sample` parameter.\n", stacklevel=3)
         
         self.n_features_in_ = X.shape[1]
         self.n_outputs_ = 1
@@ -326,7 +326,7 @@ class Cubist(BaseEstimator, RegressorMixin):
         # inform user that they may want to use rules only
         if "Recommend using rules only" in output:
             warn("Cubist recommends using rules only "
-                 "(i.e. set composite=False)", stacklevel=2)
+                 "(i.e. set composite=False)", stacklevel=3)
 
         # print model output if using verbose output
         if self.verbose:
