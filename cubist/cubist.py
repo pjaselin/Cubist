@@ -129,7 +129,8 @@ class Cubist(BaseEstimator, RegressorMixin):
                  n_committees: int = 1,
                  neighbors: int = None,
                  unbiased: bool = False,
-                 composite: Union[bool, str] = False,
+                 auto: bool = False,
+                #  composite: Union[bool, str] = False,
                  extrapolation: float = 0.05,
                  sample: float = None,
                  cv: int = None,
@@ -142,7 +143,7 @@ class Cubist(BaseEstimator, RegressorMixin):
         self.n_committees = n_committees
         self.neighbors = neighbors
         self.unbiased = unbiased
-        self.composite = composite
+        self.auto = auto
         self.extrapolation = extrapolation
         self.sample = sample
         self.cv = cv
@@ -171,31 +172,27 @@ class Cubist(BaseEstimator, RegressorMixin):
             raise ValueError("Number of committees must be between 1 and 100")
         
         if self.neighbors:
-            if self.composite is False:
-                raise ValueError("`neighbors` should not be set when "
-                                 "`composite` is False")
-            elif not isinstance(self.neighbors, int):
+            if not isinstance(self.neighbors, int):
                 raise TypeError("Number of neighbors must be an integer")
             elif self.neighbors < 1 or self.neighbors > 9:
                 raise ValueError("'neighbors' must be between 1 and 9")
+            elif self.auto:
+                warn("Cubist will choose an appropriate value for `neighbor` "
+                 "as this is not set. Cubist will receive neighbors = 0"
+                 "regardless of the input value for `neighbors`.", stacklevel=3)
+                self.neighbors_ = 0
             else:
                 self.neighbors_ = self.neighbors
-        else:
-            if self.composite:
-                warn("Cubist will choose an appropriate value for `neighbor` "
-                     "as this is not set.", stacklevel=3)
-            self.neighbors_ = 0
         
-        if self.composite not in [True, False, 'auto']:
-            raise ValueError(f"Wrong input for parameter `composite`. Expected "
-                             f"True, False, or 'auto', got {self.composite}")
+        if not isinstance(self.auto, bool):
+            raise ValueError("Wrong input for parameter `auto`. Expected "
+                             f"True or False, got {self.composite}")
+        elif self.auto:
+            self.composite_ = 'auto'
+        elif self.neighbors_ > 0:
+            self.composite_ = 'yes'
         else:
-            if self.composite is True:
-                self.composite_ = 'yes'
-            elif self.composite is False:
-                self.composite_ = 'no'
-            else:
-                self.composite_ = 'auto'
+            self.composite_ = 'no'
 
         if not isinstance(self.extrapolation, float):
             raise TypeError("Extrapolation percentage must be a float")
@@ -344,15 +341,16 @@ class Cubist(BaseEstimator, RegressorMixin):
             self.model_ = self.model_[:self.model_.index("sample")] + \
                           self.model_[self.model_.index("entries"):]
         
+
+        # when a composite model has not been used, drop the data_string
+        if not (
+            (self.composite_ == "yes") or ("nearest neighbors" in output) or 
+            (self.neighbors_ > 0)):
+            self.data_string_ = "1"
+
         # compress and save descriptors
         self.names_string_ = zlib.compress(names_string.encode())
-
-        # when a composite model has been used compress and save training data
-        if self.composite is True or "nearest neighbors" in output \
-            or self.neighbors_ > 0:
-            self.data_string_ = zlib.compress(data_string.encode())
-        else:
-            self.data_string_ = zlib.compress("1".encode())
+        self.data_string_ = zlib.compress(data_string.encode())
 
         # parse model contents and store useful information
         self.rules_, self.coeff_ = parse_model(self.model_, X)
