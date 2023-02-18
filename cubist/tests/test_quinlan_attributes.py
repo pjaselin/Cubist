@@ -5,7 +5,7 @@ import pandas as pd
 import numpy as np
 import pytest
 
-from .._quinlan_attributes import quinlan_attributes, _get_data_format, \
+from .._quinlan_attributes import _quinlan_attributes, _get_data_format, \
     _is_all_float_dtype, _is_all_int_dtype
 
 
@@ -71,4 +71,4 @@ def test_get_data_format(test_input, expected, raises):
                          (bad_df, dict, pytest.raises(ValueError))])
 def test_quinlan_attributes(test_input, expected, raises):
     with raises:
-        assert type(quinlan_attributes(test_input)) == expected
+        assert type(_quinlan_attributes(test_input)) == expected

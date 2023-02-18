@@ -4,7 +4,6 @@ from typing import Type, Union
 
 import numpy as np
 import pandas as pd
-
 from sklearn.utils.validation import check_is_fitted, check_random_state, \
     _check_sample_weight
 from sklearn.base import RegressorMixin, BaseEstimator
@@ -143,6 +142,7 @@ class Cubist(BaseEstimator, RegressorMixin):
         self.n_rules = n_rules
         self.n_committees = n_committees
         self.neighbors = neighbors
+        self._neighbors = None
         self.unbiased = unbiased
         self.auto = auto
         self.extrapolation = extrapolation
@@ -183,16 +183,16 @@ class Cubist(BaseEstimator, RegressorMixin):
                 warn("Cubist will choose an appropriate value for `neighbor`."
                  "Cubist will receive neighbors = 0 regardless of the input" 
                  "value for `neighbors`.", stacklevel=3)
-                self.neighbors_ = 0
+                self._neighbors = 0
             else:
-                self.neighbors_ = self.neighbors
+                self._neighbors = self.neighbors
         
         if not isinstance(self.auto, bool):
             raise ValueError("Wrong input for parameter `auto`. Expected "
                              f"True or False, got {self.composite}")
         elif self.auto:
             self.composite_ = 'auto'
-        elif self.neighbors_ > 0:
+        elif self._neighbors > 0:
             self.composite_ = 'yes'
         else:
             self.composite_ = 'no'
@@ -305,7 +305,7 @@ class Cubist(BaseEstimator, RegressorMixin):
                                 datav_=data_string.encode(),
                                 unbiased_=self.unbiased,
                                 compositev_=self.composite_.encode(),
-                                neighbors_=self.neighbors_,
+                                neighbors_=self._neighbors,
                                 committees_=self.n_committees,
                                 sample_=self.sample_,
                                 seed_=random_state.randint(0, 4095) % 4096,
@@ -348,7 +348,7 @@ class Cubist(BaseEstimator, RegressorMixin):
         # when a composite model has not been used, drop the data_string
         if not (
             (self.composite_ == "yes") or ("nearest neighbors" in output) or 
-            (self.neighbors_ > 0)):
+            (self._neighbors > 0)):
             self.data_string_ = "1"
 
         # compress and save descriptors
