@@ -141,7 +141,7 @@
 #define E_BADNUMBER(a) "value of `%s' changed to `?'\n", a
 #define E_NOMEM "unable to allocate sufficient memory\n"
 #define E_TOOMANYVALS(a, n)                                                    \
-  // "too many values for attribute `%s'"                                         \
+  "too many values for attribute `%s'"                                         \
   " (max %d)\n",                                                               \
       a, n
 #define E_BADDISCRETE                                                          \
