@@ -38,12 +38,12 @@ jobs:
       with:
         python-version: ${{ matrix.python-version }}
     
-    - name: Enable Developer Command Prompt for Windows
+    - name: Enable Developer Command Prompt for Windows and add sys/time.h
       if: matrix.os == 'windows-latest'
       uses: ilammy/msvc-dev-cmd@v1
     
-    - name: Add sys/time.h for Windows
-      if: matrix.os == 'windows-latest'
+    # - name: Add sys/time.h for Windows
+    #   if: matrix.os == 'windows-latest'
       run: |
         mv winsys/ cubist/sys
       
@@ -57,7 +57,7 @@ jobs:
         pip3 install --upgrade pip
         pip3 install setuptools wheel build cython
         pip3 install flake8 pytest pytest-cov numpy
-        pip install -e .
+        pip install .
 
     - name: Lint with flake8
       run: |
@@ -93,8 +93,8 @@ jobs:
         if: matrix.os == 'windows-latest'
         uses: ilammy/msvc-dev-cmd@v1
 
-      - name: Add sys/time.h for Windows
-        if: matrix.os == 'windows-latest'
+      # - name: Add sys/time.h for Windows
+      #   if: matrix.os == 'windows-latest'
         run: |
           mv winsys/ cubist/sys
 

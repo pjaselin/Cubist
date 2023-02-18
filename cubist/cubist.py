@@ -142,7 +142,6 @@ class Cubist(BaseEstimator, RegressorMixin):
         self.n_rules = n_rules
         self.n_committees = n_committees
         self.neighbors = neighbors
-        self._neighbors = None
         self.unbiased = unbiased
         self.auto = auto
         self.extrapolation = extrapolation
@@ -244,12 +243,6 @@ class Cubist(BaseEstimator, RegressorMixin):
         -------
         self : object
         """
-        # get column name from y if it is a Pandas Series
-        if isinstance(y, pd.Series):
-            target_label_ = y.name
-        else:
-            target_label_ = None
-
         # scikit-learn checks
         X, y = self._validate_data(X, y, 
                                    dtype=None,
@@ -268,7 +261,7 @@ class Cubist(BaseEstimator, RegressorMixin):
         else:
             self.is_sample_weighted_ = False
         
-        # validate model parameters
+        # check parameters
         self._validate_model_parameters()
 
         # raise warning if sampling a small dataset
@@ -290,14 +283,9 @@ class Cubist(BaseEstimator, RegressorMixin):
 
         random_state = check_random_state(self.random_state)
 
-        # if a Pandas series wasn't used or it has no name,
-        # use the passed target_label feature, otherwise use
-        # the name of the Pandas series
-        self.target_label_ = target_label_ or self.target_label
-
         # create the names and data strings required for cubist
         names_string = _make_names_string(X, w=sample_weight,
-                                          label=self.target_label_)
+                                          label=self.target_label)
         data_string = _make_data_string(X, y, w=sample_weight)
         
         # call the C implementation of cubist

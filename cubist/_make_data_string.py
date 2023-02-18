@@ -12,7 +12,7 @@ def _r_format(x: float, digits: int = 15) -> str:
     if pd.isna(x):
         return x
     if np.iscomplex(x):
-        raise ValueError("Complex data not supported")
+        raise ValueError("Complex numbers not supported")
 
     # get the count of whole number digits, i.e. the number of digits to the left of the decimal place
     whole_nums_count = len(str(int(x)))
