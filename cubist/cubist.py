@@ -61,11 +61,13 @@ class Cubist(BaseEstimator, RegressorMixin):
         Adjusts how much rule predictions are adjusted to be consistent with 
         the training dataset. Recommended value is 5% as a decimal (0.05)
 
-    sample : float, default=None
+    sample : float, default=0.0
         Percentage of the data set to be randomly selected for model building.
     
-    cv : int or None, default=None
-        Whether to carry out cross-validation (recommended value is 10)
+    cv : int, default=0
+        Whether to carry out cross-validation and how many folds to use. Setting
+        cv=0 means no cross-validation will be performed (no folds) (recommended 
+        value is 10 per Quinlan)
 
     random_state : int, default=None
         An integer to set the random seed for the C Cubist code.
@@ -129,8 +131,8 @@ class Cubist(BaseEstimator, RegressorMixin):
                  unbiased: bool = False,
                  auto: bool = False,
                  extrapolation: float = 0.05,
-                 sample: float = None,
-                 cv: int = None,
+                 sample: float = 0.0,
+                 cv: int = 0,
                  random_state: int = None,
                  target_label: str = "outcome",
                  verbose: int = 0):
@@ -174,7 +176,7 @@ class Cubist(BaseEstimator, RegressorMixin):
         -------
         self : object
         """
-        # scikit-learn data checks
+        # scikit-learn data validation
         X, y = self._validate_data(X, y, 
                                    dtype=None,
                                    force_all_finite='allow-nan', 
@@ -192,70 +194,62 @@ class Cubist(BaseEstimator, RegressorMixin):
         else:
             self.is_sample_weighted_ = False
         
-        # check parameters
+        # validate number of rules
         if not isinstance(self.n_rules, int):
-            raise TypeError("Number of rules must be an integer")
-        elif self.n_rules < 1 or self.n_rules > 1000000:
-            raise ValueError("Number of rules must be between 1 and 1000000")
+            raise TypeError("`n_rules` must be an integer")
+        if self.n_rules < 1 or self.n_rules > 1000000:
+            raise ValueError("`n_rules` must be between 1 and 1000000")
 
+        # validate number of committees
         if not isinstance(self.n_committees, int):
-            raise TypeError("Number of committees must be an integer")
-        elif self.n_committees < 1 or self.n_committees > 100:
-            raise ValueError("Number of committees must be between 1 and 100")
+            raise TypeError("`n_committees` must be an integer")
+        if self.n_committees < 1 or self.n_committees > 100:
+            raise ValueError("`n_committees` must be between 1 and 100")
         
-        if self.neighbors:
+        # validate number of neighbors
+        if self.neighbors is not None:
             if not isinstance(self.neighbors, int):
-                raise TypeError("Number of neighbors must be an integer")
+                raise TypeError("`neighbors` must be an integer")
             elif self.neighbors < 1 or self.neighbors > 9:
-                raise ValueError("'neighbors' must be between 1 and 9")
+                raise ValueError("`neighbors` must be between 1 and 9")
             elif self.auto:
                 warn("Cubist will choose an appropriate value for `neighbor`."
-                 "Cubist will receive neighbors = 0 regardless of the input" 
+                 "Cubist will receive neighbors = 0 regardless of the set" 
                  "value for `neighbors`.", stacklevel=3)
-                self._neighbors = 0
+                neighbors = 0
             else:
-                self._neighbors = self.neighbors
+                neighbors = self.neighbors
         
+        # validate the auto parameter
         if not isinstance(self.auto, bool):
             raise ValueError("Wrong input for parameter `auto`. Expected "
-                             f"True or False, got {self.composite}")
+                             f"True or False, got {self.auto}")
+        # if auto=True, let cubist decide whether to use a composite model and 
+        # how many neighbors to use
         elif self.auto:
-            self.composite_ = 'auto'
-        elif self._neighbors > 0:
-            self.composite_ = 'yes'
+            composite = 'auto'
+        # if a number of neighbors is given, make a composite model
+        elif neighbors > 0:
+            composite = 'yes'
         else:
-            self.composite_ = 'no'
+            composite = 'no'
 
+        # validate the range of extrapolation
         if not isinstance(self.extrapolation, float):
             raise TypeError("Extrapolation percentage must be a float")
-        elif self.extrapolation < 0.0 or self.extrapolation > 1.0:
+        if self.extrapolation < 0.0 or self.extrapolation > 1.0:
             raise ValueError("Extrapolation percentage must be between "
                              "0.0 and 1.0")
 
-        if self.sample:
-            if not isinstance(self.sample, float):
-                raise TypeError("Sampling percentage must be a float")
-            if self.sample < 0.0 or self.sample >= 1.0:
-                raise ValueError("Sampling percentage must be between "
-                                 "0.0 and 1.0")
-            self.sample_ = self.sample
-        else:
-            self.sample_ = 0.0
+        # validate the sample percentage
+        if not isinstance(self.sample, float):
+            raise TypeError("Sampling percentage must be a float")
+        if self.sample < 0.0 or self.sample > 1:
+            raise ValueError("Sampling percentage must be between "
+                             "0.0 and 1.0")
         
-        if not isinstance(self.cv, (int, type(None))):
-            raise TypeError("Number of cross-validation folds must be an \
-                integer or None")
-        if isinstance(self.cv, int):
-            if self.cv <= 1 and self.cv != 0:
-                raise ValueError("Number of cross-validation folds must be \
-                    greater than 1")
-            else:
-                self.cv_ = self.cv
-        else:
-            self.cv_ = 0
-
         # raise warning if sampling a small dataset
-        if self.sample:
+        if self.sample > 0:
             trained_num_samples = int(round(self.sample * X.shape[0], 0))
             if trained_num_samples < 10:
                 warn(f"Sampling a dataset with {X.shape[0]} rows and a "
@@ -264,14 +258,25 @@ class Cubist(BaseEstimator, RegressorMixin):
                      f"to incorrect or failing predictions. Please increase "
                      f"or remove the `sample` parameter.\n", stacklevel=3)
         
+        # validate number of cv folds
+        if not isinstance(self.cv, int):
+            raise TypeError("Number of cross-validation folds must be an \
+                            integer or None")
+        if (self.cv < 0) or (self.cv == 1):
+            raise ValueError("Number of cross-validation folds must be \
+                             0 or greater than 1 (not equal to 1)")
+        
+        
+        # number of input features
         self.n_features_in_ = X.shape[1]
+        # number of outputs is 1 (single output regression)
         self.n_outputs_ = 1
+
+        random_state = check_random_state(self.random_state)
 
         # (re)construct a dataframe from X
         X = pd.DataFrame(X, columns=self.feature_names_in_)
         y = pd.Series(y)
-
-        random_state = check_random_state(self.random_state)
 
         # create the names and data strings required for cubist
         names_string = _make_names_string(X, w=sample_weight,
@@ -282,10 +287,10 @@ class Cubist(BaseEstimator, RegressorMixin):
         model, output = _cubist(namesv_=names_string.encode(),
                                 datav_=data_string.encode(),
                                 unbiased_=self.unbiased,
-                                compositev_=self.composite_.encode(),
-                                neighbors_=self._neighbors,
+                                compositev_=composite.encode(),
+                                neighbors_=neighbors,
                                 committees_=self.n_committees,
-                                sample_=self.sample_,
+                                sample_=self.sample,
                                 seed_=random_state.randint(0, 4095) % 4096,
                                 rules_=self.n_rules,
                                 extrapolation_=self.extrapolation,
@@ -298,13 +303,13 @@ class Cubist(BaseEstimator, RegressorMixin):
         output = output.decode()
 
         # raise Cubist training errors
-        if "***" in output or "Error" in output:
+        if ("***" in output) or ("Error" in output):
             raise CubistError(output)
         
         # inform user that they may want to use rules only
         if "Recommend using rules only" in output:
             warn("Cubist recommends using rules only "
-                 "(i.e. set composite=False)", stacklevel=3)
+                 "(i.e. set auto=False)", stacklevel=3)
 
         # print model output if using verbose output
         if self.verbose:
@@ -325,11 +330,13 @@ class Cubist(BaseEstimator, RegressorMixin):
 
         # when a composite model has not been used, drop the data_string
         if not (
-            (self.composite_ == "yes") or ("nearest neighbors" in output) or 
-            (self._neighbors > 0)):
-            self.data_string_ = "1"
+            (composite == "yes") or 
+            ("nearest neighbors" in output) or 
+            (neighbors > 0)
+        ):
+            data_string = "1"
 
-        # compress and save descriptors
+        # compress and save descriptors/data
         self.names_string_ = zlib.compress(names_string.encode())
         self.data_string_ = zlib.compress(data_string.encode())
 
@@ -352,7 +359,7 @@ class Cubist(BaseEstimator, RegressorMixin):
             used_variables = set(self.rules_["variable"]).union(
                 set(not_na_cols)
             )
-            self.variables_ = {"all": list(X.columns),
+            self.variables_ = {"all": list(self.feature_names_in_),
                                "used": list(used_variables)}
         return self
 
