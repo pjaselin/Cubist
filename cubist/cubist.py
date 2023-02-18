@@ -1,6 +1,5 @@
 import zlib
 from warnings import warn
-from typing import Type, Union
 
 import numpy as np
 import pandas as pd
@@ -123,10 +122,8 @@ class Cubist(BaseEstimator, RegressorMixin):
     >>> model.predict(X_test)
     >>> model.score(X_test, y_test)
     """
-
     def __init__(self,
-                 n_rules: int = 500,
-                 *,
+                 n_rules: int = 500, *,
                  n_committees: int = 1,
                  neighbors: int = None,
                  unbiased: bool = False,
@@ -156,13 +153,46 @@ class Cubist(BaseEstimator, RegressorMixin):
         """
         return {"allow_nan": True,
                 "X_types": ["2darray", "string"]}
-    
-    def _validate_model_parameters(self):
-        """Validate inputs to the Cubist model
+        
 
-        Raises:
-            ValueError for invalid model parameter inputs
+    def fit(self, X, y, sample_weight = None):
+        """Build a Cubist regression model from training set (X, y).
+
+        Parameters
+        ----------
+        X : {array-like} of shape (n_samples, n_features)
+            The training input samples.
+
+        y : array-like of shape (n_samples,)
+            The target values (Real numbers in regression).
+
+        sample_weight : array-like of shape (n_samples,)
+            Optional vector of sample weights that is the same length as y for 
+            how much each instance should contribute to the model fit.
+
+        Returns
+        -------
+        self : object
         """
+        # scikit-learn data checks
+        X, y = self._validate_data(X, y, 
+                                   dtype=None,
+                                   force_all_finite='allow-nan', 
+                                   y_numeric=True,
+                                   ensure_min_samples=2)
+        
+        # set the feature names if it hasn't already been done
+        if not hasattr(self, "feature_names_in_"):
+            self.feature_names_in_ = [f'var{i}' for i in range(X.shape[1])]
+        
+        # check sample weighting
+        if sample_weight is not None:
+            sample_weight = _check_sample_weight(sample_weight, X)
+            self.is_sample_weighted_ = True
+        else:
+            self.is_sample_weighted_ = False
+        
+        # check parameters
         if not isinstance(self.n_rules, int):
             raise TypeError("Number of rules must be an integer")
         elif self.n_rules < 1 or self.n_rules > 1000000:
@@ -223,46 +253,6 @@ class Cubist(BaseEstimator, RegressorMixin):
                 self.cv_ = self.cv
         else:
             self.cv_ = 0
-
-    def fit(self, X, y, sample_weight = None):
-        """Build a Cubist regression model from training set (X, y).
-
-        Parameters
-        ----------
-        X : {array-like} of shape (n_samples, n_features)
-            The training input samples.
-
-        y : array-like of shape (n_samples,)
-            The target values (Real numbers in regression).
-
-        sample_weight : array-like of shape (n_samples,)
-            Optional vector of sample weights that is the same length as y for 
-            how much each instance should contribute to the model fit.
-
-        Returns
-        -------
-        self : object
-        """
-        # scikit-learn checks
-        X, y = self._validate_data(X, y, 
-                                   dtype=None,
-                                   force_all_finite='allow-nan', 
-                                   y_numeric=True,
-                                   ensure_min_samples=2)
-        
-        # set the feature names if it hasn't already been done
-        if not hasattr(self, "feature_names_in_"):
-            self.feature_names_in_ = [f'var{i}' for i in range(X.shape[1])]
-        
-        # check sample weighting
-        if sample_weight is not None:
-            sample_weight = _check_sample_weight(sample_weight, X)
-            self.is_sample_weighted_ = True
-        else:
-            self.is_sample_weighted_ = False
-        
-        # check parameters
-        self._validate_model_parameters()
 
         # raise warning if sampling a small dataset
         if self.sample:

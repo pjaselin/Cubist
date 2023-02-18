@@ -31,19 +31,19 @@ jobs:
 
     steps:
     - name: Checkout repo
-      uses: actions/checkout@v2
+      uses: actions/checkout@latest
 
     - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v2
+      uses: actions/setup-python@latest
       with:
         python-version: ${{ matrix.python-version }}
     
-    - name: Enable Developer Command Prompt for Windows and add sys/time.h
+    - name: Enable Developer Command Prompt for Windows
       if: matrix.os == 'windows-latest'
       uses: ilammy/msvc-dev-cmd@v1
     
-    # - name: Add sys/time.h for Windows
-    #   if: matrix.os == 'windows-latest'
+    - name: Add sys/time.h for Windows
+      if: matrix.os == 'windows-latest'
       run: |
         mv winsys/ cubist/sys
       
@@ -57,7 +57,7 @@ jobs:
         pip3 install --upgrade pip
         pip3 install setuptools wheel build cython
         pip3 install flake8 pytest pytest-cov numpy
-        pip install .
+        pip install -e .
 
     - name: Lint with flake8
       run: |
@@ -82,9 +82,9 @@ jobs:
     env:
       CIBW_SKIP: "pp* *-win32 cp310-*"
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@latest
 
-      - uses: actions/setup-python@v2
+      - uses: actions/setup-python@latest
         name: Install Python
         with:
           python-version: '3.9'
@@ -93,8 +93,8 @@ jobs:
         if: matrix.os == 'windows-latest'
         uses: ilammy/msvc-dev-cmd@v1
 
-      # - name: Add sys/time.h for Windows
-      #   if: matrix.os == 'windows-latest'
+      - name: Add sys/time.h for Windows
+        if: matrix.os == 'windows-latest'
         run: |
           mv winsys/ cubist/sys
 
@@ -106,7 +106,7 @@ jobs:
       - name: Build wheels
         uses: pypa/cibuildwheel@v2.2.2
       
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@latest
         with:
           path: ./wheelhouse/*.whl
 
@@ -116,10 +116,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Checkout repo
-      uses: actions/checkout@v2
+      uses: actions/checkout@latest
 
     - name: Set up Python
-      uses: actions/setup-python@v2
+      uses: actions/setup-python@latest
       with:
         python-version: "3.9"
 
@@ -127,7 +127,7 @@ jobs:
       run: |
         python -m pip install setuptools wheel build cython numpy
         python setup.py sdist
-    - uses: actions/upload-artifact@v2
+    - uses: actions/upload-artifact@latest
       with:
         path: dist/*.tar.gz
   
@@ -144,7 +144,7 @@ jobs:
         mkdir dist
 
     - name: download artifacts
-      uses: actions/download-artifact@v2
+      uses: actions/download-artifact@latest
       with:
         name: artifact
         path: dist
