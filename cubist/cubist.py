@@ -9,11 +9,12 @@ from sklearn.utils.validation import check_is_fitted, check_random_state, \
     _check_sample_weight
 from sklearn.base import RegressorMixin, BaseEstimator
 
-from ._make_names_string import make_names_string
-from ._make_data_string import make_data_string
-from ._parse_model import parse_model
-from ._variable_usage import get_variable_usage
 from _cubist import _cubist, _predictions
+
+from ._make_names_string import _make_names_string
+from ._make_data_string import _make_data_string
+from ._parse_model import _parse_model
+from ._variable_usage import _get_variable_usage
 from .exceptions import CubistError
 
 
@@ -152,6 +153,8 @@ class Cubist(BaseEstimator, RegressorMixin):
         self.verbose = verbose
     
     def _more_tags(self):
+        """scikit-learn estimator configuration method
+        """
         return {"allow_nan": True,
                 "X_types": ["2darray", "string"]}
     
@@ -293,9 +296,9 @@ class Cubist(BaseEstimator, RegressorMixin):
         self.target_label_ = target_label_ or self.target_label
 
         # create the names and data strings required for cubist
-        names_string = make_names_string(X, w=sample_weight,
-                                         label=self.target_label_)
-        data_string = make_data_string(X, y, w=sample_weight)
+        names_string = _make_names_string(X, w=sample_weight,
+                                          label=self.target_label_)
+        data_string = _make_data_string(X, y, w=sample_weight)
         
         # call the C implementation of cubist
         model, output = _cubist(namesv_=names_string.encode(),
@@ -353,10 +356,10 @@ class Cubist(BaseEstimator, RegressorMixin):
         self.data_string_ = zlib.compress(data_string.encode())
 
         # parse model contents and store useful information
-        self.rules_, self.coeff_ = parse_model(self.model_, X)
+        self.rules_, self.coeff_ = _parse_model(self.model_, X)
 
         # get the input data variable usage
-        self.feature_importances_ = get_variable_usage(output, X)
+        self.feature_importances_ = _get_variable_usage(output, X)
 
         # get the names of columns that have no nan values
         is_na_col = ~self.coeff_.isna().any()
@@ -407,7 +410,7 @@ class Cubist(BaseEstimator, RegressorMixin):
             X["case_weight_pred"] = np.nan
 
         # make data string for predictions
-        data_string = make_data_string(X)
+        data_string = _make_data_string(X)
 
         # get cubist predictions from trained model
         pred, output = _predictions(data_string.encode(),

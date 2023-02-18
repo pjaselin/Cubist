@@ -5,10 +5,10 @@ from datetime import datetime
 import pandas as pd
 import numpy as np
 
-from ._quinlan_attributes import quinlan_attributes
+from ._quinlan_attributes import _quinlan_attributes
 
 
-def make_names_string(x, w=None, label="outcome"):
+def _make_names_string(x, w=None, label="outcome"):
     """
     Create the names string to pass to Cubist. This string contains information about Python and the time of run along
     with the column names and their data types.
@@ -50,7 +50,7 @@ def make_names_string(x, w=None, label="outcome"):
     out = f'{out}\n{label}.\n{label}{outcome_type}'
 
     # get dictionary of feature names as keys and data types as values
-    var_data = quinlan_attributes(x)
+    var_data = _quinlan_attributes(x)
 
     # if weights are present add this to var_data
     if w is not None:

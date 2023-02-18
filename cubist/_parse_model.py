@@ -15,7 +15,7 @@ OPERATORS = {
 }
 
 
-def split_to_groups(x, f):
+def _split_to_groups(x, f):
     """Function to convert two lists into a dictionary where the keys are unique values in f and 
     the values are lists of the corresponding values in x. Analogous to the split function in R."""
     if len(x) != len(f):
@@ -29,7 +29,7 @@ def split_to_groups(x, f):
     return groups
 
 
-def parse_model(model, x):
+def _parse_model(model, x):
     # split on newline
     model = model.split("\n")
     # remove empty strings
@@ -46,7 +46,7 @@ def parse_model(model, x):
     # loop through model and indicate
     for i, row in enumerate(model):
         # break each row of x into dicts for each key/value pair
-        tt = parser(row)
+        tt = _parser(row)
         # get the first key in the first entry of tt
         first_key = list(tt[0])[0]
 
@@ -85,7 +85,7 @@ def parse_model(model, x):
     for i in is_type2:
         # set the type of split
         split_type[i] = "continuous"
-        continuous_split = type2(model[i])
+        continuous_split = _type2(model[i])
         # set split variable name
         split_var[i] = continuous_split["var"].replace('\"', "")
         # set split direction (comparison operator)
@@ -96,7 +96,7 @@ def parse_model(model, x):
     # handle categorical (type 3) rules
     is_type3 = [i for i, c in enumerate(model) if re.search("^type=\"3\"", c)]
     for i in is_type3:
-        categorical_split = type3(model[i])
+        categorical_split = _type3(model[i])
         # set the type of split
         split_type[i] = "categorical"
         # set the split variable
@@ -138,7 +138,7 @@ def parse_model(model, x):
     # get the indices of rows in model that contain model coefficients
     is_eqn = [i for i, c in enumerate(model) if "coeff=" in c]
     # extract the model coefficients from the row
-    coefs = [eqn(model[i], var_names=list(x.columns)) for i in is_eqn]
+    coefs = [_eqn(model[i], var_names=list(x.columns)) for i in is_eqn]
     out = pd.DataFrame(coefs)
     # get the committee number
     out["committee"] = [com_num[i] for i in is_eqn]
@@ -148,7 +148,7 @@ def parse_model(model, x):
     return split_data, out
 
 
-def type2(x, dig=3):
+def _type2(x, dig=3):
     x = x.replace("\"", "")
 
     # get the indices where these keywords start
@@ -173,7 +173,7 @@ def type2(x, dig=3):
             "text": f"{var} {result} {val}"}
 
 
-def type3(x):
+def _type3(x):
     # get the indices where these keywords start
     att_ind = x.find("att=")
     elts_ind = x.find("elts=")
@@ -194,7 +194,7 @@ def type3(x):
     return {"var": var, "val": val, "text": txt}
 
 
-def eqn(x, var_names=None):
+def _eqn(x, var_names=None):
     x = x.replace("\"", "")
     starts = [m.start(0) for m in re.finditer("(coeff=)|(att=)", x)]
     tmp = [""] * len(starts)
@@ -220,7 +220,7 @@ def eqn(x, var_names=None):
     return vals
 
 
-def make_parsed_dict(x):
+def _make_parsed_dict(x):
     x = x.split("=")
     if len(x) > 1:
         return {x[0]: x[1]}
@@ -228,7 +228,7 @@ def make_parsed_dict(x):
         return None
 
 
-def parser(x):
+def _parser(x):
     x = x.split(" ")
-    x = [make_parsed_dict(c) for c in x]
+    x = [_make_parsed_dict(c) for c in x]
     return x
