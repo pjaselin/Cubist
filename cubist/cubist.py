@@ -35,7 +35,7 @@ class Cubist(BaseEstimator, RegressorMixin):
         and beyond the first tries to correct the prediction errors of the prior 
         constructed model. Recommended value is 5.
     
-    neighbors : int or None, default=None
+    neighbors : int, default=None
         Number between 1 and 9 for how many instances should be used to correct 
         the rule-based prediction. If no value is given, Cubist will build a
         rule-based model only. If this value is set, Cubist will create a 
@@ -61,13 +61,12 @@ class Cubist(BaseEstimator, RegressorMixin):
         Adjusts how much rule predictions are adjusted to be consistent with 
         the training dataset. Recommended value is 5% as a decimal (0.05)
 
-    sample : float, default=0.0
+    sample : float, default=None
         Percentage of the data set to be randomly selected for model building.
     
-    cv : int, default=0
-        Whether to carry out cross-validation and how many folds to use. Setting
-        cv=0 means no cross-validation will be performed (no folds) (recommended 
-        value is 10 per Quinlan)
+    cv : int, default=None
+        Whether to carry out cross-validation and how many folds to use
+        (recommended value is 10 per Quinlan)
 
     random_state : int, default=None
         An integer to set the random seed for the C Cubist code.
@@ -131,7 +130,7 @@ class Cubist(BaseEstimator, RegressorMixin):
                  unbiased: bool = False,
                  auto: bool = False,
                  extrapolation: float = 0.05,
-                 sample: float = 0.0,
+                 sample: float = None,
                  cv: int = 0,
                  random_state: int = None,
                  target_label: str = "outcome",
@@ -219,6 +218,9 @@ class Cubist(BaseEstimator, RegressorMixin):
                 neighbors = 0
             else:
                 neighbors = self.neighbors
+        else:
+            # default value must be zero even when not used
+            neighbors = 0
         
         # validate the auto parameter
         if not isinstance(self.auto, bool):
@@ -242,14 +244,13 @@ class Cubist(BaseEstimator, RegressorMixin):
                              "0.0 and 1.0")
 
         # validate the sample percentage
-        if not isinstance(self.sample, float):
-            raise TypeError("Sampling percentage must be a float")
-        if self.sample < 0.0 or self.sample > 1:
-            raise ValueError("Sampling percentage must be between "
-                             "0.0 and 1.0")
-        
-        # raise warning if sampling a small dataset
-        if self.sample > 0:
+        if self.sample is not None:
+            if not isinstance(self.sample, float):
+                raise TypeError("Sampling percentage must be a float")
+            if self.sample < 0.0 or self.sample > 1:
+                raise ValueError("Sampling percentage must be between "
+                                 "0.0 and 1.0")
+            # check to see if the sample will create a very small dataset
             trained_num_samples = int(round(self.sample * X.shape[0], 0))
             if trained_num_samples < 10:
                 warn(f"Sampling a dataset with {X.shape[0]} rows and a "
@@ -257,14 +258,21 @@ class Cubist(BaseEstimator, RegressorMixin):
                      f"train with {trained_num_samples} rows. This may lead "
                      f"to incorrect or failing predictions. Please increase "
                      f"or remove the `sample` parameter.\n", stacklevel=3)
+            sample = self.sample
+        else:
+            sample = 0
         
         # validate number of cv folds
-        if not isinstance(self.cv, int):
-            raise TypeError("Number of cross-validation folds must be an \
-                            integer or None")
-        if (self.cv < 0) or (self.cv == 1):
-            raise ValueError("Number of cross-validation folds must be \
-                             0 or greater than 1 (not equal to 1)")
+        if self.cv is not None:
+            if not isinstance(self.cv, int):
+                raise TypeError("Number of cross-validation folds must be an \
+                                integer or None")
+            if (self.cv < 0) or (self.cv == 1):
+                raise ValueError("Number of cross-validation folds must be \
+                                 0 or greater than 1 (not equal to 1)")
+            cv = self.cv
+        else:
+            cv = 0
         
         
         # number of input features
@@ -290,11 +298,11 @@ class Cubist(BaseEstimator, RegressorMixin):
                                 compositev_=composite.encode(),
                                 neighbors_=neighbors,
                                 committees_=self.n_committees,
-                                sample_=self.sample,
+                                sample_=sample,
                                 seed_=random_state.randint(0, 4095) % 4096,
                                 rules_=self.n_rules,
                                 extrapolation_=self.extrapolation,
-                                cv_=self.cv_,
+                                cv_=cv,
                                 modelv_=b"1",
                                 outputv_=b"1")
 

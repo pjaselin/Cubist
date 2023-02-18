@@ -9,5 +9,5 @@ from ..cubist import Cubist
     "estimator",
     [Cubist()]
 )
-def test_all_estimators(estimator):
+def test_estimator(estimator):
     return check_estimator(estimator)
