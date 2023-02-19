@@ -90,7 +90,8 @@ _special_chars_map = {i: '\\' + chr(i) for i in b'()[]{}?*+-|:;^$\\.&~#\t\n\r\v\
 
 
 def _re_escape(pattern):
-    """Escape special characters in a string. Sourced from 're' Python package."""
+    """Escape special characters in a string. 
+    Sourced from 're' Python package."""
     if isinstance(pattern, str):
         return pattern.translate(_special_chars_map)
     else:
