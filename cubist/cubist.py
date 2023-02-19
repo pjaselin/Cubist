@@ -123,6 +123,7 @@ class Cubist(BaseEstimator, RegressorMixin):
     >>> model.predict(X_test)
     >>> model.score(X_test, y_test)
     """
+
     def __init__(self,
                  n_rules: int = 500, *,
                  n_committees: int = 1,
@@ -148,15 +149,14 @@ class Cubist(BaseEstimator, RegressorMixin):
         self.random_state = random_state
         self.target_label = target_label
         self.verbose = verbose
-    
+
     def _more_tags(self):
         """scikit-learn estimator configuration method
         """
         return {"allow_nan": True,
                 "X_types": ["2darray", "string"]}
-        
 
-    def fit(self, X, y, sample_weight = None):
+    def fit(self, X, y, sample_weight=None):
         """Build a Cubist regression model from training set (X, y).
 
         Parameters
@@ -176,23 +176,23 @@ class Cubist(BaseEstimator, RegressorMixin):
         self : object
         """
         # scikit-learn data validation
-        X, y = self._validate_data(X, y, 
+        X, y = self._validate_data(X, y,
                                    dtype=None,
-                                   force_all_finite='allow-nan', 
+                                   force_all_finite='allow-nan',
                                    y_numeric=True,
                                    ensure_min_samples=2)
-        
+
         # set the feature names if it hasn't already been done
         if not hasattr(self, "feature_names_in_"):
             self.feature_names_in_ = [f'var{i}' for i in range(X.shape[1])]
-        
+
         # check sample weighting
         if sample_weight is not None:
             sample_weight = _check_sample_weight(sample_weight, X)
             self.is_sample_weighted_ = True
         else:
             self.is_sample_weighted_ = False
-        
+
         # validate number of rules
         if not isinstance(self.n_rules, int):
             raise TypeError("`n_rules` must be an integer")
@@ -204,7 +204,7 @@ class Cubist(BaseEstimator, RegressorMixin):
             raise TypeError("`n_committees` must be an integer")
         if self.n_committees < 1 or self.n_committees > 100:
             raise ValueError("`n_committees` must be between 1 and 100")
-        
+
         # validate number of neighbors
         if self.neighbors is not None:
             if not isinstance(self.neighbors, int):
@@ -213,15 +213,15 @@ class Cubist(BaseEstimator, RegressorMixin):
                 raise ValueError("`neighbors` must be between 1 and 9")
             elif self.auto:
                 warn("Cubist will choose an appropriate value for `neighbor`."
-                 "Cubist will receive neighbors = 0 regardless of the set" 
-                 "value for `neighbors`.", stacklevel=3)
+                     "Cubist will receive neighbors = 0 regardless of the set"
+                     "value for `neighbors`.", stacklevel=3)
                 neighbors = 0
             else:
                 neighbors = self.neighbors
         else:
             # default value must be zero even when not used
             neighbors = 0
-        
+
         # validate the auto parameter
         if not isinstance(self.auto, bool):
             raise ValueError("Wrong input for parameter `auto`. Expected "
@@ -261,7 +261,7 @@ class Cubist(BaseEstimator, RegressorMixin):
             sample = self.sample
         else:
             sample = 0
-        
+
         # validate number of cv folds
         if self.cv is not None:
             if not isinstance(self.cv, int):
@@ -273,8 +273,7 @@ class Cubist(BaseEstimator, RegressorMixin):
             cv = self.cv
         else:
             cv = 0
-        
-        
+
         # number of input features
         self.n_features_in_ = X.shape[1]
         # number of outputs is 1 (single output regression)
@@ -290,7 +289,7 @@ class Cubist(BaseEstimator, RegressorMixin):
         names_string = _make_names_string(X, w=sample_weight,
                                           label=self.target_label)
         data_string = _make_data_string(X, y, w=sample_weight)
-        
+
         # call the C implementation of cubist
         model, output = _cubist(namesv_=names_string.encode(),
                                 datav_=data_string.encode(),
@@ -313,7 +312,7 @@ class Cubist(BaseEstimator, RegressorMixin):
         # raise Cubist training errors
         if ("***" in output) or ("Error" in output):
             raise CubistError(output)
-        
+
         # inform user that they may want to use rules only
         if "Recommend using rules only" in output:
             warn("Cubist recommends using rules only "
@@ -322,7 +321,7 @@ class Cubist(BaseEstimator, RegressorMixin):
         # print model output if using verbose output
         if self.verbose:
             print(output)
-        
+
         # if the model returned nothing, we're doing cross-validation so stop
         if self.model_ == "1":
             return self
@@ -334,13 +333,12 @@ class Cubist(BaseEstimator, RegressorMixin):
             # clean model string when using reserved sample name
             self.model_ = self.model_[:self.model_.index("sample")] + \
                           self.model_[self.model_.index("entries"):]
-        
 
         # when a composite model has not been used, drop the data_string
         if not (
-            (composite == "yes") or 
-            ("nearest neighbors" in output) or 
-            (neighbors > 0)
+                (composite == "yes") or
+                ("nearest neighbors" in output) or
+                (neighbors > 0)
         ):
             data_string = "1"
 
@@ -385,13 +383,13 @@ class Cubist(BaseEstimator, RegressorMixin):
             The predicted values.
         """
         # make sure the model has been fitted
-        check_is_fitted(self, attributes=["model_", "rules_", "coeff_", 
+        check_is_fitted(self, attributes=["model_", "rules_", "coeff_",
                                           "feature_importances_"])
 
         # validate input data
-        X = self._validate_data(X, 
-                                dtype=None, 
-                                force_all_finite='allow-nan', 
+        X = self._validate_data(X,
+                                dtype=None,
+                                force_all_finite='allow-nan',
                                 reset=False)
 
         # (re)construct a dataframe from X
@@ -412,15 +410,15 @@ class Cubist(BaseEstimator, RegressorMixin):
                                     self.model_.encode(),
                                     np.zeros(X.shape[0]),
                                     b"1")
-        
+
         # decode output
         output = output.decode()
 
         # raise Cubist prediction errors
         if "***" in output or "Error" in output:
             raise CubistError(output)
-        
+
         if output:
             print(output)
-        
+
         return pred

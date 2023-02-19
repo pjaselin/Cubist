@@ -13,6 +13,7 @@ titanic = titanic.drop(["name", "ticket"], axis=1)
 y = titanic["fare"]
 X = titanic.drop(["fare"], axis=1)
 
+
 @contextmanager
 def no_raise():
     yield
@@ -24,9 +25,9 @@ def test_model_instance(expected_output):
     assert isinstance(model, Cubist) == expected_output
 
 
-@pytest.mark.parametrize("n_rules,raises", 
-                        [(500, no_raise()), 
-                         (10000000, pytest.raises(ValueError))])
+@pytest.mark.parametrize("n_rules,raises",
+                         [(500, no_raise()),
+                          (10000000, pytest.raises(ValueError))])
 def test_n_rules(n_rules, raises):
     model = Cubist(n_rules=n_rules)
     with raises:
@@ -34,10 +35,10 @@ def test_n_rules(n_rules, raises):
         check_is_fitted(model)
 
 
-@pytest.mark.parametrize("n_committees,raises", 
-                        [(5, no_raise()), 
-                         (-1, pytest.raises(ValueError)),
-                         ("sdfa", pytest.raises(TypeError))])
+@pytest.mark.parametrize("n_committees,raises",
+                         [(5, no_raise()),
+                          (-1, pytest.raises(ValueError)),
+                          ("sdfa", pytest.raises(TypeError))])
 def test_n_committees(n_committees, raises):
     model = Cubist(n_committees=n_committees)
     with raises:
@@ -45,9 +46,9 @@ def test_n_committees(n_committees, raises):
         check_is_fitted(model)
 
 
-@pytest.mark.parametrize("neighbors,raises", 
-                        [(5, no_raise()), 
-                         (10, pytest.raises(ValueError))])
+@pytest.mark.parametrize("neighbors,raises",
+                         [(5, no_raise()),
+                          (10, pytest.raises(ValueError))])
 def test_neighbors(neighbors, raises):
     model = Cubist(neighbors=neighbors)
     with raises:
@@ -55,8 +56,8 @@ def test_neighbors(neighbors, raises):
         check_is_fitted(model)
 
 
-@pytest.mark.parametrize("unbiased,raises", 
-                        [(True, no_raise())])
+@pytest.mark.parametrize("unbiased,raises",
+                         [(True, no_raise())])
 def test_unbiased(unbiased, raises):
     model = Cubist(unbiased=unbiased)
     with raises:
@@ -64,9 +65,9 @@ def test_unbiased(unbiased, raises):
         check_is_fitted(model)
 
 
-@pytest.mark.parametrize("extrapolation,raises", 
-                        [(0.1, no_raise()),
-                         (-0.1, pytest.raises(ValueError))])
+@pytest.mark.parametrize("extrapolation,raises",
+                         [(0.1, no_raise()),
+                          (-0.1, pytest.raises(ValueError))])
 def test_extrapolation(extrapolation, raises):
     model = Cubist(extrapolation=extrapolation)
     with raises:
@@ -74,9 +75,9 @@ def test_extrapolation(extrapolation, raises):
         check_is_fitted(model)
 
 
-@pytest.mark.parametrize("sample,raises", 
-                        [(0.1, no_raise()),
-                         (-0.1, pytest.raises(ValueError))])
+@pytest.mark.parametrize("sample,raises",
+                         [(0.1, no_raise()),
+                          (-0.1, pytest.raises(ValueError))])
 def test_sample(sample, raises):
     model = Cubist(sample=sample)
     with raises:
@@ -84,10 +85,10 @@ def test_sample(sample, raises):
         check_is_fitted(model)
 
 
-@pytest.mark.parametrize("cv,raises", 
-                        [(10, no_raise()),
-                         (-0.1, pytest.raises(TypeError)),
-                         (-1, pytest.raises(ValueError))])
+@pytest.mark.parametrize("cv,raises",
+                         [(10, no_raise()),
+                          (-0.1, pytest.raises(TypeError)),
+                          (-1, pytest.raises(ValueError))])
 def test_cv(cv, raises):
     model = Cubist(cv=cv)
     with raises:
@@ -95,10 +96,10 @@ def test_cv(cv, raises):
         check_is_fitted(model)
 
 
-@pytest.mark.parametrize("auto,raises", 
-                        [(True, no_raise()),
-                         (False, no_raise()),
-                         ("1234", pytest.raises(ValueError))])
+@pytest.mark.parametrize("auto,raises",
+                         [(True, no_raise()),
+                          (False, no_raise()),
+                          ("1234", pytest.raises(ValueError))])
 def test_auto(auto, raises):
     model = Cubist(auto=auto)
     with raises:
