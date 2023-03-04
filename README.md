@@ -55,7 +55,7 @@ The following parameters can be passed as arguments to the ```Cubist()``` class 
 
 ## Considerations
 - For small datasets, using the `sample` parameter is probably inadvisable because Cubist won't have enough samples to produce a representative model.
-- If you are looking for fast inferencing and can spare accuracy, skip using a composite model with `composite=False`.
+- If you are looking for fast inferencing and can spare accuracy, skip using a composite model by not setting a value for `neighbors`.
 
 ## Model Attributes
 The following attributes are exposed to understand the Cubist model results:
