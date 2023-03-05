@@ -132,7 +132,7 @@ class Cubist(BaseEstimator, RegressorMixin):
                  auto: bool = False,
                  extrapolation: float = 0.05,
                  sample: float = None,
-                 cv: int = 0,
+                 cv: int = None,
                  random_state: int = None,
                  target_label: str = "outcome",
                  verbose: int = 0):
