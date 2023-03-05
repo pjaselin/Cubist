@@ -27,7 +27,9 @@ def test_model_instance(expected_output):
 
 @pytest.mark.parametrize("n_rules,raises",
                          [(500, no_raise()),
-                          (10000000, pytest.raises(ValueError))])
+                          (0, pytest.raises(ValueError)),
+                          (10000000, pytest.raises(ValueError)),
+                          ("asdf", pytest.raises(TypeError))])
 def test_n_rules(n_rules, raises):
     model = Cubist(n_rules=n_rules)
     with raises:
@@ -38,7 +40,8 @@ def test_n_rules(n_rules, raises):
 @pytest.mark.parametrize("n_committees,raises",
                          [(5, no_raise()),
                           (-1, pytest.raises(ValueError)),
-                          ("sdfa", pytest.raises(TypeError))])
+                          (500, pytest.raises(ValueError)),
+                          ("asdf", pytest.raises(TypeError))])
 def test_n_committees(n_committees, raises):
     model = Cubist(n_committees=n_committees)
     with raises:

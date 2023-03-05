@@ -156,6 +156,71 @@ class Cubist(BaseEstimator, RegressorMixin):
         return {"allow_nan": True,
                 "X_types": ["2darray", "string"]}
 
+    def _check_neighbors(self):
+        # validate number of neighbors
+        if self.neighbors is not None:
+            if not isinstance(self.neighbors, int):
+                raise TypeError("`neighbors` must be an integer")
+            elif self.neighbors < 1 or self.neighbors > 9:
+                raise ValueError("`neighbors` must be between 1 and 9")
+            elif self.auto:
+                warn("Cubist will choose an appropriate value for `neighbor`."
+                     "Cubist will receive neighbors = 0 regardless of the set"
+                     "value for `neighbors`.", stacklevel=3)
+                return 0
+            else:
+                return self.neighbors
+        # default value must be zero even when not used
+        return 0
+
+    def _check_composite(self, neighbors):
+        # validate the auto parameter
+        if not isinstance(self.auto, bool):
+            raise ValueError("Wrong input for parameter `auto`. Expected "
+                             f"True or False, got {self.auto}")
+        # if auto=True, let cubist decide whether to use a composite model and
+        # how many neighbors to use
+        elif self.auto:
+            return 'auto'
+        # if a number of neighbors is given, make a composite model
+        elif neighbors > 0:
+            return 'yes'
+        else:
+            return 'no'
+
+    def _check_sample(self, num_samples):
+        # validate the sample percentage
+        if self.sample is not None:
+            if not isinstance(self.sample, float):
+                raise TypeError("Sampling percentage must be a float")
+            if self.sample < 0.0 or self.sample > 1:
+                raise ValueError("Sampling percentage must be between "
+                                 "0.0 and 1.0")
+            # check to see if the sample will create a very small dataset
+            trained_num_samples = int(round(self.sample * num_samples, 0))
+            if trained_num_samples < 10:
+                warn(f"Sampling a dataset with {num_samples} rows and a "
+                     f"sampling percent of {self.sample} means Cubist will "
+                     f"train with {trained_num_samples} rows. This may lead "
+                     f"to incorrect or failing predictions. Please increase "
+                     f"or remove the `sample` parameter.\n", stacklevel=3)
+            return self.sample
+        else:
+            return 0
+
+    def _check_cv(self):
+        # validate number of cv folds
+        if self.cv is not None:
+            if not isinstance(self.cv, int):
+                raise TypeError("Number of cross-validation folds must be an \
+                                        integer or None")
+            if (self.cv < 0) or (self.cv == 1):
+                raise ValueError("Number of cross-validation folds must be \
+                                         0 or greater than 1 (not equal to 1)")
+            return self.cv
+        else:
+            return 0
+
     def fit(self, X, y, sample_weight=None):
         """Build a Cubist regression model from training set (X, y).
 
@@ -205,36 +270,8 @@ class Cubist(BaseEstimator, RegressorMixin):
         if self.n_committees < 1 or self.n_committees > 100:
             raise ValueError("`n_committees` must be between 1 and 100")
 
-        # validate number of neighbors
-        if self.neighbors is not None:
-            if not isinstance(self.neighbors, int):
-                raise TypeError("`neighbors` must be an integer")
-            elif self.neighbors < 1 or self.neighbors > 9:
-                raise ValueError("`neighbors` must be between 1 and 9")
-            elif self.auto:
-                warn("Cubist will choose an appropriate value for `neighbor`."
-                     "Cubist will receive neighbors = 0 regardless of the set"
-                     "value for `neighbors`.", stacklevel=3)
-                neighbors = 0
-            else:
-                neighbors = self.neighbors
-        else:
-            # default value must be zero even when not used
-            neighbors = 0
-
-        # validate the auto parameter
-        if not isinstance(self.auto, bool):
-            raise ValueError("Wrong input for parameter `auto`. Expected "
-                             f"True or False, got {self.auto}")
-        # if auto=True, let cubist decide whether to use a composite model and 
-        # how many neighbors to use
-        elif self.auto:
-            composite = 'auto'
-        # if a number of neighbors is given, make a composite model
-        elif neighbors > 0:
-            composite = 'yes'
-        else:
-            composite = 'no'
+        neighbors = self._check_neighbors()
+        composite = self._check_composite(neighbors)
 
         # validate the range of extrapolation
         if not isinstance(self.extrapolation, float):
@@ -243,36 +280,8 @@ class Cubist(BaseEstimator, RegressorMixin):
             raise ValueError("Extrapolation percentage must be between "
                              "0.0 and 1.0")
 
-        # validate the sample percentage
-        if self.sample is not None:
-            if not isinstance(self.sample, float):
-                raise TypeError("Sampling percentage must be a float")
-            if self.sample < 0.0 or self.sample > 1:
-                raise ValueError("Sampling percentage must be between "
-                                 "0.0 and 1.0")
-            # check to see if the sample will create a very small dataset
-            trained_num_samples = int(round(self.sample * X.shape[0], 0))
-            if trained_num_samples < 10:
-                warn(f"Sampling a dataset with {X.shape[0]} rows and a "
-                     f"sampling percent of {self.sample} means Cubist will "
-                     f"train with {trained_num_samples} rows. This may lead "
-                     f"to incorrect or failing predictions. Please increase "
-                     f"or remove the `sample` parameter.\n", stacklevel=3)
-            sample = self.sample
-        else:
-            sample = 0
-
-        # validate number of cv folds
-        if self.cv is not None:
-            if not isinstance(self.cv, int):
-                raise TypeError("Number of cross-validation folds must be an \
-                                integer or None")
-            if (self.cv < 0) or (self.cv == 1):
-                raise ValueError("Number of cross-validation folds must be \
-                                 0 or greater than 1 (not equal to 1)")
-            cv = self.cv
-        else:
-            cv = 0
+        sample = self._check_sample(X.shape[0])
+        cv = self._check_cv()
 
         # number of input features
         self.n_features_in_ = X.shape[1]
