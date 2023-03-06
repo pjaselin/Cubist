@@ -25,7 +25,7 @@ X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_
 
 
 # X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
-model = Cubist(composite='auto', n_committees=1, verbose=True)
+model = Cubist(auto=True, n_committees=1, verbose=True)
 model.fit(X_train, y_train)
 print("score", model.score(X_train, y_train))
 pred_list = model.predict(X_test).tolist()
