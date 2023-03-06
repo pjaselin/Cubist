@@ -156,6 +156,22 @@ class Cubist(BaseEstimator, RegressorMixin):
         return {"allow_nan": True,
                 "X_types": ["2darray", "string"]}
 
+    def _check_n_rules(self):
+        # validate number of rules
+        if not isinstance(self.n_rules, int):
+            raise TypeError("`n_rules` must be an integer")
+        if self.n_rules < 1 or self.n_rules > 1000000:
+            raise ValueError("`n_rules` must be between 1 and 1000000")
+        return self.n_rules
+
+    def _check_n_committees(self):
+        # validate number of committees
+        if not isinstance(self.n_committees, int):
+            raise TypeError("`n_committees` must be an integer")
+        if self.n_committees < 1 or self.n_committees > 100:
+            raise ValueError("`n_committees` must be between 1 and 100")
+        return self.n_committees
+
     def _check_neighbors(self):
         # validate number of neighbors
         if self.neighbors is not None:
@@ -173,6 +189,13 @@ class Cubist(BaseEstimator, RegressorMixin):
         # default value must be zero even when not used
         return 0
 
+    def _check_unbiased(self):
+        # validate unbiased option
+        if not isinstance(self.unbiased, bool):
+            raise ValueError("Wrong input for parameter `unbiased`. Expected "
+                             f"True or False, got {self.unbiased}")
+        return self.unbiased
+
     def _check_composite(self, neighbors):
         # validate the auto parameter
         if not isinstance(self.auto, bool):
@@ -188,12 +211,21 @@ class Cubist(BaseEstimator, RegressorMixin):
         else:
             return 'no'
 
+    def _check_extrapolation(self):
+        # validate the range of extrapolation
+        if not isinstance(self.extrapolation, float):
+            raise TypeError("Extrapolation percentage must be a float")
+        if self.extrapolation < 0.0 or self.extrapolation > 1.0:
+            raise ValueError("Extrapolation percentage must be between "
+                             "0.0 and 1.0")
+        return self.extrapolation
+
     def _check_sample(self, num_samples):
         # validate the sample percentage
         if self.sample is not None:
             if not isinstance(self.sample, float):
                 raise TypeError("Sampling percentage must be a float")
-            if self.sample < 0.0 or self.sample > 1:
+            if not (0.0 < self.sample < 1.0):
                 raise ValueError("Sampling percentage must be between "
                                  "0.0 and 1.0")
             # check to see if the sample will create a very small dataset
@@ -214,9 +246,9 @@ class Cubist(BaseEstimator, RegressorMixin):
             if not isinstance(self.cv, int):
                 raise TypeError("Number of cross-validation folds must be an \
                                         integer or None")
-            if (self.cv < 0) or (self.cv == 1):
+            if self.cv <= 1:
                 raise ValueError("Number of cross-validation folds must be \
-                                         0 or greater than 1 (not equal to 1)")
+                                         greater than 1")
             return self.cv
         else:
             return 0
@@ -258,37 +290,20 @@ class Cubist(BaseEstimator, RegressorMixin):
         else:
             self.is_sample_weighted_ = False
 
-        # validate number of rules
-        if not isinstance(self.n_rules, int):
-            raise TypeError("`n_rules` must be an integer")
-        if self.n_rules < 1 or self.n_rules > 1000000:
-            raise ValueError("`n_rules` must be between 1 and 1000000")
-
-        # validate number of committees
-        if not isinstance(self.n_committees, int):
-            raise TypeError("`n_committees` must be an integer")
-        if self.n_committees < 1 or self.n_committees > 100:
-            raise ValueError("`n_committees` must be between 1 and 100")
-
+        n_rules = self._check_n_rules()
+        n_committees = self._check_n_committees()
         neighbors = self._check_neighbors()
+        unbiased = self._check_unbiased()
         composite = self._check_composite(neighbors)
-
-        # validate the range of extrapolation
-        if not isinstance(self.extrapolation, float):
-            raise TypeError("Extrapolation percentage must be a float")
-        if self.extrapolation < 0.0 or self.extrapolation > 1.0:
-            raise ValueError("Extrapolation percentage must be between "
-                             "0.0 and 1.0")
-
+        extrapolation = self._check_extrapolation()
         sample = self._check_sample(X.shape[0])
         cv = self._check_cv()
+        random_state = check_random_state(self.random_state)
 
         # number of input features
         self.n_features_in_ = X.shape[1]
         # number of outputs is 1 (single output regression)
         self.n_outputs_ = 1
-
-        random_state = check_random_state(self.random_state)
 
         # (re)construct a dataframe from X
         X = pd.DataFrame(X, columns=self.feature_names_in_)
@@ -302,14 +317,14 @@ class Cubist(BaseEstimator, RegressorMixin):
         # call the C implementation of cubist
         model, output = _cubist(namesv_=names_string.encode(),
                                 datav_=data_string.encode(),
-                                unbiased_=self.unbiased,
+                                unbiased_=unbiased,
                                 compositev_=composite.encode(),
                                 neighbors_=neighbors,
-                                committees_=self.n_committees,
+                                committees_=n_committees,
                                 sample_=sample,
                                 seed_=random_state.randint(0, 4095) % 4096,
-                                rules_=self.n_rules,
-                                extrapolation_=self.extrapolation,
+                                rules_=n_rules,
+                                extrapolation_=extrapolation,
                                 cv_=cv,
                                 modelv_=b"1",
                                 outputv_=b"1")
