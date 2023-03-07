@@ -1,3 +1,4 @@
+
 import pandas as pd
 from sklearn.model_selection import train_test_split
 from cubist import Cubist
@@ -24,12 +25,12 @@ X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_
 
 
 # X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
-model = Cubist(composite=True, verbose=True, neighbors=1)
+model = Cubist(auto=True, n_committees=1, verbose=True)
 model.fit(X_train, y_train)
 print("score", model.score(X_train, y_train))
 pred_list = model.predict(X_test).tolist()
-print(pred_list)
-print("pearson", pearsonr(pred_list, y_test.tolist())[0])
+# print(pred_list)
+# print("pearson", pearsonr(pred_list, y_test.tolist())[0])
 # print(model.data_string_)
 # print(model.fit(X_train, y_train, sample_weight=np.ones(y_train.shape[0])).predict(X_test))
 # print(model.feature_importances_)

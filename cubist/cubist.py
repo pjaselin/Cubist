@@ -1,19 +1,18 @@
 import zlib
 from warnings import warn
-from typing import Type, Union
 
 import numpy as np
 import pandas as pd
-
 from sklearn.utils.validation import check_is_fitted, check_random_state, \
     _check_sample_weight
 from sklearn.base import RegressorMixin, BaseEstimator
 
-from ._make_names_string import make_names_string
-from ._make_data_string import make_data_string
-from ._parse_model import parse_model
-from ._variable_usage import get_variable_usage
 from _cubist import _cubist, _predictions
+
+from ._make_names_string import _make_names_string
+from ._make_data_string import _make_data_string
+from ._parse_model import _parse_model
+from ._variable_usage import _get_variable_usage
 from .exceptions import CubistError
 
 
@@ -35,12 +34,15 @@ class Cubist(BaseEstimator, RegressorMixin):
         Number of committees to construct. Each committee is a rule based model 
         and beyond the first tries to correct the prediction errors of the prior 
         constructed model. Recommended value is 5.
-
-    neighbors : int or None, default=None
+    
+    neighbors : int, default=None
         Number between 1 and 9 for how many instances should be used to correct 
-        the rule-based prediction. Only used when composite is True or 'auto'. 
-        If neighbors=0 and composite=False or 'auto', Cubist will choose a value
-        for this parameter.
+        the rule-based prediction. If no value is given, Cubist will build a
+        rule-based model only. If this value is set, Cubist will create a 
+        composite model with the given number of neighbors. Regardless of the 
+        value set, if auto=True, Cubist may override this input and choose a 
+        different number of neighbors. Please assess the model for the selected 
+        value for the number of neighbors used.
 
     unbiased : bool, default=False
         Should unbiased rules be used? Since Cubist minimizes the MAE of the 
@@ -49,13 +51,11 @@ class Cubist(BaseEstimator, RegressorMixin):
         frequent occurrences of the same value in a training dataset. Note that 
         MAE may be slightly higher.
     
-    composite : bool or 'auto', default=False
-        A composite model is a combination of Cubist's rule-based model and 
-        instance-based or nearest-neighbor models to improve the predictive
-        performance of the returned model. A value of True requires Cubist to
-        include the nearest-neighbor model, False will ensure Cubist only
-        generates a rule-based model, and 'auto' allows the algorithm to choose
-        whether to use nearest-neighbor corrections.
+    auto : bool, default=False
+        A value of True allows the algorithm to choose whether to use 
+        nearest-neighbor corrections and how many neighbors to use. False will
+        leave the choice of whether to use a composite model to value passed to
+        the `neighbors` parameter.
 
     extrapolation : float, default=0.05
         Adjusts how much rule predictions are adjusted to be consistent with 
@@ -64,8 +64,9 @@ class Cubist(BaseEstimator, RegressorMixin):
     sample : float, default=None
         Percentage of the data set to be randomly selected for model building.
     
-    cv : int or None, default=None
-        Whether to carry out cross-validation (recommended value is 10)
+    cv : int, default=None
+        Whether to carry out cross-validation and how many folds to use
+        (recommended value is 10 per Quinlan)
 
     random_state : int, default=None
         An integer to set the random seed for the C Cubist code.
@@ -124,12 +125,11 @@ class Cubist(BaseEstimator, RegressorMixin):
     """
 
     def __init__(self,
-                 n_rules: int = 500,
-                 *,
+                 n_rules: int = 500, *,
                  n_committees: int = 1,
                  neighbors: int = None,
                  unbiased: bool = False,
-                 composite: Union[bool, str] = False,
+                 auto: bool = False,
                  extrapolation: float = 0.05,
                  sample: float = None,
                  cv: int = None,
@@ -142,90 +142,118 @@ class Cubist(BaseEstimator, RegressorMixin):
         self.n_committees = n_committees
         self.neighbors = neighbors
         self.unbiased = unbiased
-        self.composite = composite
+        self.auto = auto
         self.extrapolation = extrapolation
         self.sample = sample
         self.cv = cv
         self.random_state = random_state
         self.target_label = target_label
         self.verbose = verbose
-    
+
     def _more_tags(self):
+        """scikit-learn estimator configuration method
+        """
         return {"allow_nan": True,
                 "X_types": ["2darray", "string"]}
-    
-    def _validate_model_parameters(self):
-        """Validate inputs to the Cubist model
 
-        Raises:
-            ValueError for invalid model parameter inputs
-        """
+    def _check_n_rules(self):
+        # validate number of rules
         if not isinstance(self.n_rules, int):
-            raise TypeError("Number of rules must be an integer")
-        elif self.n_rules < 1 or self.n_rules > 1000000:
-            raise ValueError("Number of rules must be between 1 and 1000000")
+            raise TypeError("`n_rules` must be an integer")
+        if self.n_rules < 1 or self.n_rules > 1000000:
+            raise ValueError("`n_rules` must be between 1 and 1000000")
+        return self.n_rules
 
+    def _check_n_committees(self):
+        # validate number of committees
         if not isinstance(self.n_committees, int):
-            raise TypeError("Number of committees must be an integer")
-        elif self.n_committees < 1 or self.n_committees > 100:
-            raise ValueError("Number of committees must be between 1 and 100")
-        
-        if self.neighbors:
-            if self.composite is False:
-                raise ValueError("`neighbors` should not be set when "
-                                 "`composite` is False")
-            elif not isinstance(self.neighbors, int):
-                raise TypeError("Number of neighbors must be an integer")
-            elif self.neighbors < 1 or self.neighbors > 9:
-                raise ValueError("'neighbors' must be between 1 and 9")
-            else:
-                self.neighbors_ = self.neighbors
-        else:
-            if self.composite:
-                warn("Cubist will choose an appropriate value for `neighbor` "
-                     "as this is not set.", stacklevel=3)
-            self.neighbors_ = 0
-        
-        if self.composite not in [True, False, 'auto']:
-            raise ValueError(f"Wrong input for parameter `composite`. Expected "
-                             f"True, False, or 'auto', got {self.composite}")
-        else:
-            if self.composite is True:
-                self.composite_ = 'yes'
-            elif self.composite is False:
-                self.composite_ = 'no'
-            else:
-                self.composite_ = 'auto'
+            raise TypeError("`n_committees` must be an integer")
+        if self.n_committees < 1 or self.n_committees > 100:
+            raise ValueError("`n_committees` must be between 1 and 100")
+        return self.n_committees
 
+    def _check_neighbors(self):
+        # validate number of neighbors
+        if self.neighbors is not None:
+            if not isinstance(self.neighbors, int):
+                raise TypeError("`neighbors` must be an integer")
+            elif self.neighbors < 1 or self.neighbors > 9:
+                raise ValueError("`neighbors` must be between 1 and 9")
+            elif self.auto:
+                warn("Cubist will choose an appropriate value for `neighbor`."
+                     "Cubist will receive neighbors = 0 regardless of the set"
+                     "value for `neighbors`.", stacklevel=3)
+                return 0
+            else:
+                return self.neighbors
+        # default value must be zero even when not used
+        return 0
+
+    def _check_unbiased(self):
+        # validate unbiased option
+        if not isinstance(self.unbiased, bool):
+            raise ValueError("Wrong input for parameter `unbiased`. Expected "
+                             f"True or False, got {self.unbiased}")
+        return self.unbiased
+
+    def _check_composite(self, neighbors):
+        # validate the auto parameter
+        if not isinstance(self.auto, bool):
+            raise ValueError("Wrong input for parameter `auto`. Expected "
+                             f"True or False, got {self.auto}")
+        # if auto=True, let cubist decide whether to use a composite model and
+        # how many neighbors to use
+        elif self.auto:
+            return 'auto'
+        # if a number of neighbors is given, make a composite model
+        elif neighbors > 0:
+            return 'yes'
+        else:
+            return 'no'
+
+    def _check_extrapolation(self):
+        # validate the range of extrapolation
         if not isinstance(self.extrapolation, float):
             raise TypeError("Extrapolation percentage must be a float")
-        elif self.extrapolation < 0.0 or self.extrapolation > 1.0:
+        if self.extrapolation < 0.0 or self.extrapolation > 1.0:
             raise ValueError("Extrapolation percentage must be between "
                              "0.0 and 1.0")
+        return self.extrapolation
 
-        if self.sample:
+    def _check_sample(self, num_samples):
+        # validate the sample percentage
+        if self.sample is not None:
             if not isinstance(self.sample, float):
                 raise TypeError("Sampling percentage must be a float")
-            if self.sample < 0.0 or self.sample >= 1.0:
+            if not (0.0 < self.sample < 1.0):
                 raise ValueError("Sampling percentage must be between "
                                  "0.0 and 1.0")
-            self.sample_ = self.sample
+            # check to see if the sample will create a very small dataset
+            trained_num_samples = int(round(self.sample * num_samples, 0))
+            if trained_num_samples < 10:
+                warn(f"Sampling a dataset with {num_samples} rows and a "
+                     f"sampling percent of {self.sample} means Cubist will "
+                     f"train with {trained_num_samples} rows. This may lead "
+                     f"to incorrect or failing predictions. Please increase "
+                     f"or remove the `sample` parameter.\n", stacklevel=3)
+            return self.sample
         else:
-            self.sample_ = 0.0
-        
-        if not isinstance(self.cv, (int, type(None))):
-            raise TypeError("Number of cross-validation folds must be an \
-                integer or None")
-        if isinstance(self.cv, int):
-            if self.cv <= 1 and self.cv != 0:
-                raise ValueError("Number of cross-validation folds must be \
-                    greater than 1")
-            else:
-                self.cv_ = self.cv
-        else:
-            self.cv_ = 0
+            return 0
 
-    def fit(self, X, y, sample_weight = None):
+    def _check_cv(self):
+        # validate number of cv folds
+        if self.cv is not None:
+            if not isinstance(self.cv, int):
+                raise TypeError("Number of cross-validation folds must be an \
+                                        integer or None")
+            if self.cv <= 1:
+                raise ValueError("Number of cross-validation folds must be \
+                                         greater than 1")
+            return self.cv
+        else:
+            return 0
+
+    def fit(self, X, y, sample_weight=None):
         """Build a Cubist regression model from training set (X, y).
 
         Parameters
@@ -244,74 +272,60 @@ class Cubist(BaseEstimator, RegressorMixin):
         -------
         self : object
         """
-        # get column name from y if it is a Pandas Series
-        if isinstance(y, pd.Series):
-            target_label_ = y.name
-        else:
-            target_label_ = None
-
-        # scikit-learn checks
-        X, y = self._validate_data(X, y, 
+        # scikit-learn data validation
+        X, y = self._validate_data(X, y,
                                    dtype=None,
-                                   force_all_finite='allow-nan', 
+                                   force_all_finite='allow-nan',
                                    y_numeric=True,
                                    ensure_min_samples=2)
-        
+
         # set the feature names if it hasn't already been done
         if not hasattr(self, "feature_names_in_"):
             self.feature_names_in_ = [f'var{i}' for i in range(X.shape[1])]
-        
+
         # check sample weighting
         if sample_weight is not None:
             sample_weight = _check_sample_weight(sample_weight, X)
             self.is_sample_weighted_ = True
         else:
             self.is_sample_weighted_ = False
-        
-        # validate model parameters
-        self._validate_model_parameters()
 
-        # raise warning if sampling a small dataset
-        if self.sample:
-            trained_num_samples = int(round(self.sample * X.shape[0], 0))
-            if trained_num_samples < 10:
-                warn(f"Sampling a dataset with {X.shape[0]} rows and a "
-                     f"sampling percent of {self.sample} means Cubist will "
-                     f"train with {trained_num_samples} rows. This may lead "
-                     f"to incorrect or failing predictions. Please increase "
-                     f"or remove the `sample` parameter.\n", stacklevel=3)
-        
+        n_rules = self._check_n_rules()
+        n_committees = self._check_n_committees()
+        neighbors = self._check_neighbors()
+        unbiased = self._check_unbiased()
+        composite = self._check_composite(neighbors)
+        extrapolation = self._check_extrapolation()
+        sample = self._check_sample(X.shape[0])
+        cv = self._check_cv()
+        random_state = check_random_state(self.random_state)
+
+        # number of input features
         self.n_features_in_ = X.shape[1]
+        # number of outputs is 1 (single output regression)
         self.n_outputs_ = 1
 
         # (re)construct a dataframe from X
         X = pd.DataFrame(X, columns=self.feature_names_in_)
         y = pd.Series(y)
 
-        random_state = check_random_state(self.random_state)
-
-        # if a Pandas series wasn't used or it has no name,
-        # use the passed target_label feature, otherwise use
-        # the name of the Pandas series
-        self.target_label_ = target_label_ or self.target_label
-
         # create the names and data strings required for cubist
-        names_string = make_names_string(X, w=sample_weight,
-                                         label=self.target_label_)
-        data_string = make_data_string(X, y, w=sample_weight)
-        
+        names_string = _make_names_string(X, w=sample_weight,
+                                          label=self.target_label)
+        data_string = _make_data_string(X, y, w=sample_weight)
+
         # call the C implementation of cubist
         model, output = _cubist(namesv_=names_string.encode(),
                                 datav_=data_string.encode(),
-                                unbiased_=self.unbiased,
-                                compositev_=self.composite_.encode(),
-                                neighbors_=self.neighbors_,
-                                committees_=self.n_committees,
-                                sample_=self.sample_,
+                                unbiased_=unbiased,
+                                compositev_=composite.encode(),
+                                neighbors_=neighbors,
+                                committees_=n_committees,
+                                sample_=sample,
                                 seed_=random_state.randint(0, 4095) % 4096,
-                                rules_=self.n_rules,
-                                extrapolation_=self.extrapolation,
-                                cv_=self.cv_,
+                                rules_=n_rules,
+                                extrapolation_=extrapolation,
+                                cv_=cv,
                                 modelv_=b"1",
                                 outputv_=b"1")
 
@@ -320,18 +334,18 @@ class Cubist(BaseEstimator, RegressorMixin):
         output = output.decode()
 
         # raise Cubist training errors
-        if "***" in output or "Error" in output:
+        if ("***" in output) or ("Error" in output):
             raise CubistError(output)
-        
+
         # inform user that they may want to use rules only
         if "Recommend using rules only" in output:
             warn("Cubist recommends using rules only "
-                 "(i.e. set composite=False)", stacklevel=3)
+                 "(i.e. set auto=False)", stacklevel=3)
 
         # print model output if using verbose output
         if self.verbose:
             print(output)
-        
+
         # if the model returned nothing, we're doing cross-validation so stop
         if self.model_ == "1":
             return self
@@ -343,22 +357,24 @@ class Cubist(BaseEstimator, RegressorMixin):
             # clean model string when using reserved sample name
             self.model_ = self.model_[:self.model_.index("sample")] + \
                           self.model_[self.model_.index("entries"):]
-        
-        # compress and save descriptors
-        self.names_string_ = zlib.compress(names_string.encode())
 
-        # when a composite model has been used compress and save training data
-        if self.composite is True or "nearest neighbors" in output \
-            or self.neighbors_ > 0:
-            self.data_string_ = zlib.compress(data_string.encode())
-        else:
-            self.data_string_ = zlib.compress("1".encode())
+        # when a composite model has not been used, drop the data_string
+        if not (
+                (composite == "yes") or
+                ("nearest neighbors" in output) or
+                (neighbors > 0)
+        ):
+            data_string = "1"
+
+        # compress and save descriptors/data
+        self.names_string_ = zlib.compress(names_string.encode())
+        self.data_string_ = zlib.compress(data_string.encode())
 
         # parse model contents and store useful information
-        self.rules_, self.coeff_ = parse_model(self.model_, X)
+        self.rules_, self.coeff_ = _parse_model(self.model_, X)
 
         # get the input data variable usage
-        self.feature_importances_ = get_variable_usage(output, X)
+        self.feature_importances_ = _get_variable_usage(output, X)
 
         # get the names of columns that have no nan values
         is_na_col = ~self.coeff_.isna().any()
@@ -373,7 +389,7 @@ class Cubist(BaseEstimator, RegressorMixin):
             used_variables = set(self.rules_["variable"]).union(
                 set(not_na_cols)
             )
-            self.variables_ = {"all": list(X.columns),
+            self.variables_ = {"all": list(self.feature_names_in_),
                                "used": list(used_variables)}
         return self
 
@@ -391,13 +407,13 @@ class Cubist(BaseEstimator, RegressorMixin):
             The predicted values.
         """
         # make sure the model has been fitted
-        check_is_fitted(self, attributes=["model_", "rules_", "coeff_", 
+        check_is_fitted(self, attributes=["model_", "rules_", "coeff_",
                                           "feature_importances_"])
 
         # validate input data
-        X = self._validate_data(X, 
-                                dtype=None, 
-                                force_all_finite='allow-nan', 
+        X = self._validate_data(X,
+                                dtype=None,
+                                force_all_finite='allow-nan',
                                 reset=False)
 
         # (re)construct a dataframe from X
@@ -409,7 +425,7 @@ class Cubist(BaseEstimator, RegressorMixin):
             X["case_weight_pred"] = np.nan
 
         # make data string for predictions
-        data_string = make_data_string(X)
+        data_string = _make_data_string(X)
 
         # get cubist predictions from trained model
         pred, output = _predictions(data_string.encode(),
@@ -418,15 +434,15 @@ class Cubist(BaseEstimator, RegressorMixin):
                                     self.model_.encode(),
                                     np.zeros(X.shape[0]),
                                     b"1")
-        
+
         # decode output
         output = output.decode()
 
         # raise Cubist prediction errors
         if "***" in output or "Error" in output:
             raise CubistError(output)
-        
+
         if output:
             print(output)
-        
+
         return pred

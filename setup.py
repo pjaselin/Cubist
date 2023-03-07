@@ -20,10 +20,12 @@ with open("README.md", 'r') as f:
 with open("requirements.txt", 'r') as f:
     requires = f.read()
 
+
 def read(rel_path):
     here = os.path.abspath(os.path.dirname(__file__))
     with codecs.open(os.path.join(here, rel_path), 'r') as fp:
         return fp.read()
+
 
 def get_version(rel_path):
     for line in read(rel_path).splitlines():
@@ -33,9 +35,10 @@ def get_version(rel_path):
     else:
         raise RuntimeError("Unable to find version string.")
 
+
 setup(
     name="cubist",
-    version=get_version("cubist/_version.py"),
+    version=get_version("cubist/__version__.py"),
     author="Patrick Aselin",
     description="A Python package for fitting Quinlan's Cubist regression model.",
     long_description=long_description,
@@ -47,7 +50,7 @@ setup(
     url="https://github.com/pjaselin/Cubist",
     packages=["cubist"],
     license="GPL v3",
-    classifiers = [
+    classifiers=[
         "Programming Language :: Python",
         "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
         "Topic :: Software Development :: Libraries",

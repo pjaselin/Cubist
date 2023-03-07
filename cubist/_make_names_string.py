@@ -5,10 +5,10 @@ from datetime import datetime
 import pandas as pd
 import numpy as np
 
-from ._quinlan_attributes import quinlan_attributes
+from ._quinlan_attributes import _quinlan_attributes
 
 
-def make_names_string(x, w=None, label="outcome"):
+def _make_names_string(x, w=None, label="outcome"):
     """
     Create the names string to pass to Cubist. This string contains information about Python and the time of run along
     with the column names and their data types.
@@ -50,14 +50,14 @@ def make_names_string(x, w=None, label="outcome"):
     out = f'{out}\n{label}.\n{label}{outcome_type}'
 
     # get dictionary of feature names as keys and data types as values
-    var_data = quinlan_attributes(x)
+    var_data = _quinlan_attributes(x)
 
     # if weights are present add this to var_data
     if w is not None:
         var_data["case weight"] = "continuous."
 
     # join the column names and data types into a single string
-    var_data = [f'{escapes([key])[0]}: {value}' for key, value in var_data.items()]
+    var_data = [f'{_escapes([key])[0]}: {value}' for key, value in var_data.items()]
     var_data = '\n'.join(var_data)
 
     # merge the out and var_data strings
@@ -65,7 +65,7 @@ def make_names_string(x, w=None, label="outcome"):
     return out
 
 
-def escapes(x, chars=None):
+def _escapes(x, chars=None):
     """Double escape reserved and special characters in x."""
     # set custom reserved characters list
     if chars is None:
@@ -76,21 +76,22 @@ def escapes(x, chars=None):
         for i in chars:
             x = [c.replace(i, f'\\{i}') for c in x]
         # apply second escaping
-        x = [re_escape(c) for c in x]
+        x = [_re_escape(c) for c in x]
     else:
         # apply first escaping
         for i in chars:
             x = x.replace(i, f'\\{i}')
         # apply second escaping
-        x = re_escape(x)
+        x = _re_escape(x)
     return x
 
 
 _special_chars_map = {i: '\\' + chr(i) for i in b'()[]{}?*+-|:;^$\\.&~#\t\n\r\v\f'}
 
 
-def re_escape(pattern):
-    """Escape special characters in a string. Sourced from 're' Python package."""
+def _re_escape(pattern):
+    """Escape special characters in a string. 
+    Sourced from 're' Python package."""
     if isinstance(pattern, str):
         return pattern.translate(_special_chars_map)
     else:

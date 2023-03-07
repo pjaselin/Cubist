@@ -1,7 +1,7 @@
 import pandas as pd
 
 
-def get_variable_usage(output, x):
+def _get_variable_usage(output, x):
     output = output.split("\n")
     # get the attribute usage section of the model output
     start_vars = [i for i, c in enumerate(output) if '\tAttribute usage' in c]
@@ -14,9 +14,9 @@ def get_variable_usage(output, x):
     if len(has_pct) < 1:
         return None
     output = [output[i] for i in has_pct]
-    values = [get_values(c) for c in output]
+    values = [_get_values(c) for c in output]
     values = pd.DataFrame(values, columns=["Conditions", "Model"])
-    values["Variable"] = [get_variable(c) for c in output]
+    values["Variable"] = [_get_variable(c) for c in output]
 
     if values.shape[0] < x.shape[1]:
         x_names = set(x.columns)
@@ -32,7 +32,7 @@ def get_variable_usage(output, x):
     return values
 
 
-def get_values(x):
+def _get_values(x):
     x2 = x.split(" ")
     has_pct = ["%" in c for c in x2]
     if sum(has_pct) == 2:
@@ -54,6 +54,6 @@ def get_values(x):
             return 0
 
 
-def get_variable(x):
+def _get_variable(x):
     x = x.split(" ")
     return x[-1]

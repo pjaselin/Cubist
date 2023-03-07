@@ -1,13 +1,8 @@
-import pytest
-
-from sklearn.utils.estimator_checks import check_estimator
+from sklearn.utils.estimator_checks import parametrize_with_checks
 
 from ..cubist import Cubist
 
 
-@pytest.mark.parametrize(
-    "estimator",
-    [Cubist()]
-)
-def test_all_estimators(estimator):
-    return check_estimator(estimator)
+@parametrize_with_checks([Cubist()])
+def test_sklearn_compatible_estimator(estimator, check):
+    return check(estimator)

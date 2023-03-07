@@ -49,7 +49,7 @@ def _get_data_format(x: pd.Series):
         raise ValueError(f"Dtype {x.dtype} is not supported")
 
 
-def quinlan_attributes(df: pd.DataFrame) -> dict:
+def _quinlan_attributes(df: pd.DataFrame) -> dict:
     """
     Function to collect the data formatting information for each column in a Pandas DataFrame.
 
