@@ -31,7 +31,7 @@ STRBUF *strbuf_create_empty(unsigned int len) {
     return NULL;
 
   /* Allocate memory for the buffer */
-  sb->buf = (unsigned char *)malloc(len);
+  sb->buf = (char *)malloc(len);
   if (sb->buf == NULL) {
     free(sb);
     return NULL;
@@ -53,7 +53,7 @@ STRBUF *strbuf_create_empty(unsigned int len) {
  * it doesn't assume that the memory has been dynamically allocated.
  * The data buffer is neither reallocated or freed for any reason.
  */
-STRBUF *strbuf_create_full(unsigned char *data, unsigned int len) {
+STRBUF *strbuf_create_full(char *data, unsigned int len) {
   STRBUF *sb;
 
   /* Allocate memory for the STRBUF */
@@ -82,7 +82,7 @@ STRBUF *strbuf_copy(STRBUF *sb) {
     return NULL;
 
   /* Allocate memory for the buffer */
-  nsb->buf = (unsigned char *)malloc(sb->len);
+  nsb->buf = (char *)malloc(sb->len);
   if (nsb->buf == NULL) {
     free(nsb);
     return NULL;
@@ -155,7 +155,7 @@ void strbuf_destroy(STRBUF *sb) {
 /*
  * Write the specified amount of data to the STRBUF.
  */
-int strbuf_write(STRBUF *sb, const unsigned char *data, unsigned int n) {
+int strbuf_write(STRBUF *sb, const char *data, unsigned int n) {
   unsigned int nlen = sb->i + n; /* Minimum length needed */
 
   /* If the new string won't fit, extend sb */
@@ -174,7 +174,7 @@ int strbuf_write(STRBUF *sb, const unsigned char *data, unsigned int n) {
   return 0;
 }
 
-int strbuf_printf(STRBUF *sb, const unsigned char *format, ...) {
+int strbuf_printf(STRBUF *sb, const char *format, ...) {
   va_list ap;
   int status;
 
@@ -185,7 +185,7 @@ int strbuf_printf(STRBUF *sb, const unsigned char *format, ...) {
   return status;
 }
 
-int strbuf_vprintf(STRBUF *sb, const unsigned char *format, va_list ap) {
+int strbuf_vprintf(STRBUF *sb, const char *format, va_list ap) {
   int s;
   unsigned int nlen;
   int size = sb->len - sb->i; /* Remaining space left */
@@ -264,7 +264,7 @@ int strbuf_vprintf(STRBUF *sb, const unsigned char *format, va_list ap) {
 /*
  * Write a null-terminated string to the STRBUF.
  */
-int strbuf_puts(STRBUF *sb, const unsigned char *s) {
+int strbuf_puts(STRBUF *sb, const char *s) {
   return strbuf_write(sb, s, strlen(s));
 }
 
@@ -280,7 +280,7 @@ int strbuf_putc(STRBUF *sb, int c) {
       return -1;
 
   /* Put the character into the buffer, and update the position and size */
-  sb->buf[sb->i++] = (unsigned char)c;
+  sb->buf[sb->i++] = (char)c;
   if (sb->i > sb->n)
     sb->n = sb->i;
 
@@ -292,7 +292,7 @@ int strbuf_putc(STRBUF *sb, int c) {
 /*
  * Read a string from the STRBUF.
  */
-unsigned char *strbuf_gets(STRBUF *sb, unsigned char *s, unsigned int n) {
+char *strbuf_gets(STRBUF *sb, char *s, unsigned int n) {
   int c = -1;
   int i, j;
 
@@ -327,7 +327,7 @@ int strbuf_getc(STRBUF *sb) {
  * Return the entire buffer.
  * Be careful, because it's not null-terminated!
  */
-unsigned char *strbuf_getall(STRBUF *sb) {
+char *strbuf_getall(STRBUF *sb) {
   /* Make sure there is enough memory to null-terminate the data */
   if (sb->n >= sb->len) {
     /* sb->n should never actually be larger than sb->len */
@@ -349,7 +349,7 @@ unsigned char *strbuf_getall(STRBUF *sb) {
  * Increase the allocated size of the buffer to the specified size.
  */
 static int extend(STRBUF *sb, unsigned int nlen) {
-  unsigned char *buf;
+  char *buf;
 
   /* Do nothing if nlen isn't larger than the current size */
   if (nlen <= sb->len)
@@ -360,7 +360,7 @@ static int extend(STRBUF *sb, unsigned int nlen) {
     return -1;
 
   /* Try to reallocate the buffer */
-  buf = (unsigned char *)realloc(sb->buf, nlen);
+  buf = (char *)realloc(sb->buf, nlen);
   if (buf == NULL)
     return -1; /* Note that sb is untouched */
 
