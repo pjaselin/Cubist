@@ -260,7 +260,7 @@ class Cubist(BaseEstimator, RegressorMixin):
         ----------
         X : {array-like} of shape (n_samples, n_features)
             The training input samples. Must have complete column names or none
-            provided at all (NumPy arrays will be given names by column index)
+            provided at all (NumPy arrays will be given names by column index).
 
         y : array-like of shape (n_samples,)
             The target values (Real numbers in regression).
@@ -405,7 +405,8 @@ class Cubist(BaseEstimator, RegressorMixin):
         Parameters
         ----------
         X : {array-like} of shape (n_samples, n_features)
-            The input samples.
+            The input samples. Must have complete column names or none
+            provided at all (NumPy arrays will be given names by column index).
 
         Returns
         -------
