@@ -282,6 +282,11 @@ class Cubist(BaseEstimator, RegressorMixin):
         # set the feature names if it hasn't already been done
         if not hasattr(self, "feature_names_in_"):
             self.feature_names_in_ = [f'var{i}' for i in range(X.shape[1])]
+        
+        # check to see if any of the feature names are empty
+        if any(n == "" or pd.isnull(n) for n in self.feature_names_in_):
+            raise ValueError("At least one column is missing unnamed and is NA \
+                             or an empty string.")
 
         # check sample weighting
         if sample_weight is not None:

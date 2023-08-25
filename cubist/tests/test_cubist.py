@@ -126,3 +126,17 @@ def test_auto(auto, expected, n, raises):
         assert expected == model._check_composite(n)
         model.fit(X, y)
         check_is_fitted(model)
+
+
+@pytest.mark.parametrize("raises",
+                         [(pytest.raises(ValueError))])
+def test_missing_column_name(raises):
+    model = Cubist()
+    # copy X so we can change the column names without editing the main object
+    X_changed_cols = X.copy(deep=True)
+    # change the age column to an empty string
+    X_changed_cols = X_changed_cols.rename(columns={"age": ""})
+    # make sure we get a ValueError for this
+    with raises:
+        model.fit(X_changed_cols, y)
+        check_is_fitted(model)
