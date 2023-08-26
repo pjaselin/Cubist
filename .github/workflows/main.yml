@@ -19,7 +19,7 @@ on:
       - main
   release:
     types:
-      - created
+      - published
 
 jobs:
   test:
@@ -136,7 +136,6 @@ jobs:
     # release only tagged commits to pypi / github
     name: release distribution
     needs: [build_wheels, build_sdist]
-    if: github.event_name == 'release' && startsWith(github.ref, 'refs/tags')
     runs-on: ubuntu-latest
 
     steps:
@@ -157,8 +156,16 @@ jobs:
         password: ${{ secrets.TEST_PYPI_API_TOKEN }}
         repository_url: https://test.pypi.org/legacy/
 
+    # publish only tagged commits to pypi
+    - name: Publish distribution 📦 to PyPI
+      if: startsWith(github.ref, 'refs/tags')
+      uses: pypa/gh-action-pypi-publish@master
+      with:
+        password: ${{ secrets.PYPI_API_TOKEN }}
+
     # github upload release asset
     - name: Upload Release Asset
+      if: startsWith(github.ref, 'refs/tags')
       uses: softprops/action-gh-release@v1
       with:
         name: latest
@@ -168,9 +175,3 @@ jobs:
           dist/*
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-    # publish only tagged commits to pypi
-    - name: Publish distribution 📦 to PyPI
-      uses: pypa/gh-action-pypi-publish@master
-      with:
-        password: ${{ secrets.PYPI_API_TOKEN }}
