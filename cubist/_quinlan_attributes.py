@@ -64,4 +64,4 @@ def _quinlan_attributes(df: pd.DataFrame) -> dict:
         Dictionary with keys as column names and values as the description of
         the data type.
     """
-    return {col_name: _get_data_format(col_data) for col_name, col_data in df.iteritems()}
+    return {col_name: _get_data_format(df[col_name]) for col_name in df.columns}
