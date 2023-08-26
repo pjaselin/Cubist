@@ -9,14 +9,15 @@ on:
         default: 'warning'
   push:
     branches:
-      - master
       - main
-      - release
-      - test
       - dev
-  release:
+  pull_request:
+    types:
+      - synchronize
     branches:
-      - master
+      - dev
+      - main
+  release:
     types:
       - created
 
