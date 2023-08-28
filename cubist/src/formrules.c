@@ -207,7 +207,7 @@ void Scan(Tree T)
 /*            */
 /*************************************************************************/
 
-void PushCondition()
+void PushCondition(void)
 /*   -------------  */
 {
   int i;
@@ -219,7 +219,7 @@ void PushCondition()
   }
 }
 
-void PopCondition()
+void PopCondition(void)
 /*   -------------  */
 {
   int i;
@@ -398,7 +398,7 @@ void UpdateCount(int d, CaseNo i, double *Total, double *PredErr)
 /*            */
 /*************************************************************************/
 
-void ProcessLists()
+void ProcessLists(void)
 /*   ------------  */
 {
   CaseNo i, iNext, *Prev;

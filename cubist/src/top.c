@@ -5,7 +5,7 @@
 #include "rulebasedmodels.h"
 #include "strbuf.h"
 
-extern void cubistmain();
+extern void cubistmain(void);
 extern void samplemain(double *outputv);
 extern void FreeCases(void);
 

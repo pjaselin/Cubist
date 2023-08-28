@@ -1,0 +1,171 @@
+name: Test and Lint Cubist
+
+on:
+  workflow_dispatch:
+    inputs:
+      logLevel:
+        description: 'Log level'
+        required: true
+        default: 'warning'
+  pull_request:
+    types:
+      - synchronize
+    branches:
+      - dev
+      - main
+  workflow_call
+
+jobs:
+  test:
+    name: Test and lint on Python ${{ matrix.python-version }} and ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        python-version: ["3.7", "3.8", "3.9", "3.10", "3.11"]
+    runs-on: ${{ matrix.os }}
+
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v3
+
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ matrix.python-version }}
+    
+    - name: Enable Developer Command Prompt for Windows
+      if: matrix.os == 'windows-latest'
+      uses: ilammy/msvc-dev-cmd@v1
+    
+    - name: Add sys/time.h for Windows
+      if: matrix.os == 'windows-latest'
+      run: |
+        mv winsys/ cubist/sys
+      
+    - name: Remove winsys folder for non-Windows OS
+      if: matrix.os != 'windows-latest'
+      run: |
+        rm -r winsys/
+    
+    - name: Install dependencies
+      run: |
+        pip3 install --upgrade pip
+        pip3 install setuptools wheel build cython
+        pip3 install flake8 pytest pytest-cov numpy
+        pip install .
+
+    - name: Lint with flake8
+      run: |
+        pip install flake8
+        # stop the build if there are Python syntax errors or undefined names
+        flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+        # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
+        flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+
+    - name: Test with pytest
+      run: |
+        pip install pytest
+        pytest --cov=com --cov-report=xml --cov-report=html
+
+  # build_wheels:
+  #   needs: test
+  #   name: Build wheels on ${{ matrix.os }}
+  #   runs-on: ${{ matrix.os }}
+  #   strategy:
+  #     matrix:
+  #       os: [ubuntu-latest, windows-latest, macos-latest]
+  #   env:
+  #     CIBW_SKIP: "pp* *-win32"
+  #   steps:
+  #     - uses: actions/checkout@v3
+
+  #     - uses: actions/setup-python@v4
+  #       name: Install Python
+  #       with:
+  #         python-version: '3.9'
+
+  #     - name: Enable Developer Command Prompt for Windows
+  #       if: matrix.os == 'windows-latest'
+  #       uses: ilammy/msvc-dev-cmd@v1
+
+  #     - name: Add sys/time.h for Windows
+  #       if: matrix.os == 'windows-latest'
+  #       run: |
+  #         mv winsys/ cubist/sys
+
+  #     - name: Remove winsys folder for non-Windows OS
+  #       if: matrix.os != 'windows-latest'
+  #       run: |
+  #         rm -r winsys/
+
+  #     - name: Build wheels
+  #       uses: pypa/cibuildwheel@v2.2.2
+      
+  #     - uses: actions/upload-artifact@v3
+  #       with:
+  #         path: ./wheelhouse/*.whl
+
+  # build_sdist:
+  #   name: Build source distribution
+  #   needs: test
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #   - name: Checkout repo
+  #     uses: actions/checkout@v3
+
+  #   - name: Set up Python
+  #     uses: actions/setup-python@v4
+  #     with:
+  #       python-version: "3.9"
+
+  #   - name: Build sdist
+  #     run: |
+  #       python -m pip install setuptools wheel build cython numpy
+  #       python setup.py sdist
+  #   - uses: actions/upload-artifact@v3
+  #     with:
+  #       path: dist/*.tar.gz
+  
+  # release:
+  #   # release only tagged commits to pypi / github
+  #   name: release distribution
+  #   needs: [build_wheels, build_sdist]
+  #   runs-on: ubuntu-latest
+
+  #   steps:
+  #   - name: mkdir
+  #     run: |
+  #       mkdir dist
+
+  #   - name: download artifacts
+  #     uses: actions/download-artifact@v3
+  #     with:
+  #       name: artifact
+  #       path: dist
+
+  #   # test publish to pypi
+  #   - name: Publish distribution 📦 to Test PyPI
+  #     uses: pypa/gh-action-pypi-publish@master
+  #     with:
+  #       password: ${{ secrets.TEST_PYPI_API_TOKEN }}
+  #       repository_url: https://test.pypi.org/legacy/
+
+  #   # publish only tagged commits to pypi
+  #   - name: Publish distribution 📦 to PyPI
+  #     if: startsWith(github.ref, 'refs/tags')
+  #     uses: pypa/gh-action-pypi-publish@master
+  #     with:
+  #       password: ${{ secrets.PYPI_API_TOKEN }}
+
+  #   # github upload release asset
+  #   - name: Upload Release Asset
+  #     if: startsWith(github.ref, 'refs/tags')
+  #     uses: softprops/action-gh-release@v1
+  #     with:
+  #       name: latest
+  #       tag_name: latest
+  #       body: Latest version of distribution
+  #       files: |
+  #         dist/*
+  #     env:
+  #       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

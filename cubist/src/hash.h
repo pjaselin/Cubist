@@ -12,7 +12,7 @@ extern unsigned int ht_hashcode(const char *key);
 
 /* Constructor and destructor */
 extern void *ht_new(int size);
-extern void ht_destroy();
+extern void ht_destroy(void *ht);
 
 /* Hash table iteration functions */
 extern void *ht_next(void *ht);
