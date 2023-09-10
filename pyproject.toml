@@ -1,3 +1,3 @@
 [build-system]
-requires = ["setuptools==52.0.0.post20210125", "wheel", "build", "Cython", "numpy"]
+requires = ["setuptools", "wheel", "build", "Cython", "numpy"]
 build-backend = "setuptools.build_meta"

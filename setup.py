@@ -14,10 +14,10 @@ extensions = [
     )
 ]
 
-with open("README.md", 'r') as f:
+with open("README.md", 'r', encoding="utf-8") as f:
     long_description = f.read()
 
-with open("requirements.txt", 'r') as f:
+with open("requirements.txt", 'r', encoding="utf-8") as f:
     requires = f.read()
 
 
@@ -32,8 +32,7 @@ def get_version(rel_path):
         if line.startswith('__version__'):
             delim = '"' if '"' in line else "'"
             return line.split(delim)[1]
-    else:
-        raise RuntimeError("Unable to find version string.")
+    raise RuntimeError("Unable to find version string.")
 
 
 setup(
