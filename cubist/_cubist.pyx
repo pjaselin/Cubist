@@ -4,7 +4,7 @@ np.import_array()
 # external declarations for cubist and predictions function from the top.c file
 cdef extern from "src/top.c":
     void cubist(char **namesv, char **datav, int *unbiased,
-                char **compositev, int *neighbors, int *committees,
+                char **compositev, *neighbors, int *committees,
                 double *sample, int *seed, int *rules, double *extrapolation,
                 int *cv, char **modelv, char **outputv)
     void predictions(char **casev, char **namesv, char **datav, char **modelv, 

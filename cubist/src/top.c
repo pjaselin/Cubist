@@ -65,9 +65,7 @@ static void cubist(char **namesv, char **datav, int *unbiased,
       // I think the previous value of *modelv will be garbage collected
       *modelv = model;
     }
-  } //else {
-    // printf("training code called exit with value %d\n", val - JMP_OFFSET);
-  //}
+  }
 
   // Close file object "Of", and return its contents via argument outputv
   char *outputString = closeOf();
