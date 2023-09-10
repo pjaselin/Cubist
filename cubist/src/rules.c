@@ -317,7 +317,7 @@ void PrintRule(CRule R)
   snprintf(Entry, size, "%s =", AttName[ClassAtt]);
   Indent = CharWidth(Entry);
 
-  snprintf(Entry + Indent, size, " %.14g", Model[0]);
+  snprintf(Entry + Indent, size - Indent, " %.14g", Model[0]);
   fprintf(Of, "\t%s", Entry);
   LineLen = CharWidth(Entry);
 
