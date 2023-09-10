@@ -15,7 +15,7 @@ on:
     types:
       - published
   workflow_run:
-    workflows: ["tests"]
+    workflows: ["Test and Lint Cubist"]
     branches:
       - main
       - dev
@@ -86,6 +86,7 @@ jobs:
   release:
     # release only tagged commits to pypi / github
     name: release distribution
+    if: startsWith(github.ref, 'refs/tags')
     needs: [build_wheels, build_sdist]
     runs-on: ubuntu-latest
 
@@ -109,14 +110,12 @@ jobs:
 
     # publish only tagged commits to pypi
     - name: Publish distribution 📦 to PyPI
-      if: startsWith(github.ref, 'refs/tags')
       uses: pypa/gh-action-pypi-publish@master
       with:
         password: ${{ secrets.PYPI_API_TOKEN }}
 
     # github upload release asset
     - name: Upload Release Asset
-      if: startsWith(github.ref, 'refs/tags')
       uses: softprops/action-gh-release@v1
       with:
         name: latest

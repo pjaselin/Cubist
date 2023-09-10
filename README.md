@@ -4,10 +4,6 @@ A Python package for fitting Quinlan's [Cubist](https://www.rulequest.com/cubist
 
 ## Installation 
 ```bash
-pip install cubist
-```
-or
-```bash
 pip install --upgrade cubist
 ```
 
