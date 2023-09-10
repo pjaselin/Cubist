@@ -83,7 +83,8 @@ void GetData(FILE *Df, Boolean Train, Boolean AllowUnknownTarget)
   Boolean AnyUnknown = false, FirstIgnore = true, *AttMsg;
   Attribute Att;
   ContValue Val, Range;
-  char CVS[20];
+  size_t size = 20;
+  char CVS[size];
   CaseCount *Freq; /* discrete value frequencies */
   CaseNo Count, WantTrain, LeftTrain, WantTest, LeftTest;
   Boolean SelectTrain;
@@ -267,7 +268,7 @@ void GetData(FILE *Df, Boolean Train, Boolean AllowUnknownTarget)
         if (Discrete(Att)) {
           fprintf(Of, "`%s'\n", AttValName[Att][Modal[Att]]);
         } else {
-          CValToStr(AttMean[Att], Att, CVS);
+          CValToStr(AttMean[Att], Att, CVS, size);
           fprintf(Of, "%s\n", CVS);
         }
       }
