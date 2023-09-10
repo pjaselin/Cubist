@@ -8,7 +8,7 @@ pip install --upgrade cubist
 ```
 
 ## Background
-Cubist is a regression algorithm develped by John Ross Quinlan for generating rule-based predictive models. This has been available in the R world thanks to the work of Max Kuhn and his colleagues. With this package it is introduced to Python and made scikit-learn compatible for easy use with existing data and model pipelines. Additionally, cross-validation and control over whether Cubist creates a composite model is added here.
+Cubist is a regression algorithm develped by John Ross Quinlan for generating rule-based predictive models. This has been available in the R world thanks to the work of Max Kuhn and his colleagues. It is introduced to Python with this package and made scikit-learn compatible for easy use with existing data and model pipelines. Additionally, cross-validation and control over whether Cubist creates a composite model is added here.
 
 ## Advantages
 Unlike other ensemble models such as RandomForest and XGBoost, Cubist generates a set of rules, making it easy to understand precisely how the model makes it's predictive decisions. Thus tools such as SHAP and LIME are unnecessary as Cubist doesn't exhibit black box behavior. 
