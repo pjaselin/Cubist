@@ -725,7 +725,7 @@ void CValToStr(ContValue CV, Attribute Att, String DS, size_t DS_size)
   int Mins;
 
   if (TStampVal(Att)) {
-    DayToDate(floor(CV / 1440) + TSBase, DS, DS_size);
+    DayToDate(floor(CV / 1440) + TSBase, DS, DS_size - 11);
     DS[10] = ' ';
     Mins = rint(CV) - floor(CV / 1440) * 1440;
     SecsToTime(Mins * 60, DS + 11, DS_size);
