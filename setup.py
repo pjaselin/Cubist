@@ -42,7 +42,7 @@ setup(
     description="A Python package for fitting Quinlan's Cubist regression model.",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    ext_modules=cythonize(extensions),
+    ext_modules=cythonize(extensions, include_path = [np.get_include()]),
     zip_safe=False,
     include_package_data=True,
     install_requires=requires,
