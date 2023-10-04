@@ -1,4 +1,4 @@
-from setuptools import setup, Extension, find_namespace_packages
+from setuptools import setup, Extension
 from Cython.Build import cythonize
 import glob
 import os.path
@@ -47,7 +47,7 @@ setup(
     include_package_data=True,
     install_requires=requires,
     url="https://github.com/pjaselin/Cubist",
-    packages=find_namespace_packages(),
+    packages=["cubist"],
     license="GPL v3",
     classifiers=[
         "Programming Language :: Python",
