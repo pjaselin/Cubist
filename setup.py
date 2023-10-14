@@ -3,19 +3,14 @@ from Cython.Build import cythonize
 import glob
 import os.path
 import codecs
-import sysconfig
 
 import numpy as np
-
-extra_compile_args = sysconfig.get_config_var('CFLAGS').split()
-extra_compile_args += ["-c"]
 
 extensions = [
     Extension(
         name='_cubist',
         sources=["cubist/_cubist.pyx"] + glob.glob("cubist/src/*.c"),
-        include_dirs=["cubist/src", np.get_include()],
-        extra_compile_args=extra_compile_args
+        include_dirs=["cubist/src", np.get_include()]
     )
 ]
 

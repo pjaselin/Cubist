@@ -36,6 +36,8 @@ jobs:
     - name: Enable Developer Command Prompt for Windows
       if: matrix.os == 'windows-latest'
       uses: ilammy/msvc-dev-cmd@v1
+      with:
+        vsversion: 2019
     
     - name: Add sys/time.h for Windows
       if: matrix.os == 'windows-latest'
