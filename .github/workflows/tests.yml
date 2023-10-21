@@ -54,10 +54,10 @@ jobs:
     
     - name: Install dependencies
       run: |
-        python -m pip3 install --upgrade pip3
-        pip3 install setuptools wheel build cython
-        pip3 install flake8 pytest pytest-cov numpy
-        pip3 install -r requirements.txt
+        python -m pip install --upgrade pip
+        pip install setuptools wheel build cython
+        pip install flake8 pytest pytest-cov numpy
+        pip install -r requirements.txt
         python setup.py build_ext --inplace
 
     - name: Lint with flake8
