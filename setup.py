@@ -10,7 +10,8 @@ extensions = [
     Extension(
         name='_cubist',
         sources=["cubist/_cubist.pyx"] + glob.glob("cubist/src/*.c"),
-        include_dirs=["cubist/src", np.get_include()]
+        include_dirs=["cubist/src", np.get_include()],
+        define_macros=[('NPY_NO_DEPRECATED_API', 'NPY_1_7_API_VERSION')],
     )
 ]
 
