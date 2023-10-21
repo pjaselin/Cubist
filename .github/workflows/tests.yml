@@ -50,7 +50,7 @@ jobs:
           rm -r winsys/
 
       - name: Build wheels
-        uses: pypa/cibuildwheel@latest
+        uses: pypa/cibuildwheel
 
     # steps:
     # - name: Checkout repo
