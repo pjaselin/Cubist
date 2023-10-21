@@ -32,7 +32,7 @@
 #include "defns.h"
 #include "extern.h"
 #include <time.h>
-#include <stddef.h>
+
 #include "redefine.h"
 #include "transform.h"
 
