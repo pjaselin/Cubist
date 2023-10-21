@@ -25,73 +25,47 @@ jobs:
     defaults:
       run:
         shell: bash
-    env:
-      CIBW_SKIP: "pp* *-win32"
+
     steps:
-      - uses: actions/checkout@v3
-    
-      - uses: actions/setup-python@v4
-        name: Install Python
-        with:
-          python-version: '3.9'
-    
-      - name: Enable Developer Command Prompt for Windows
-        if: matrix.os == 'windows-latest'
-        uses: ilammy/msvc-dev-cmd@v1
+    - name: Checkout repo
+      uses: actions/checkout@v3
 
-      - name: Add sys/time.h for Windows
-        if: matrix.os == 'windows-latest'
-        run: |
-          mv winsys/ cubist/sys
-
-      - name: Remove winsys folder for non-Windows OS
-        if: matrix.os != 'windows-latest'
-        run: |
-          rm -r winsys/
-          
-      - name: Build wheels
-        uses: pypa/cibuildwheel@v2.2.2
-
-    # steps:
-    # - name: Checkout repo
-    #   uses: actions/checkout@v3
-
-    # - name: Set up Python 3.11
-    #   uses: actions/setup-python@v4
-    #   with:
-    #     python-version: "3.11"
+    - name: Set up Python 3.11
+      uses: actions/setup-python@v4
+      with:
+        python-version: "3.11"
     
-    # - name: Enable Developer Command Prompt for Windows
-    #   if: matrix.os == 'windows-latest'
-    #   uses: ilammy/msvc-dev-cmd@v1
+    - name: Enable Developer Command Prompt for Windows
+      if: matrix.os == 'windows-latest'
+      uses: ilammy/msvc-dev-cmd@v1
     
-    # - name: Add sys/time.h for Windows
-    #   if: matrix.os == 'windows-latest'
-    #   run: |
-    #     mv winsys/ cubist/sys
+    - name: Add sys/time.h for Windows
+      if: matrix.os == 'windows-latest'
+      run: |
+        mv winsys/ cubist/sys
       
-    # - name: Remove winsys folder for non-Windows OS
-    #   if: matrix.os != 'windows-latest'
-    #   run: |
-    #     rm -r winsys/
+    - name: Remove winsys folder for non-Windows OS
+      if: matrix.os != 'windows-latest'
+      run: |
+        rm -r winsys/
 
-    # - name: Install dependencies
-    #   run: |
-    #     python -m pip install --upgrade pip
-    #     pip install setuptools wheel build cython
-    #     pip install flake8 pytest pytest-cov numpy
-    #     pip install -r requirements.txt
-    #     python setup.py build_ext --inplace
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install setuptools wheel build cython
+        pip install flake8 pytest pytest-cov numpy
+        pip install -r requirements.txt
+        python setup.py build_ext --inplace
 
-    # - name: Lint with flake8
-    #   run: |
-    #     pip install flake8
-    #     # stop the build if there are Python syntax errors or undefined names
-    #     flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
-    #     # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
-    #     flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+    - name: Lint with flake8
+      run: |
+        pip install flake8
+        # stop the build if there are Python syntax errors or undefined names
+        flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+        # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
+        flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
 
-    # - name: Test with pytest
-    #   run: |
-    #     pip install pytest
-    #     pytest --cov=com --cov-report=xml --cov-report=html
+    - name: Test with pytest
+      run: |
+        pip install pytest
+        pytest --cov=com --cov-report=xml --cov-report=html
