@@ -194,8 +194,7 @@ RRuleSet ConstructRuleSet(int ModelNo)
 /*       ----------------  */
 {
   RRuleSet RS;
-  size_t size = 20;
-  char Msg[size];
+  char Msg[20];
   CaseNo i;
   RuleNo r;
   float TempMTSize;
@@ -228,9 +227,9 @@ RRuleSet ConstructRuleSet(int ModelNo)
   ForEach(r, 1, RS->SNRules) { RS->SRule[r]->MNo = ModelNo; }
 
   if (MEMBERS > 1) {
-    snprintf(Msg, size, "Model %d:", ModelNo + 1);
+    sprintf(Msg, "Model %d:", ModelNo + 1);
   } else {
-    snprintf(Msg, size, "Model:");
+    sprintf(Msg, "Model:");
   }
 
   PrintRules(RS, Msg);
@@ -371,8 +370,7 @@ void AttributeUsage(void)
   int m;
   RuleNo r;
   Attribute Att, BestAtt;
-  size_t size = 5;
-  char U1[size], U2[size];
+  char U1[5], U2[5];
 
   /*  Initialise counts  */
 
@@ -408,8 +406,8 @@ void AttributeUsage(void)
     if (!BestAtt)
       break;
 
-    snprintf(U1, size, "%3.0f%%", rint((100.0 * SumCond[BestAtt]) / SumCases));
-    snprintf(U2, size, "%3.0f%%", rint((100.0 * SumModel[BestAtt]) / SumCases));
+    sprintf(U1, "%3.0f%%", rint((100.0 * SumCond[BestAtt]) / SumCases));
+    sprintf(U2, "%3.0f%%", rint((100.0 * SumModel[BestAtt]) / SumCases));
 
     fprintf(Of, "\t  %4s   %4s    %s\n",
             (SumCond[BestAtt] >= 0.01 * SumCases ? U1 : " "),
