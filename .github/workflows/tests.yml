@@ -54,7 +54,7 @@ jobs:
     
     - name: Install dependencies
       run: |
-        pip3 install --upgrade pip
+        python -m pip3 install --upgrade pip3
         pip3 install setuptools wheel build cython
         pip3 install flake8 pytest pytest-cov numpy
         pip3 install -r requirements.txt
