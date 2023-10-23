@@ -597,87 +597,85 @@ void DefSyntaxError(String Msg)
 void DefSemanticsError(int Fi, String Msg, int OpCode)
 /*   -----------------  */
 {
-  size_t size = 1000;
-  size_t size_x = 1008;
-  char Exp[size], XMsg[size_x], Op[size];
+  char Exp[1000], XMsg[1008], Op[1000];
 
   if (!PreviousError) {
     /*  Abbreviate the input if necessary  */
 
     if (BN - Fi > 23) {
-      snprintf(Exp, size, "%.10s...%.10s", Buff + Fi, Buff + BN - 10);
+      sprintf(Exp, "%.10s...%.10s", Buff + Fi, Buff + BN - 10);
     } else {
-      snprintf(Exp, size, "%.*s", BN - Fi, Buff + Fi);
+      sprintf(Exp, "%.*s", BN - Fi, Buff + Fi);
     }
 
     switch (OpCode) {
     case OP_AND:
-      snprintf(Op, "%s", "and");
+      sprintf(Op, "%s", "and");
       break;
     case OP_OR:
-      snprintf(Op, "%s", "or");
+      sprintf(Op, "%s", "or");
       break;
     case OP_SEQ:
     case OP_EQ:
-      snprintf(Op, "%s", "=");
+      sprintf(Op, "%s", "=");
       break;
     case OP_SNE:
     case OP_NE:
-      snprintf(Op, "%s", "<>");
+      sprintf(Op, "%s", "<>");
       break;
     case OP_GT:
-      snprintf(Op, "%s", ">");
+      sprintf(Op, "%s", ">");
       break;
     case OP_GE:
-      snprintf(Op, "%s", ">=");
+      sprintf(Op, "%s", ">=");
       break;
     case OP_LT:
-      snprintf(Op, "%s", "<");
+      sprintf(Op, "%s", "<");
       break;
     case OP_LE:
-      snprintf(Op, "%s", "<=");
+      sprintf(Op, "%s", "<=");
       break;
     case OP_PLUS:
-      snprintf(Op, "%s", "+");
+      sprintf(Op, "%s", "+");
       break;
     case OP_MINUS:
-      snprintf(Op, "%s", "-");
+      sprintf(Op, "%s", "-");
       break;
     case OP_UMINUS:
-      snprintf(Op, "%s", "unary -");
+      sprintf(Op, "%s", "unary -");
       break;
     case OP_MULT:
-      snprintf(Op, "%s", "*");
+      sprintf(Op, "%s", "*");
       break;
     case OP_DIV:
-      snprintf(Op, "%s", "/");
+      sprintf(Op, "%s", "/");
       break;
     case OP_MOD:
-      snprintf(Op, "%s", "%");
+      sprintf(Op, "%s", "%");
       break;
     case OP_POW:
       snprintf(Op, "%s", "^");
       break;
     case OP_SIN:
-      snprintf(Op, "%s", "sin");
+      sprintf(Op, "%s", "sin");
       break;
     case OP_COS:
-      snprintf(Op, "%s", "cos");
+      sprintf(Op, "%s", "cos");
       break;
     case OP_TAN:
-      snprintf(Op, "%s", "tan");
+      sprintf(Op, "%s", "tan");
       break;
     case OP_LOG:
-      snprintf(Op, "%s", "log");
+      sprintf(Op, "%s", "log");
       break;
     case OP_EXP:
-      snprintf(Op, "%s", "exp");
+      sprintf(Op, "%s", "exp");
       break;
     case OP_INT:
       snprintf(Op, "%s", "int");
     }
 
-    snprintf(XMsg, "%s with '%s'", Msg, Op);
+    sprintf(XMsg, "%s with '%s'", Msg, Op);
     Error(BADDEF2, Exp, XMsg);
     PreviousError = true;
   }
