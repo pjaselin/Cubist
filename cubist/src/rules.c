@@ -265,9 +265,7 @@ void PrintRule(CRule R)
 /*   ---------  */
 {
   int c, d, dd, id, LineLen, EntryLen, Indent, NCoeff = 0;
-  Attribute Att;
-  size_t size = 1000;
-  char Entry[size];
+  char Entry[1000];
   double *Model;
   float *Importance;
 
