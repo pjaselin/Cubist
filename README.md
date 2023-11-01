@@ -59,6 +59,7 @@ The following attributes are exposed to understand the Cubist model results:
 - rules_ (pd.DataFrame): Table of the rules built by the Cubist model and the percentage of data for which each rule condition applies.
 - coeff_ (pd.DataFrame): Table of the regression coefficients found by the Cubist model.
 - variables_ (dict): Information about all the variables passed to the model and those that were actually used.
+- feature_names_in_ (list): List of features used to train Cubist.
 
 ## Benchmarks
 There are many literature examples demonstrating the power of Cubist and comparing it to Random Forest as well as other bootstrapped/boosted models. Some of these are compiled here: https://www.rulequest.com/cubist-pubs.html. To demonstrate this, some benchmark scripts are provided in the respectively named folder.
