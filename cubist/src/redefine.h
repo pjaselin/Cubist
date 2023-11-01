@@ -6,7 +6,7 @@
 
 #include "strbuf.h"
 
-extern int rbm_init();
+extern int rbm_init(void);
 extern int rbm_register(STRBUF *sb, const char *filename, int force);
 extern int rbm_deregister(const char *filename);
 extern STRBUF *rbm_lookup(const char *filename);
@@ -24,7 +24,7 @@ extern int rbm_fputs(const char *s, FILE *stream);
 extern size_t rbm_fwrite(const void *ptr, size_t size, size_t nitems,
                          FILE *stream);
 extern int rbm_remove(const char *fname);
-extern void rbm_removeall();
+extern void rbm_removeall(void);
 extern void rbm_exit(int status);
 
 #endif

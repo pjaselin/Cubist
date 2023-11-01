@@ -10,14 +10,15 @@ extensions = [
     Extension(
         name='_cubist',
         sources=["cubist/_cubist.pyx"] + glob.glob("cubist/src/*.c"),
-        include_dirs=["cubist/src", np.get_include()]
+        include_dirs=["cubist/src", np.get_include()],
+        define_macros=[('NPY_NO_DEPRECATED_API', 'NPY_1_7_API_VERSION')],
     )
 ]
 
-with open("README.md", 'r') as f:
+with open("README.md", 'r', encoding="utf-8") as f:
     long_description = f.read()
 
-with open("requirements.txt", 'r') as f:
+with open("requirements.txt", 'r', encoding="utf-8") as f:
     requires = f.read()
 
 
@@ -32,8 +33,7 @@ def get_version(rel_path):
         if line.startswith('__version__'):
             delim = '"' if '"' in line else "'"
             return line.split(delim)[1]
-    else:
-        raise RuntimeError("Unable to find version string.")
+    raise RuntimeError("Unable to find version string.")
 
 
 setup(
@@ -43,7 +43,9 @@ setup(
     description="A Python package for fitting Quinlan's Cubist regression model.",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    ext_modules=cythonize(extensions),
+    ext_modules=cythonize(extensions, 
+                          include_path = [np.get_include()],
+                          compiler_directives={'language_level' : "3"}),
     zip_safe=False,
     include_package_data=True,
     install_requires=requires,

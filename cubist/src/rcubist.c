@@ -37,7 +37,7 @@
 #include "redefine.h"
 #include "transform.h"
 
-int cubistmain()
+int cubistmain(void)
 /*  ----------  */
 {
   double StartTime, SumCWt = 0;

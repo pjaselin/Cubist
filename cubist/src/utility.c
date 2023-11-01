@@ -281,7 +281,8 @@ void Error(int ErrNo, String S1, String S2)
 /*   -----  */
 {
   Boolean Quit = false, WarningOnly = false;
-  char Buffer[10000], *Msg = Buffer;
+  char Buffer[10000];
+  char *Msg = Buffer;
 
   if (!ErrMsgs)
     fprintf(Of, "\n");
@@ -627,8 +628,9 @@ void DayToDate(int Day, String Date)
     Year++;
   }
 
-  sprintf(Date, "%d/%d%d/%d%d", Year, Month / 10, Month % 10, Day / 10,
-          Day % 10);
+  sprintf(Date, 
+          "%d/%d%d/%d%d", 
+          Year, Month / 10, Month % 10, Day / 10, Day % 10);
 }
 
 /*************************************************************************/
@@ -665,8 +667,9 @@ void SecsToTime(int Secs, String Time)
   Mins = (Secs % 3600) / 60;
   Secs = Secs % 60;
 
-  sprintf(Time, "%d%d:%d%d:%d%d", Hour / 10, Hour % 10, Mins / 10, Mins % 10,
-          Secs / 10, Secs % 10);
+  sprintf(Time,
+          "%d%d:%d%d:%d%d", 
+          Hour / 10, Hour % 10, Mins / 10, Mins % 10, Secs / 10, Secs % 10);
 }
 
 void SetTSBase(int y)

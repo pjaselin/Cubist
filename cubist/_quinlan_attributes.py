@@ -6,12 +6,12 @@ import numpy as np
 
 def _is_all_float_dtype(x: pd.Series):
     """check whether all values are of float dtype"""
-    return all([j == float or np.issubdtype(j, np.floating) for j in [type(i) for i in x.values]])
+    return all(j == float or np.issubdtype(j, np.floating) for j in [type(i) for i in x.values])
 
 
 def _is_all_int_dtype(x: pd.Series):
     """check whether all values are of float dtype"""
-    return all([j == int or np.issubdtype(j, np.integer) for j in [type(i) for i in x.values]])
+    return all(j == int or np.issubdtype(j, np.integer) for j in [type(i) for i in x.values])
 
 
 def _get_data_format(x: pd.Series):
@@ -36,17 +36,16 @@ def _get_data_format(x: pd.Series):
     if is_complex_dtype(x):
         raise ValueError("Complex data not supported")
     # for numeric columns
-    elif is_numeric_dtype(x) or _is_all_float_dtype(x) or _is_all_int_dtype(x):
+    if is_numeric_dtype(x) or _is_all_float_dtype(x) or _is_all_int_dtype(x):
         return "continuous."
     # for string columns
-    elif is_string_dtype(x):
+    if is_string_dtype(x):
         x = x.astype(str)
         return f"{','.join(set(x))}."
     # for datetime columns
-    elif is_datetime64_any_dtype(x):
+    if is_datetime64_any_dtype(x):
         return x
-    else:
-        raise ValueError(f"Dtype {x.dtype} is not supported")
+    raise ValueError(f"Dtype {x.dtype} is not supported")
 
 
 def _quinlan_attributes(df: pd.DataFrame) -> dict:
@@ -64,4 +63,4 @@ def _quinlan_attributes(df: pd.DataFrame) -> dict:
         Dictionary with keys as column names and values as the description of
         the data type.
     """
-    return {col_name: _get_data_format(col_data) for col_name, col_data in df.iteritems()}
+    return {col_name: _get_data_format(df[col_name]) for col_name in df.columns}

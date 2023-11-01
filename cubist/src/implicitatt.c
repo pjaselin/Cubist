@@ -654,7 +654,7 @@ void DefSemanticsError(int Fi, String Msg, int OpCode)
       sprintf(Op, "%s", "%");
       break;
     case OP_POW:
-      sprintf(Op, "%s", "^");
+      snprintf(Op, "%s", "^");
       break;
     case OP_SIN:
       sprintf(Op, "%s", "sin");
@@ -672,7 +672,7 @@ void DefSemanticsError(int Fi, String Msg, int OpCode)
       sprintf(Op, "%s", "exp");
       break;
     case OP_INT:
-      sprintf(Op, "%s", "int");
+      snprintf(Op, "%s", "int");
     }
 
     sprintf(XMsg, "%s with '%s'", Msg, Op);

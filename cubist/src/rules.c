@@ -264,8 +264,8 @@ void PrintRules(RRuleSet RS, String Msg)
 void PrintRule(CRule R)
 /*   ---------  */
 {
-  int c, d, dd, id, LineLen, EntryLen, Indent, NCoeff = 0;
   Attribute Att;
+  int c, d, dd, id, LineLen, EntryLen, Indent, NCoeff = 0;
   char Entry[1000];
   double *Model;
   float *Importance;

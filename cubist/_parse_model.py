@@ -16,8 +16,9 @@ OPERATORS = {
 
 
 def _split_to_groups(x, f):
-    """Function to convert two lists into a dictionary where the keys are unique values in f and 
-    the values are lists of the corresponding values in x. Analogous to the split function in R."""
+    """Function to convert two lists into a dictionary where the keys are 
+    unique values in f and the values are lists of the corresponding values in 
+    x. Analogous to the split function in R."""
     if len(x) != len(f):
         raise ValueError("lists x and f must be of the same length")
     groups = {}
@@ -187,7 +188,7 @@ def _type3(x):
     # TODO: enter all vals in dataframe but limit the column width when printing
     multiple_vals = "," in val
     if multiple_vals:
-        val = f"{{multiple_vals}}"
+        val = "{" + str(multiple_vals) + "}"
         txt = f"{var} in {val}"
     else:
         txt = f"{var} = {val}"
@@ -198,22 +199,22 @@ def _eqn(x, var_names=None):
     x = x.replace("\"", "")
     starts = [m.start(0) for m in re.finditer("(coeff=)|(att=)", x)]
     tmp = [""] * len(starts)
-    for i in range(len(starts)):
+    for i, val in enumerate(starts):
         if i < len(starts) - 1:
-            txt = x[starts[i]:starts[i + 1] - 1]
+            txt = x[val:starts[i + 1] - 1]
         else:
-            txt = x[starts[i]:]
+            txt = x[val:]
         tmp[i] = txt.replace("coeff=", "").replace("att=", "")
 
     vals = tmp[::2]
     vals = [float(c) for c in vals]
     nms = tmp[1::2]
     nms = ["(Intercept)"] + nms
-    vals = {nm: val for nm, val in zip(nms, vals)}
+    vals = dict(zip(nms, vals))
     if var_names:
         vars2 = [var for var in var_names if var not in nms]
         vals2 = [np.nan] * len(vars2)
-        vals2 = {nm: val for nm, val in zip(vars2, vals2)}
+        vals2 = dict(zip(vars2, vals2))
         vals = {**vals, **vals2}
         new_names = ["(Intercept)"] + var_names
         vals = {nm: vals[nm] for nm in new_names}
@@ -224,8 +225,7 @@ def _make_parsed_dict(x):
     x = x.split("=")
     if len(x) > 1:
         return {x[0]: x[1]}
-    else:
-        return None
+    return None
 
 
 def _parser(x):
