@@ -177,15 +177,14 @@ class Cubist(BaseEstimator, RegressorMixin):
         if self.neighbors is not None:
             if not isinstance(self.neighbors, int):
                 raise TypeError("`neighbors` must be an integer")
-            elif self.neighbors < 1 or self.neighbors > 9:
+            if self.neighbors < 1 or self.neighbors > 9:
                 raise ValueError("`neighbors` must be between 1 and 9")
-            elif self.auto:
+            if self.auto:
                 warn("Cubist will choose an appropriate value for `neighbor`."
                      "Cubist will receive neighbors = 0 regardless of the set"
                      "value for `neighbors`.", stacklevel=3)
                 return 0
-            else:
-                return self.neighbors
+            return self.neighbors
         # default value must be zero even when not used
         return 0
 
@@ -203,13 +202,12 @@ class Cubist(BaseEstimator, RegressorMixin):
                              f"True or False, got {self.auto}")
         # if auto=True, let cubist decide whether to use a composite model and
         # how many neighbors to use
-        elif self.auto:
+        if self.auto:
             return 'auto'
         # if a number of neighbors is given, make a composite model
-        elif neighbors > 0:
+        if neighbors > 0:
             return 'yes'
-        else:
-            return 'no'
+        return 'no'
 
     def _check_extrapolation(self):
         # validate the range of extrapolation
@@ -237,8 +235,7 @@ class Cubist(BaseEstimator, RegressorMixin):
                      f"to incorrect or failing predictions. Please increase "
                      f"or remove the `sample` parameter.\n", stacklevel=3)
             return self.sample
-        else:
-            return 0
+        return 0
 
     def _check_cv(self):
         # validate number of cv folds
@@ -250,8 +247,7 @@ class Cubist(BaseEstimator, RegressorMixin):
                 raise ValueError("Number of cross-validation folds must be \
                                          greater than 1")
             return self.cv
-        else:
-            return 0
+        return 0
 
     def fit(self, X, y, sample_weight=None):
         """Build a Cubist regression model from training set (X, y).

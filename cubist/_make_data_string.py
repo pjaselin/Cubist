@@ -14,15 +14,16 @@ def _r_format(x: float, digits: int = 15) -> str:
     if np.iscomplex(x):
         raise ValueError("Complex numbers not supported")
 
-    # get the count of whole number digits, i.e. the number of digits to the left of the decimal place
+    # get the count of whole number digits, i.e. the number of digits to the 
+    # left of the decimal place
     whole_nums_count = len(str(int(x)))
-    # Where there are decimal places that need to be rounded, round to digits - whole_nums_count decimal places
+    # Where there are decimal places that need to be rounded, round to digits 
+    # - whole_nums_count decimal places
     if whole_nums_count < digits:
         remaining_decimals = digits - whole_nums_count
         return str(round(x, remaining_decimals))
     # Where there are no decimals that need to/can be rounded
-    else:
-        return str(x)
+    return str(x)
 
 
 def _make_data_string(x, y=None, w=None):
@@ -43,7 +44,8 @@ def _make_data_string(x, y=None, w=None):
     Returns
     -------
     x : str
-        Input dataset converted to a string and formatted per Cubist's requirements.
+        Input dataset converted to a string and formatted per Cubist's 
+        requirements.
     """
     x = x.copy(deep=True)
     
@@ -52,7 +54,8 @@ def _make_data_string(x, y=None, w=None):
         if is_string_dtype(x[col]):
             x[col] = _escapes(x[col].astype(str))
 
-    # if y is None for model predictions, set y as a column of NaN values, which will become ?'s later
+    # if y is None for model predictions, set y as a column of NaN values, 
+    # # which will become ?'s later
     if y is None:
         y = [np.nan] * x.shape[0]
         y = pd.Series(y)
@@ -67,7 +70,8 @@ def _make_data_string(x, y=None, w=None):
 
     # handle weights matrix (?) TODO: validate
     if w is not None:
-        column_names = list(x.columns) + ["w"] #[f"w{i}" for i in range(x.shape[1])]
+        # [f"w{i}" for i in range(x.shape[1])]
+        column_names = list(x.columns) + ["w"]
         x = x.assign(w=w)
         x.columns = column_names
 
