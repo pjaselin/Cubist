@@ -43,7 +43,7 @@ static void *strbufv;
  * XXX Is this called anywhere in Cubist?  It looks like it's
  * XXX been made obsolete by rbm_removeall.
  */
-int rbm_init() {
+int rbm_init(void) {
   if (strbufv == NULL) {
     strbufv = ht_new(HASH_LEN);
   }
@@ -188,7 +188,7 @@ int rbm_remove(const char *path) {
  * all "files" generated on the previous run and to prepare it
  * for the next run.
  */
-void rbm_removeall() {
+void rbm_removeall(void) {
   /* Check if there actually is anything to remove */
   if (strbufv != NULL) {
     /*

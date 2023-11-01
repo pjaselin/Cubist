@@ -86,7 +86,8 @@ def _escapes(x, chars=None):
     return x
 
 
-_special_chars_map = {i: '\\' + chr(i) for i in b'()[]{}?*+-|:;^$\\.&~#\t\n\r\v\f'}
+_special_chars_map = \
+    {i: '\\' + chr(i) for i in b'()[]{}?*+-|:;^$\\.&~#\t\n\r\v\f'}
 
 
 def _re_escape(pattern):
@@ -94,6 +95,5 @@ def _re_escape(pattern):
     Sourced from 're' Python package."""
     if isinstance(pattern, str):
         return pattern.translate(_special_chars_map)
-    else:
-        pattern = str(pattern, 'latin1')
-        return pattern.translate(_special_chars_map).encode('latin1')
+    pattern = str(pattern, 'latin1')
+    return pattern.translate(_special_chars_map).encode('latin1')

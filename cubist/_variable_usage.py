@@ -39,21 +39,17 @@ def _get_values(x):
         x2 = [x2[i] for i, c in enumerate(has_pct) if c]
         x2 = [float(c.replace("%", "")) for c in x2]
         return x2
-    else:
-        if sum(has_pct) == 1:
-            pct_ind = [i for i, c in enumerate(x2) if "%" in c][0]
-            if x2[1:pct_ind+1].count("") < x2[pct_ind+1:].count(""):
-                x2 = [c for c in x2 if "%" in c][0]
-                x2 = float(x2.replace("%", ""))
-                return [x2, 0]
-            else:
-                x2 = [c for c in x2 if "%" in c][0]
-                x2 = float(x2.replace("%", ""))
-                return [0, x2]
-        else:
-            return 0
+    if sum(has_pct) == 1:
+        pct_ind = [i for i, c in enumerate(x2) if "%" in c][0]
+        if x2[1:pct_ind+1].count("") < x2[pct_ind+1:].count(""):
+            x2 = [c for c in x2 if "%" in c][0]
+            x2 = float(x2.replace("%", ""))
+            return [x2, 0]
+        x2 = [c for c in x2 if "%" in c][0]
+        x2 = float(x2.replace("%", ""))
+        return [0, x2]
+    return 0
 
 
 def _get_variable(x):
-    x = x.split(" ")
-    return x[-1]
+    return x.split(" ")[-1]
