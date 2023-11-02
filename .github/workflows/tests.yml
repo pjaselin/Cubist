@@ -11,7 +11,6 @@ on:
     types:
       - synchronize
     branches:
-      - dev
       - main
   workflow_call:
 
