@@ -9,10 +9,11 @@ on:
         default: 'warning'
   pull_request:
     types:
+      - opened
+      - reopened
       - synchronize
     branches:
       - main
-  workflow_call:
 
 jobs:
   test:
