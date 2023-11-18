@@ -12,7 +12,6 @@ on:
       - synchronize
     branches:
       - main
-  workflow_call:
 
 jobs:
   test:
