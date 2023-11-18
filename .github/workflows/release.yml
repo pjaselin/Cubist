@@ -10,7 +10,6 @@ on:
   push:
     branches:
       - main
-      - dev
   release:
     types:
       - published
@@ -18,7 +17,6 @@ on:
     workflows: ["Test and Lint Cubist"]
     branches:
       - main
-      - dev
     types:
       - completed
 
