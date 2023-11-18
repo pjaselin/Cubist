@@ -13,16 +13,9 @@ on:
   release:
     types:
       - published
-  workflow_run:
-    workflows: ["Test and Lint Cubist"]
-    branches:
-      - main
-    types:
-      - completed
 
 jobs:
   build_wheels:
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     name: Build wheels on ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
     strategy:

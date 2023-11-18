@@ -12,9 +12,6 @@ on:
       - synchronize
     branches:
       - main
-  release:
-    types:
-      - published
   workflow_call:
 
 jobs:
