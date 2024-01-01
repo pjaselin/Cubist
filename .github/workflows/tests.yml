@@ -34,16 +34,16 @@ jobs:
       uses: actions/setup-python@v4
       with:
         python-version: "3.11"
-    
+
     - name: Enable Developer Command Prompt for Windows
       if: matrix.os == 'windows-latest'
       uses: ilammy/msvc-dev-cmd@v1
-    
+
     - name: Add sys/time.h for Windows
       if: matrix.os == 'windows-latest'
       run: |
         mv winsys/ cubist/sys
-      
+
     - name: Remove winsys folder for non-Windows OS
       if: matrix.os != 'windows-latest'
       run: |
@@ -57,12 +57,13 @@ jobs:
         pip install -r requirements.txt
         python setup.py build_ext --inplace
 
-    - name: Lint with flake8
-      run: |
-        # stop the build if there are Python syntax errors or undefined names
-        flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
-        # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
-        flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+    - name: Lint with Ruff
+      uses: chartboost/ruff-action@v1
+      # run: |
+      #   # stop the build if there are Python syntax errors or undefined names
+      #   flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+      #   # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
+      #   flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
 
     - name: Test with pytest
       run: |
