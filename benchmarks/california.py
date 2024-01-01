@@ -36,8 +36,8 @@ from cubist import Cubist
 from sklearn.linear_model import LinearRegression
 from lineartree import LinearTreeRegressor
 
-from sklearn.metrics import mean_squared_error
 import warnings
+
 warnings.filterwarnings(action="ignore", module="scipy", message="^internal gelsd")
 
 
@@ -45,17 +45,20 @@ def build_ensemble(**kwargs):
     """Generate ensemble."""
 
     ens = SuperLearner(**kwargs)
-    prep = {'Standard Scaling': [StandardScaler()],
-            'Min Max Scaling': [MinMaxScaler()],
-            'No Preprocessing': []}
+    prep = {
+        "Standard Scaling": [StandardScaler()],
+        "Min Max Scaling": [MinMaxScaler()],
+        "No Preprocessing": [],
+    }
 
-    est = {'Standard Scaling':
-               [ElasticNet(), Lasso(), KNeighborsRegressor()],
-           'Min Max Scaling':
-               [SVR()],
-           'No Preprocessing':
-               [RandomForestRegressor(random_state=SEED),
-                GradientBoostingRegressor()]}
+    est = {
+        "Standard Scaling": [ElasticNet(), Lasso(), KNeighborsRegressor()],
+        "Min Max Scaling": [SVR()],
+        "No Preprocessing": [
+            RandomForestRegressor(random_state=SEED),
+            GradientBoostingRegressor(),
+        ],
+    }
 
     ens.add(est, prep)
 
@@ -63,11 +66,13 @@ def build_ensemble(**kwargs):
 
     return ens
 
-if __name__ == '__main__':
 
+if __name__ == "__main__":
     safe_print("\nML-ENSEMBLE\n")
-    safe_print("Benchmark of ML-ENSEMBLE against Scikit-learn estimators "
-               "on the friedman1 dataset.\n")
+    safe_print(
+        "Benchmark of ML-ENSEMBLE against Scikit-learn estimators "
+        "on the friedman1 dataset.\n"
+    )
     safe_print("Scoring metric: Root Mean Squared Error.\n")
 
     safe_print("Available CPUs: %i\n" % os.cpu_count())
@@ -81,46 +86,47 @@ if __name__ == '__main__':
 
     ens_multi = build_ensemble(folds=2, shuffle=False, n_jobs=-1)
 
-    ESTIMATORS = {'Ensemble': ens_multi,
-                  'Random F': RandomForestRegressor(random_state=SEED,
-                                                    n_jobs=-1),
-                  '   elNet': make_pipeline(StandardScaler(), ElasticNet()),
-                  '   Lasso': make_pipeline(StandardScaler(), Lasso()),
-                  'Kern Rid': make_pipeline(MinMaxScaler(), KernelRidge()),
-                  '     SVR': make_pipeline(MinMaxScaler(), SVR()),
-                  '     GBM': GradientBoostingRegressor(),
-                  '     KNN': KNeighborsRegressor(n_jobs=-1),
-                  '  Cubist': Cubist(n_committees=5),
-                  'LineTree': LinearTreeRegressor(base_estimator=LinearRegression())}
+    ESTIMATORS = {
+        "Ensemble": ens_multi,
+        "Random F": RandomForestRegressor(random_state=SEED, n_jobs=-1),
+        "   elNet": make_pipeline(StandardScaler(), ElasticNet()),
+        "   Lasso": make_pipeline(StandardScaler(), Lasso()),
+        "Kern Rid": make_pipeline(MinMaxScaler(), KernelRidge()),
+        "     SVR": make_pipeline(MinMaxScaler(), SVR()),
+        "     GBM": GradientBoostingRegressor(),
+        "     KNN": KNeighborsRegressor(n_jobs=-1),
+        "  Cubist": Cubist(n_committees=5),
+        "LineTree": LinearTreeRegressor(base_estimator=LinearRegression()),
+    }
 
-    names = {k.strip(' '): k for k in ESTIMATORS}
+    names = {k.strip(" "): k for k in ESTIMATORS}
     times = {e: [] for e in ESTIMATORS}
     scores = {e: [] for e in ESTIMATORS}
 
     sizes = range(mi, mx, step)
 
-    safe_print('Ensemble architecture')
+    safe_print("Ensemble architecture")
     safe_print("Num layers: %i" % len(ens_multi.layers))
 
     safe_print("\nBenchmark estimators", end=": ")
     for name in sorted(names):
-        if name == 'Ensemble':
+        if name == "Ensemble":
             continue
         safe_print(name, end=" ")
-    safe_print('\n')
+    safe_print("\n")
 
-    safe_print('Data')
-    safe_print('Features: %i' % 10)
-    safe_print('Training set sizes: from %i to %i with step size %i.\n' % (
-          np.floor(mi / 2),
-          np.floor((mx - step) / 2),
-          np.floor(step/2)))
+    safe_print("Data")
+    safe_print("Features: %i" % 10)
+    safe_print(
+        "Training set sizes: from %i to %i with step size %i.\n"
+        % (np.floor(mi / 2), np.floor((mx - step) / 2), np.floor(step / 2))
+    )
 
-    safe_print('SCORES')
-    safe_print('%6s' % 'size', end=' | ')
+    safe_print("SCORES")
+    safe_print("%6s" % "size", end=" | ")
 
     for name in sorted(names):
-        safe_print('%s' % names[name], end=' | ')
+        safe_print("%s" % names[name], end=" | ")
     safe_print()
 
     for size in sizes:
@@ -128,7 +134,7 @@ if __name__ == '__main__':
 
         X, y = fetch_california_housing(return_X_y=True)
 
-        safe_print('%6i' % n, end=' | ')
+        safe_print("%6i" % n, end=" | ")
         for name in sorted(names):
             e = clone(ESTIMATORS[names[name]])
             t0 = time()
@@ -139,28 +145,26 @@ if __name__ == '__main__':
             s = rmse(y[n:], e.predict(X[n:]))
             scores[names[name]].append(s)
 
-            safe_print('%8.2f' % (s), end=' | ', flush=True)
+            safe_print("%8.2f" % (s), end=" | ", flush=True)
 
         safe_print()
 
-    safe_print('\nFIT TIMES')
-    safe_print('%6s' % 'size', end=' | ')
+    safe_print("\nFIT TIMES")
+    safe_print("%6s" % "size", end=" | ")
 
     for name in sorted(names):
-        safe_print('%s' % names[name], end=' | ')
+        safe_print("%s" % names[name], end=" | ")
     safe_print()
 
     for i, size in enumerate(sizes):
         n = int(np.floor(size / 2))
-        safe_print('%6i' % n, end=' | ')
+        safe_print("%6i" % n, end=" | ")
 
         for name in sorted(names):
-
             t = times[names[name]][i]
             m, s = divmod(t, 60)
-            safe_print('%5d:%02d' % (m, s), end=' | ')
+            safe_print("%5d:%02d" % (m, s), end=" | ")
         safe_print()
-    
+
     times = pd.DataFrame(times)
     scores = pd.DataFrame(scores)
-    

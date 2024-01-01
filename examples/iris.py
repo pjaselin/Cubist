@@ -1,16 +1,15 @@
-
 import pandas as pd
 from sklearn.model_selection import train_test_split
 from cubist import Cubist
-import numpy as np
-from scipy.stats import pearsonr
 
 # model = Cubist(verbose=True)
 # model.fit(X, y)
 # model.predict(X)
 # model.score(X, y)
 
-iris = pd.read_csv('https://raw.githubusercontent.com/mwaskom/seaborn-data/master/iris.csv')
+iris = pd.read_csv(
+    "https://raw.githubusercontent.com/mwaskom/seaborn-data/master/iris.csv"
+)
 y = iris["petal_width"]
 X = iris.drop(["petal_width"], axis=1)
 # print(X)
@@ -19,7 +18,9 @@ X = iris.drop(["petal_width"], axis=1)
 
 # X, y = load_diabetes(return_X_y=True, as_frame=True)
 
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.2, random_state=42
+)
 # model = Cubist(verbose=True)
 # model.fit(X, y)
 
