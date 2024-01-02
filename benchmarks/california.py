@@ -55,7 +55,7 @@ def build_ensemble(**kwargs):
         "Standard Scaling": [ElasticNet(), Lasso(), KNeighborsRegressor()],
         "Min Max Scaling": [SVR()],
         "No Preprocessing": [
-            RandomForestRegressor(random_state=SEED),
+            RandomForestRegressor(random_state=0),
             GradientBoostingRegressor(),
         ],
     }
