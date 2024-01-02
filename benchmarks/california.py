@@ -65,7 +65,7 @@ def build_ensemble(**kwargs):
     ens.add(GradientBoostingRegressor(), meta=True)
 
     return ens
-import numpy as np
+
 
 if __name__ == "__main__":
     safe_print("\nML-ENSEMBLE\n")
