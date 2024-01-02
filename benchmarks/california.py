@@ -39,7 +39,7 @@ from lineartree import LinearTreeRegressor
 import warnings
 
 warnings.filterwarnings(action="ignore", module="scipy", message="^internal gelsd")
-
+import numpy as np
 
 def build_ensemble(**kwargs):
     """Generate ensemble."""
