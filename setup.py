@@ -1,36 +1,36 @@
-from setuptools import setup, Extension
-from Cython.Build import cythonize
 import glob
 import os.path
 import codecs
 
+from Cython.Build import cythonize
+from setuptools import setup, Extension
 import numpy as np
 
 extensions = [
     Extension(
-        name='_cubist',
+        name="_cubist",
         sources=["cubist/_cubist.pyx"] + glob.glob("cubist/src/*.c"),
         include_dirs=["cubist/src", np.get_include()],
-        define_macros=[('NPY_NO_DEPRECATED_API', 'NPY_1_7_API_VERSION')],
+        define_macros=[("NPY_NO_DEPRECATED_API", "NPY_1_7_API_VERSION")],
     )
 ]
 
-with open("README.md", 'r', encoding="utf-8") as f:
+with open("README.md", "r", encoding="utf-8") as f:
     long_description = f.read()
 
-with open("requirements.txt", 'r', encoding="utf-8") as f:
+with open("requirements.txt", "r", encoding="utf-8") as f:
     requires = f.read()
 
 
 def read(rel_path):
     here = os.path.abspath(os.path.dirname(__file__))
-    with codecs.open(os.path.join(here, rel_path), 'r') as fp:
+    with codecs.open(os.path.join(here, rel_path), "r") as fp:
         return fp.read()
 
 
 def get_version(rel_path):
     for line in read(rel_path).splitlines():
-        if line.startswith('__version__'):
+        if line.startswith("__version__"):
             delim = '"' if '"' in line else "'"
             return line.split(delim)[1]
     raise RuntimeError("Unable to find version string.")
@@ -47,6 +47,10 @@ setup(
     zip_safe=False,
     include_package_data=True,
     install_requires=requires,
+    extras_require={
+        "test": ["pytest", "ruff"],
+        "dev": ["pre-commit", "pytest", "ruff"],
+    },
     url="https://github.com/pjaselin/Cubist",
     packages=["cubist"],
     license="GPL v3",
@@ -57,7 +61,11 @@ setup(
         "Topic :: Scientific/Engineering :: Artificial Intelligence",
         "Topic :: Scientific/Engineering :: Mathematics",
         "Intended Audience :: Developers",
-        "Intended Audience :: Science/Research"
+        "Intended Audience :: Science/Research",
+        "Programming Language :: Python :: 3.8",
+        "Programming Language :: Python :: 3.9",
+        "Programming Language :: Python :: 3.10",
+        "Programming Language :: Python :: 3.11",
     ],
-    tests_require=["pytest"]
+    tests_require=["pytest"],
 )

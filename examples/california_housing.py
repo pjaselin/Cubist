@@ -1,11 +1,8 @@
-import pandas as pd
-from sklearn.model_selection import train_test_split
 from cubist import Cubist
-import numpy as np
 from scipy.stats import pearsonr
 
 from sklearn.datasets import fetch_california_housing
-from cubist import Cubist
+
 X, y = fetch_california_housing(return_X_y=True, as_frame=True)
 
 # X, y = load_diabetes(return_X_y=True, as_frame=True)
