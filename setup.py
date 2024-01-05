@@ -1,9 +1,9 @@
-from setuptools import setup, Extension
-from Cython.Build import cythonize
 import glob
 import os.path
 import codecs
 
+from Cython.Build import cythonize
+from setuptools import setup, Extension
 import numpy as np
 
 extensions = [
