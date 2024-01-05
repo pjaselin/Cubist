@@ -2,7 +2,8 @@
 [![PyPI Version](https://badge.fury.io/py/cubist.svg)](https://badge.fury.io/py/cubist)
 [![GitHub Build](https://github.com/pjaselin/Cubist/actions/workflows/tests.yml/badge.svg
 )](https://github.com/pjaselin/Cubist/actions)
-[![image](https://img.shields.io/pypi/l/cubist.svg)](https://pypi.python.org/pypi/cubist)
+[![codecov](https://codecov.io/gh/pjaselin/Cubist/graph/badge.svg?token=8FAZDANIP7)](https://codecov.io/gh/pjaselin/Cubist)
+[![License](https://img.shields.io/pypi/l/cubist.svg)](https://pypi.python.org/pypi/cubist)
 [![PyPI - Python Version](https://img.shields.io/pypi/pyversions/cubist.svg)](https://pypi.org/project/cubist)
 [![PyPI - Downloads](https://img.shields.io/pypi/dm/cubist)](https://pypi.org/project/cubist)
 
