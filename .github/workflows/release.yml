@@ -54,6 +54,7 @@ jobs:
 
       - uses: actions/upload-artifact@v3
         with:
+          name: python-package-distributions
           path: ./wheelhouse/*.whl
 
   build_sdist:
@@ -74,6 +75,7 @@ jobs:
         python -m build
     - uses: actions/upload-artifact@v3
       with:
+        name: python-package-distributions
         path: dist/*.tar.gz
 
   publish-to-pypi:
