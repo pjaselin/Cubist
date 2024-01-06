@@ -48,8 +48,7 @@ setup(
     include_package_data=True,
     install_requires=requires,
     extras_require={
-        "test": ["pytest", "ruff"],
-        "dev": ["pre-commit", "pytest", "ruff"],
+        "dev": ["pre-commit", "pytest", "ruff", "coverage"],
     },
     url="https://github.com/pjaselin/Cubist",
     packages=["cubist"],
