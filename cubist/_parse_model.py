@@ -1,9 +1,11 @@
 import re
-import math 
+import math
 import operator
 
 import pandas as pd
 import numpy as np
+
+from ._utils import _format
 
 
 OPERATORS = {
@@ -11,13 +13,13 @@ OPERATORS = {
     "<=": operator.le,
     ">": operator.gt,
     ">=": operator.ge,
-    "==": operator.eq
+    "==": operator.eq,
 }
 
 
 def _split_to_groups(x, f):
-    """Function to convert two lists into a dictionary where the keys are 
-    unique values in f and the values are lists of the corresponding values in 
+    """Function to convert two lists into a dictionary where the keys are
+    unique values in f and the values are lists of the corresponding values in
     x. Analogous to the split function in R."""
     if len(x) != len(f):
         raise ValueError("lists x and f must be of the same length")
@@ -34,7 +36,7 @@ def _parse_model(model, x):
     # split on newline
     model = model.split("\n")
     # remove empty strings
-    model = [c for c in model if c.strip() != '']
+    model = [c for c in model if c.strip() != ""]
     # get model length
     model_len = len(model)
 
@@ -80,22 +82,22 @@ def _parse_model(model, x):
     split_cats = [""] * model_len
     split_dir = [""] * model_len
     split_type = [""] * model_len
-    
+
     # handle continuous (type 2) rules
-    is_type2 = [i for i, c in enumerate(model) if re.search("^type=\"2\"", c)]
+    is_type2 = [i for i, c in enumerate(model) if re.search('^type="2"', c)]
     for i in is_type2:
         # set the type of split
         split_type[i] = "continuous"
         continuous_split = _type2(model[i])
         # set split variable name
-        split_var[i] = continuous_split["var"].replace('\"', "")
+        split_var[i] = continuous_split["var"].replace('"', "")
         # set split direction (comparison operator)
         split_dir[i] = continuous_split["result"]
         # set split value
         split_val[i] = continuous_split["val"]
 
     # handle categorical (type 3) rules
-    is_type3 = [i for i, c in enumerate(model) if re.search("^type=\"3\"", c)]
+    is_type3 = [i for i, c in enumerate(model) if re.search('^type="3"', c)]
     for i in is_type3:
         categorical_split = _type3(model[i])
         # set the type of split
@@ -109,19 +111,21 @@ def _parse_model(model, x):
     if is_type2 == [] and is_type3 == []:
         split_data = None
     else:
-        split_data = pd.DataFrame({
-            "committee": com_num,
-            "rule": rule_num,
-            "variable": split_var,
-            "dir": split_dir,
-            "value": split_val,
-            "category": split_cats,
-            "type": split_type
-        })
+        split_data = pd.DataFrame(
+            {
+                "committee": com_num,
+                "rule": rule_num,
+                "variable": split_var,
+                "dir": split_dir,
+                "value": split_val,
+                "category": split_cats,
+                "type": split_type,
+            }
+        )
         # remove missing values based on the variable column
-        split_data = split_data.dropna(subset=['variable'])
+        split_data = split_data.dropna(subset=["variable"])
         split_data = split_data.reset_index(drop=True)
-        
+
         # get the percentage of data covered by this rule
         nrows = x.shape[0]
         for i in range(split_data.shape[0]):
@@ -135,7 +139,7 @@ def _parse_model(model, x):
                     # evaluate and get the percentage of data
                     comp_total = OPERATORS[comp_operator](x_col, var_value).sum()
                     split_data.loc[i, "percentile"] = comp_total / nrows
-    
+
     # get the indices of rows in model that contain model coefficients
     is_eqn = [i for i, c in enumerate(model) if "coeff=" in c]
     # extract the model coefficients from the row
@@ -150,7 +154,7 @@ def _parse_model(model, x):
 
 
 def _type2(x, dig=3):
-    x = x.replace("\"", "")
+    x = x.replace('"', "")
 
     # get the indices where these keywords start
     att_ind = x.find("att=")
@@ -160,18 +164,20 @@ def _type2(x, dig=3):
 
     missing_rule = cut_ind < 1 and val_ind > 0
     if missing_rule:
-        var = x[att_ind + 4:cut_ind - 1]
+        var = x[att_ind + 4 : cut_ind - 1]
         val = None
         result = "="
     else:
-        var = x[att_ind + 4:cut_ind - 1]
-        val = x[cut_ind + 4:result_ind - 1]
-        val = round(float(val), dig)
-        result = x[result_ind + 7:]
-    return {"var": var,
-            "val": val,
-            "result": result,
-            "text": f"{var} {result} {val}"}
+        var = x[att_ind + 4 : cut_ind - 1]
+        val = x[cut_ind + 4 : result_ind - 1]
+        val = _format(float(val), dig)
+        result = x[result_ind + 7 :]
+    return {
+        "var": var,
+        "val": float(val),
+        "result": result,
+        "text": f"{var} {result} {val}",
+    }
 
 
 def _type3(x):
@@ -179,11 +185,11 @@ def _type3(x):
     att_ind = x.find("att=")
     elts_ind = x.find("elts=")
 
-    var = x[att_ind + 5:elts_ind - 2]
-    val = x[elts_ind + 5:]
-    val = val.replace("[{}]", "").replace("\"", "").replace(" ", "").replace(",", ", ")
+    var = x[att_ind + 5 : elts_ind - 2]
+    val = x[elts_ind + 5 :]
+    val = val.replace("[{}]", "").replace('"', "").replace(" ", "").replace(",", ", ")
 
-    # if there are multiple values in the categorical split, just show 
+    # if there are multiple values in the categorical split, just show
     # {multiple_vals} for cleaner printing}
     # TODO: enter all vals in dataframe but limit the column width when printing
     multiple_vals = "," in val
@@ -196,12 +202,12 @@ def _type3(x):
 
 
 def _eqn(x, var_names=None):
-    x = x.replace("\"", "")
+    x = x.replace('"', "")
     starts = [m.start(0) for m in re.finditer("(coeff=)|(att=)", x)]
     tmp = [""] * len(starts)
     for i, val in enumerate(starts):
         if i < len(starts) - 1:
-            txt = x[val:starts[i + 1] - 1]
+            txt = x[val : starts[i + 1] - 1]
         else:
             txt = x[val:]
         tmp[i] = txt.replace("coeff=", "").replace("att=", "")
