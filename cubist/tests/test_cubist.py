@@ -69,16 +69,19 @@ def test_n_committees(n_committees, raises, X, y):
 
 
 @pytest.mark.parametrize(
-    "neighbors,expected,raises",
+    "neighbors,auto,expected,raises",
     [
-        (0, None, pytest.raises(ValueError)),
-        (1, 1, no_raise()),
-        (9, 9, no_raise()),
-        (10, None, pytest.raises(ValueError)),
+        (0, False, None, pytest.raises(ValueError)),
+        (1, False, 1, no_raise()),
+        (9, False, 9, no_raise()),
+        (10, False, None, pytest.raises(ValueError)),
+        (0, True, 0, no_raise()),
+        (None, False, 0, no_raise()),
+        (5.0, False, None, pytest.raises(TypeError)),
     ],
 )
-def test_neighbors(neighbors, expected, raises, X, y):
-    model = Cubist(neighbors=neighbors)
+def test_neighbors(neighbors, auto, expected, raises, X, y):
+    model = Cubist(neighbors=neighbors, auto=auto)
     with raises:
         assert expected == model._check_neighbors()  # noqa W0212
         model.fit(X, y)
@@ -108,6 +111,7 @@ def test_unbiased(unbiased, raises, X, y):
         (1.0, no_raise()),
         (-0.1, pytest.raises(ValueError)),
         (1.01, pytest.raises(ValueError)),
+        (1, pytest.raises(TypeError)),
     ],
 )
 def test_extrapolation(extrapolation, raises, X, y):
@@ -125,6 +129,7 @@ def test_extrapolation(extrapolation, raises, X, y):
         (1.0, pytest.raises(ValueError)),
         (-0.1, pytest.raises(ValueError)),
         (1.01, pytest.raises(ValueError)),
+        (0, pytest.raises(TypeError)),
     ],
 )
 def test_sample(sample, raises, X, y):
