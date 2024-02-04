@@ -298,7 +298,7 @@ class Cubist(BaseEstimator, RegressorMixin):
 
         # set the feature names if it hasn't already been done
         if not hasattr(self, "feature_names_in_"):
-            self.feature_names_in_ = [f"var{i}" for i in range(X.shape[1])]
+            self.feature_names_in_ = [f"var{i}" for i in range(X.shape[1])]  # noqa W0201
 
         # check to see if any of the feature names are empty
         if any(n == "" or pd.isnull(n) for n in self.feature_names_in_):
@@ -310,9 +310,9 @@ class Cubist(BaseEstimator, RegressorMixin):
         # check sample weighting
         if sample_weight is not None:
             sample_weight = _check_sample_weight(sample_weight, X)
-            self.is_sample_weighted_ = True
+            self.is_sample_weighted_ = True  # noqa W0201
         else:
-            self.is_sample_weighted_ = False
+            self.is_sample_weighted_ = False  # noqa W0201
 
         n_rules = self._check_n_rules()
         n_committees = self._check_n_committees()
@@ -325,9 +325,9 @@ class Cubist(BaseEstimator, RegressorMixin):
         random_state = check_random_state(self.random_state)
 
         # number of input features
-        self.n_features_in_ = X.shape[1]
+        self.n_features_in_ = X.shape[1]  # noqa W0201
         # number of outputs is 1 (single output regression)
-        self.n_outputs_ = 1
+        self.n_outputs_ = 1  # noqa W0201
 
         # (re)construct a dataframe from X
         X = pd.DataFrame(X, columns=self.feature_names_in_)
@@ -394,14 +394,14 @@ class Cubist(BaseEstimator, RegressorMixin):
             data_string = "1"
 
         # compress and save descriptors/data
-        self.names_string_ = zlib.compress(names_string.encode())
-        self.data_string_ = zlib.compress(data_string.encode())
+        self.names_string_ = zlib.compress(names_string.encode())  # noqa W0201
+        self.data_string_ = zlib.compress(data_string.encode())  # noqa W0201
 
         # parse model contents and store useful information
-        self.rules_, self.coeff_ = _parse_model(self.model_, X)
+        self.rules_, self.coeff_ = _parse_model(self.model_, X)  # noqa W0201
 
         # get the input data variable usage
-        self.feature_importances_ = _get_variable_usage(output, X)
+        self.feature_importances_ = _get_variable_usage(output, X)  # noqa W0201
 
         # get the names of columns that have no nan values
         is_na_col = ~self.coeff_.isna().any()

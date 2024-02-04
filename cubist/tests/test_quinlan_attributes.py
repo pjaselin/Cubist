@@ -18,6 +18,7 @@ float_series = pd.Series(np.random.uniform(low=0.5, high=13.3, size=(5,)))
 str_series = pd.Series(["test0", "test1", "test2", "test3", "test4"])
 complex_series = pd.Series([complex(0, i) for i in range(5)])
 date_series = pd.Series(pd.date_range("2018-01-01", periods=5, freq="H"))
+unsupported_series = pd.Series(["test0", "test1", "test2", "test3", np])
 good_df = pd.DataFrame(
     {"a": int_series, "b": float_series, "c": str_series, "d": date_series}
 )
@@ -62,6 +63,7 @@ def test_is_all_float_dtype(test_input, expected):
         (str_series, f"{','.join(set(str_series.values))}.", no_raise()),
         (complex_series, None, pytest.raises(ValueError)),
         (date_series, date_series, no_raise()),
+        (unsupported_series, None, pytest.raises(ValueError)),
     ],
 )
 def test_get_data_format(test_input, expected, raises):
