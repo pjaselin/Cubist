@@ -177,41 +177,33 @@ class Cubist(BaseEstimator, RegressorMixin):
         return self.n_committees
 
     def _check_neighbors(self):
-        # if auto is True then set neighbors as 0
+        # if auto is True but neighbors is set, raise an error
         if self.auto:
-            warn(
-                "Cubist will choose an appropriate value for `neighbor`."
-                "Cubist will receive neighbors = 0 regardless of the set"
-                "value for `neighbors`.",
-                stacklevel=3,
-            )
+            if self.neighbors:
+                raise ValueError(
+                    "When `auto`=True, `neighbors` should be None as Cubist will choose an appropriate value for this parameter."
+                )
+            return 0
+        # default value must be zero even when not used
+        if self.neighbors is None:
             return 0
         # validate number of neighbors
-        if self.neighbors is not None:
-            if not isinstance(self.neighbors, int):
-                raise TypeError("`neighbors` must be an integer")
-            if self.neighbors < 1 or self.neighbors > 9:
-                raise ValueError("`neighbors` must be between 1 and 9")
-            return self.neighbors
-        # default value must be zero even when not used
-        return 0
+        if not isinstance(self.neighbors, int):
+            raise TypeError("`neighbors` must be an integer")
+        if self.neighbors < 1 or self.neighbors > 9:
+            raise ValueError("`neighbors` must be between 1 and 9")
+        return self.neighbors
 
     def _check_unbiased(self):
         # validate unbiased option
         if not isinstance(self.unbiased, bool):
-            raise ValueError(
-                "Wrong input for parameter `unbiased`. Expected "
-                f"True or False, got {self.unbiased}"
-            )
+            raise TypeError("`unbiased` must be a boolean")
         return self.unbiased
 
     def _check_composite(self, neighbors):
         # validate the auto parameter
         if not isinstance(self.auto, bool):
-            raise ValueError(
-                "Wrong input for parameter `auto`. Expected "
-                f"True or False, got {self.auto}"
-            )
+            raise TypeError("`auto` must be a boolean")
         # if auto=True, let cubist decide whether to use a composite model and
         # how many neighbors to use
         if self.auto:
@@ -224,47 +216,45 @@ class Cubist(BaseEstimator, RegressorMixin):
     def _check_extrapolation(self):
         # validate the range of extrapolation
         if not isinstance(self.extrapolation, float):
-            raise TypeError("Extrapolation percentage must be a float")
+            raise TypeError("`extrapolation` must be a float")
         if self.extrapolation < 0.0 or self.extrapolation > 1.0:
-            raise ValueError("Extrapolation percentage must be between " "0.0 and 1.0")
+            raise ValueError("`extrapolation` must be between 0.0 and 1.0")
         return self.extrapolation
 
     def _check_sample(self, num_samples):
-        # validate the sample percentage
-        if self.sample is not None:
-            if not isinstance(self.sample, float):
-                raise TypeError("Sampling percentage must be a float")
-            if not (0.0 < self.sample < 1.0):
-                raise ValueError("Sampling percentage must be between " "0.0 and 1.0")
-            # check to see if the sample will create a very small dataset
-            trained_num_samples = int(round(self.sample * num_samples, 0))
-            if trained_num_samples < 10:
-                warn(
-                    f"Sampling a dataset with {num_samples} rows and a "
-                    f"sampling percent of {self.sample} means Cubist will "
-                    f"train with {trained_num_samples} rows. This may lead "
-                    f"to incorrect or failing predictions. Please increase "
-                    f"or remove the `sample` parameter.\n",
-                    stacklevel=3,
-                )
-            return self.sample
-        return 0
+        # default value must be 0 if not used
+        if self.sample is None:
+            return 0
+        # validate the sample type
+        if not isinstance(self.sample, float):
+            raise TypeError("`sample` must be a float")
+        # validate sample value
+        if not (0.0 < self.sample < 1.0):
+            raise ValueError("`sample` must be between 0.0 and 1.0")
+        # check to see if the sample will create a very small dataset
+        trained_num_samples = int(round(self.sample * num_samples, 0))
+        if trained_num_samples < 10:
+            warn(
+                f"Sampling a dataset with {num_samples} rows and a "
+                f"sampling percent of {self.sample} means Cubist will "
+                f"train with {trained_num_samples} rows. This may lead "
+                f"to incorrect or failing predictions. Please increase "
+                f"or remove the `sample` parameter.\n",
+                stacklevel=3,
+            )
+        return self.sample
 
     def _check_cv(self):
-        # validate number of cv folds
-        if self.cv is not None:
-            if not isinstance(self.cv, int):
-                raise TypeError(
-                    "Number of cross-validation folds must be an \
-                                        integer or None"
-                )
-            if self.cv <= 1:
-                raise ValueError(
-                    "Number of cross-validation folds must be \
-                                         greater than 1"
-                )
-            return self.cv
-        return 0
+        # default value must be 0 if not used
+        if self.cv is None:
+            return 0
+        # validate type
+        if not isinstance(self.cv, int):
+            raise TypeError("`cv` must be an integer")
+        # validate value
+        if self.cv <= 1:
+            raise ValueError("`cv` must be greater than 1")
+        return self.cv
 
     def fit(self, X, y, sample_weight=None):
         """Build a Cubist regression model from training set (X, y).

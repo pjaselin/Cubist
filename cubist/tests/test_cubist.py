@@ -1,29 +1,18 @@
 import pytest
 
-import pandas as pd
+# import pandas as pd
 from sklearn.utils.validation import check_is_fitted
+from sklearn.datasets import fetch_openml
 
 from .conftest import no_raise
 from ..cubist import Cubist
 
 
 @pytest.fixture
-def titanic():
-    df = pd.read_csv(
-        "https://raw.githubusercontent.com/mwaskom/seaborn-data/master/raw/titanic.csv"
-    )
-    df = df.drop(["name", "ticket"], axis=1)
-    return df
-
-
-@pytest.fixture
-def X(titanic):
-    return titanic.drop(["fare"], axis=1)
-
-
-@pytest.fixture
-def y(titanic):
-    return titanic["fare"]
+def dfs():
+    X, y = fetch_openml("titanic", version=1, as_frame=True, return_X_y=True)
+    X = X.drop(["name", "ticket", "home.dest"], axis=1)
+    return (X, y)
 
 
 @pytest.mark.parametrize("expected_output", [True])
@@ -43,10 +32,10 @@ def test_model_instance(expected_output):
         ("asdf", pytest.raises(TypeError)),
     ],
 )
-def test_n_rules(n_rules, raises, X, y):
+def test_n_rules(n_rules, raises, dfs):
     model = Cubist(n_rules=n_rules)
     with raises:
-        model.fit(X, y)
+        model.fit(*dfs)
         check_is_fitted(model)
 
 
@@ -61,10 +50,10 @@ def test_n_rules(n_rules, raises, X, y):
         ("asdf", pytest.raises(TypeError)),
     ],
 )
-def test_n_committees(n_committees, raises, X, y):
+def test_n_committees(n_committees, raises, dfs):
     model = Cubist(n_committees=n_committees)
     with raises:
-        model.fit(X, y)
+        model.fit(*dfs)
         check_is_fitted(model)
 
 
@@ -80,11 +69,11 @@ def test_n_committees(n_committees, raises, X, y):
         (5.0, False, None, pytest.raises(TypeError)),
     ],
 )
-def test_neighbors(neighbors, auto, expected, raises, X, y):
+def test_neighbors(neighbors, auto, expected, raises, dfs):
     model = Cubist(neighbors=neighbors, auto=auto)
     with raises:
         assert expected == model._check_neighbors()  # noqa W0212
-        model.fit(X, y)
+        model.fit(*dfs)
         check_is_fitted(model)
 
 
@@ -93,14 +82,14 @@ def test_neighbors(neighbors, auto, expected, raises, X, y):
     [
         (True, no_raise()),
         (False, no_raise()),
-        (None, pytest.raises(ValueError)),
-        ("aasdf", pytest.raises(ValueError)),
+        (None, pytest.raises(TypeError)),
+        ("aasdf", pytest.raises(TypeError)),
     ],
 )
-def test_unbiased(unbiased, raises, X, y):
+def test_unbiased(unbiased, raises, dfs):
     model = Cubist(unbiased=unbiased)
     with raises:
-        model.fit(X, y)
+        model.fit(*dfs)
         check_is_fitted(model)
 
 
@@ -114,10 +103,10 @@ def test_unbiased(unbiased, raises, X, y):
         (1, pytest.raises(TypeError)),
     ],
 )
-def test_extrapolation(extrapolation, raises, X, y):
+def test_extrapolation(extrapolation, raises, dfs):
     model = Cubist(extrapolation=extrapolation)
     with raises:
-        model.fit(X, y)
+        model.fit(*dfs)
         check_is_fitted(model)
 
 
@@ -132,10 +121,10 @@ def test_extrapolation(extrapolation, raises, X, y):
         (0, pytest.raises(TypeError)),
     ],
 )
-def test_sample(sample, raises, X, y):
+def test_sample(sample, raises, dfs):
     model = Cubist(sample=sample)
     with raises:
-        model.fit(X, y)
+        model.fit(*dfs)
         check_is_fitted(model)
 
 
@@ -148,28 +137,28 @@ def test_sample(sample, raises, X, y):
         (0, None, pytest.raises(ValueError)),
     ],
 )
-def test_cv(cv, expected, raises, X, y):
+def test_cv(cv, expected, raises, dfs):
     model = Cubist(cv=cv)
     with raises:
         assert expected == model._check_cv()  # noqa W0212
-        model.fit(X, y)
+        model.fit(*dfs)
         check_is_fitted(model)
 
 
 @pytest.mark.parametrize(
-    "auto,expected,n,raises",
+    "auto,n,expected,raises",
     [
-        (True, "auto", 5, no_raise()),
-        (False, "yes", 5, no_raise()),
-        (False, "no", 0, no_raise()),
-        ("1234", "", 5, pytest.raises(ValueError)),
+        (True, 5, "auto", no_raise()),
+        (False, 5, "yes", no_raise()),
+        (False, 0, "no", no_raise()),
+        ("1234", 5, "", pytest.raises(TypeError)),
     ],
 )
-def test_auto(auto, expected, n, raises, X, y):
+def test_auto(auto, n, expected, raises, dfs):
     model = Cubist(auto=auto)
     with raises:
         assert expected == model._check_composite(n)  # noqa W0212
-        model.fit(X, y)
+        model.fit(*dfs)
         check_is_fitted(model)
 
 
@@ -177,8 +166,10 @@ def test_auto(auto, expected, n, raises, X, y):
     "i, raises",
     [(0, no_raise()), (5, pytest.raises(ValueError)), (1, pytest.raises(ValueError))],
 )
-def test_missing_column_name(i, raises, X, y):
+def test_missing_column_name(i, raises, dfs):
     model = Cubist()
+    X = dfs[0]
+    y = dfs[1]
     # get the column names as a list
     col_names = list(X.columns)
     # change some number of columns to empty strings

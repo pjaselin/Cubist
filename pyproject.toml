@@ -1,3 +1,7 @@
 [build-system]
 requires = ["setuptools", "wheel", "build", "Cython", "numpy"]
 build-backend = "setuptools.build_meta"
+
+[tool.pytest.ini_options]
+addopts="-v -s"
+filterwarnings = "ignore:np.asscalar:DeprecationWarning"
