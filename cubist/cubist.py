@@ -179,7 +179,7 @@ class Cubist(BaseEstimator, RegressorMixin):
     def _check_neighbors(self):
         # if auto is True but neighbors is set, raise an error
         if self.auto:
-            if self.neighbors:
+            if self.neighbors is not None:
                 raise ValueError(
                     "When `auto`=True, `neighbors` should be None as Cubist will choose an appropriate value for this parameter."
                 )
@@ -355,7 +355,7 @@ class Cubist(BaseEstimator, RegressorMixin):
         # inform user that they may want to use rules only
         if "Recommend using rules only" in output:
             warn(
-                "Cubist recommends using rules only " "(i.e. set auto=False)",
+                "Cubist recommends using rules only (set auto=False)",
                 stacklevel=3,
             )
 

@@ -1,6 +1,8 @@
+import random
+
 import pytest
 
-# import pandas as pd
+import pandas as pd
 from sklearn.utils.validation import check_is_fitted
 from sklearn.datasets import fetch_openml
 
@@ -10,7 +12,9 @@ from ..cubist import Cubist
 
 @pytest.fixture
 def dfs():
-    X, y = fetch_openml("titanic", version=1, as_frame=True, return_X_y=True)
+    X, y = fetch_openml(
+        "titanic", version=1, as_frame=True, return_X_y=True, parser="auto"
+    )
     X = X.drop(["name", "ticket", "home.dest"], axis=1)
     return (X, y)
 
@@ -64,9 +68,10 @@ def test_n_committees(n_committees, raises, dfs):
         (1, False, 1, no_raise()),
         (9, False, 9, no_raise()),
         (10, False, None, pytest.raises(ValueError)),
-        (0, True, 0, no_raise()),
+        (None, True, 0, no_raise()),
         (None, False, 0, no_raise()),
         (5.0, False, None, pytest.raises(TypeError)),
+        (5, True, None, pytest.raises(ValueError)),
     ],
 )
 def test_neighbors(neighbors, auto, expected, raises, dfs):
@@ -180,3 +185,37 @@ def test_missing_column_name(i, raises, dfs):
     with raises:
         model.fit(X, y)
         check_is_fitted(model)
+
+
+def test_small_ds_warning():
+    with pytest.warns(Warning):
+        X = pd.DataFrame(
+            dict(
+                a=pd.Series(random.sample(range(10, 30), 5)),
+                b=pd.Series(random.sample(range(10, 30), 5)),
+                c=pd.Series(random.sample(range(10, 30), 5)),
+            )
+        )
+        y = pd.Series(random.sample(range(10, 30), 5))
+        model = Cubist(sample=0.8)
+        model.fit(X, y)
+        check_is_fitted(model)
+
+
+def test_verbose(capfd, dfs):
+    model = Cubist(verbose=True)
+    model.fit(*dfs)
+    out, _ = capfd.readouterr()
+    assert out
+
+
+# def test_training_errors():
+#     with pytest.raises(CubistError):
+#         X = pd.DataFrame(dict(a=[0]*5,
+#                               b=[0]*5,
+#                               c=[0]*5)
+#                         )
+#         y = pd.Series([1]*5)
+#         model = Cubist(verbose=True)
+#         model.fit(X, y)
+#         check_is_fitted(model)
