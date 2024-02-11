@@ -56,9 +56,10 @@ class Cubist(BaseEstimator, RegressorMixin):
 
     auto : bool, default=False
         A value of True allows the algorithm to choose whether to use
-        nearest-neighbor corrections and how many neighbors to use. False will
-        leave the choice of whether to use a composite model to value passed to
-        the `neighbors` parameter.
+        nearest-neighbor corrections and how many neighbors. In this case,
+        `neighbors` must be left as None since the input has no bearing on the
+        model's behavior. False will leave the choice of whether to use a
+        composite model to value passed to the `neighbors` parameter.
 
     extrapolation : float, default=0.05
         Adjusts how much rule predictions are adjusted to be consistent with
