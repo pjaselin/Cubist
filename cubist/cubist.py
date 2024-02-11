@@ -163,17 +163,25 @@ class Cubist(BaseEstimator, RegressorMixin):
     def _check_n_rules(self):
         # validate number of rules
         if not isinstance(self.n_rules, int):
-            raise TypeError("`n_rules` must be an integer")
+            raise TypeError(
+                f"`n_rules` must be an integer but got {type(self.n_rules)}"
+            )
         if self.n_rules < 1 or self.n_rules > 1000000:
-            raise ValueError("`n_rules` must be between 1 and 1000000")
+            raise ValueError(
+                f"`n_rules` must be between 1 and 1000000 but got {self.n_rules}"
+            )
         return self.n_rules
 
     def _check_n_committees(self):
         # validate number of committees
         if not isinstance(self.n_committees, int):
-            raise TypeError("`n_committees` must be an integer")
+            raise TypeError(
+                f"`n_committees` must be an integer but got {type(self.n_committees)}"
+            )
         if self.n_committees < 1 or self.n_committees > 100:
-            raise ValueError("`n_committees` must be between 1 and 100")
+            raise ValueError(
+                f"`n_committees` must be between 1 and 100 but got {self.n_committees}"
+            )
         return self.n_committees
 
     def _check_neighbors(self):
@@ -181,7 +189,7 @@ class Cubist(BaseEstimator, RegressorMixin):
         if self.auto:
             if self.neighbors is not None:
                 raise ValueError(
-                    "When `auto`=True, `neighbors` should be None as Cubist will choose an appropriate value for this parameter."
+                    f"When `auto`=True, `neighbors` should be None as Cubist will choose this parameter but got {self.neighbors}."
                 )
             return 0
         # default value must be zero even when not used
@@ -189,21 +197,27 @@ class Cubist(BaseEstimator, RegressorMixin):
             return 0
         # validate number of neighbors
         if not isinstance(self.neighbors, int):
-            raise TypeError("`neighbors` must be an integer")
+            raise TypeError(
+                f"`neighbors` must be an integer but got {type(self.neighbors)}"
+            )
         if self.neighbors < 1 or self.neighbors > 9:
-            raise ValueError("`neighbors` must be between 1 and 9")
+            raise ValueError(
+                f"`neighbors` must be between 1 and 9 but got {self.neighbors}"
+            )
         return self.neighbors
 
     def _check_unbiased(self):
         # validate unbiased option
         if not isinstance(self.unbiased, bool):
-            raise TypeError("`unbiased` must be a boolean")
+            raise TypeError(
+                f"`unbiased` must be a boolean but got {type(self.unbiased)}"
+            )
         return self.unbiased
 
     def _check_composite(self, neighbors):
         # validate the auto parameter
         if not isinstance(self.auto, bool):
-            raise TypeError("`auto` must be a boolean")
+            raise TypeError(f"`auto` must be a boolean but got {type(self.auto)}")
         # if auto=True, let cubist decide whether to use a composite model and
         # how many neighbors to use
         if self.auto:
@@ -216,9 +230,13 @@ class Cubist(BaseEstimator, RegressorMixin):
     def _check_extrapolation(self):
         # validate the range of extrapolation
         if not isinstance(self.extrapolation, float):
-            raise TypeError("`extrapolation` must be a float")
+            raise TypeError(
+                f"`extrapolation` must be a float but got {type(self.extrapolation)}"
+            )
         if self.extrapolation < 0.0 or self.extrapolation > 1.0:
-            raise ValueError("`extrapolation` must be between 0.0 and 1.0")
+            raise ValueError(
+                f"`extrapolation` must be between 0.0 and 1.0 but got {self.extrapolation}"
+            )
         return self.extrapolation
 
     def _check_sample(self, num_samples):
@@ -227,10 +245,12 @@ class Cubist(BaseEstimator, RegressorMixin):
             return 0
         # validate the sample type
         if not isinstance(self.sample, float):
-            raise TypeError("`sample` must be a float")
+            raise TypeError(f"`sample` must be a float but got {type(self.sample)}")
         # validate sample value
         if not (0.0 < self.sample < 1.0):
-            raise ValueError("`sample` must be between 0.0 and 1.0")
+            raise ValueError(
+                f"`sample` must be between 0.0 and 1.0 but got {self.sample}"
+            )
         # check to see if the sample will create a very small dataset
         trained_num_samples = int(round(self.sample * num_samples, 0))
         if trained_num_samples < 10:
@@ -250,10 +270,10 @@ class Cubist(BaseEstimator, RegressorMixin):
             return 0
         # validate type
         if not isinstance(self.cv, int):
-            raise TypeError("`cv` must be an integer")
+            raise TypeError(f"`cv` must be an integer but got {type(self.cv)}")
         # validate value
         if self.cv <= 1:
-            raise ValueError("`cv` must be greater than 1")
+            raise ValueError(f"`cv` must be greater than 1 but got {self.cv}")
         return self.cv
 
     def fit(self, X, y, sample_weight=None):
