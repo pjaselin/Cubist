@@ -1,3 +1,5 @@
+import random
+
 import pytest
 
 from sklearn.utils.validation import check_is_fitted
@@ -179,12 +181,6 @@ def test_verbose(capfd, X, y):
     assert out
 
 
-# def test_model_attributes(dfs):
-#     model = Cubist()
-#     model.fit(X, y)
-#     assert model.feature_names_in_
-
-
 @pytest.mark.parametrize(
     "df_set_name, raises",
     [
@@ -197,3 +193,10 @@ def test_training_errors(df_set_name, raises, df_set):
         model = Cubist()
         model.fit(*df_set[df_set_name])
         check_is_fitted(model)
+
+
+def test_sample_colnames(X, y):
+    X.columns = [random.choice(["sample", "Sample"]) + col for col in list(X.columns)]
+    model = Cubist()
+    model.fit(X, y)
+    check_is_fitted(model)

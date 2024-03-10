@@ -389,9 +389,9 @@ class Cubist(BaseEstimator, RegressorMixin):
             return self
 
         # replace "__Sample" with "sample" if this is used in the model
-        if "\n__Sample" in names_string:
-            output = output.replace("__Sample", "sample")
-            self.model_ = self.model_.replace("__Sample", "sample")
+        if "\n_Sample" in names_string:
+            output = output.replace("_Sample", "sample")
+            self.model_ = self.model_.replace("_Sample", "sample")
             # clean model string when using reserved sample name
             self.model_ = (
                 self.model_[: self.model_.index("sample")]
