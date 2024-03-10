@@ -14,6 +14,7 @@ extensions = [
 ]
 
 setup(
-    name="cubist",
-    ext_modules=cythonize(extensions),
+    ext_modules=cythonize(
+        extensions, compiler_directives={"language_level": 3, "profile": False}
+    ),
 )
