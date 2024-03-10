@@ -1,7 +1,7 @@
 [project]
 name = "cubist"
 authors = [
-  {name = "JR Quinlan"},
+  {name = "John Ross Quinlan"},
   {name = "Max Kuhn"},
   {name = "Patrick Aselin"},
 ]
