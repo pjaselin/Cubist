@@ -1,3 +1,7 @@
+[build-system]
+requires = ["setuptools", "wheel", "build", "cython", "numpy"]
+build-backend = "setuptools.build_meta"
+
 [project]
 name = "cubist"
 version = "0.1.2"
@@ -37,10 +41,6 @@ dev = ["pre-commit", "pytest", "ruff", "coverage"]
 Homepage = "https://github.com/pjaselin/Cubist"
 Repository = "https://github.com/pjaselin/Cubist.git"
 Issues = "https://github.com/pjaselin/Cubist/issues"
-
-[build-system]
-requires = ["setuptools", "wheel", "build", "cython", "numpy"]
-build-backend = "setuptools.build_meta"
 
 [tool.setuptools]
 packages = ["cubist"]
