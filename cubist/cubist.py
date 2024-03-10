@@ -10,7 +10,7 @@ from sklearn.utils.validation import (
 )
 from sklearn.base import RegressorMixin, BaseEstimator
 
-from _cubist import _cubist, _predictions
+from _cubist import _cubist, _predictions  # noqa E0611 # pylint: disable=E0611
 
 from ._make_names_string import _make_names_string
 from ._make_data_string import _make_data_string

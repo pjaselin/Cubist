@@ -209,6 +209,11 @@ def test_verbose(capfd, dfs):
     assert out
 
 
+# def test_model_attributes(dfs):
+#     model = Cubist()
+#     model.fit(*dfs)
+#     assert model.feature_names_in_
+
 # def test_training_errors():
 #     with pytest.raises(CubistError):
 #         X = pd.DataFrame(dict(a=[0]*5,
