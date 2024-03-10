@@ -34,5 +34,5 @@ setup(
     ext_modules=cythonize(
         extensions, compiler_directives={"language_level": 3, "profile": False}
     ),
-    version=get_version("cubist/__version__.py"),
+    # version=get_version("cubist/__version__.py"),
 )

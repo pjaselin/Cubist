@@ -45,8 +45,8 @@ build-backend = "setuptools.build_meta"
 [tool.setuptools]
 packages = ["cubist"]
 
-# [tool.setuptools.dynamic]
-# version = {attr = "cubist.__version__"}
+[tool.setuptools.dynamic]
+version = {attr = "cubist.__version__.__version__"}
 
 [tool.pytest.ini_options]
 addopts="-v -s"
