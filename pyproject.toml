@@ -6,7 +6,7 @@ authors = [
   {name = "Patrick Aselin"},
 ]
 maintainers = [
-  {name = "Patrick Aselin", email = "github email?"}
+  {name = "Patrick Aselin"}
 ]
 description="A Python package for fitting Quinlan's Cubist regression model."
 readme = {file = "README.txt", content-type = "text/markdown"}
