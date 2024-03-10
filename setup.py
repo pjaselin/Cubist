@@ -1,6 +1,6 @@
 import glob
 
-from Cython.Build import cythonize
+# from Cython.Build import cythonize
 from setuptools import setup, Extension
 import numpy as np
 
@@ -13,8 +13,4 @@ extensions = [
     )
 ]
 
-setup(
-    ext_modules=cythonize(
-        extensions, compiler_directives={"language_level": 3, "profile": False}
-    ),
-)
+setup(ext_modules=extensions)
