@@ -63,6 +63,7 @@ jobs:
 
     - name: Test with pytest
       run: |
+        pip install coverage pytest
         coverage run -m pytest
         coverage report -m
 
