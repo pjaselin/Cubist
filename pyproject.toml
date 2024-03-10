@@ -1,5 +1,6 @@
 [project]
 name = "cubist"
+version = "0.1.2"
 authors = [
   {name = "John Ross Quinlan"},
   {name = "Max Kuhn"},
@@ -28,7 +29,6 @@ dependencies = [
     "pandas",
     "scikit-learn>=0.23.0",
 ]
-dynamic = ["version"]
 
 [project.optional-dependencies]
 dev = ["pre-commit", "pytest", "ruff", "coverage"]
@@ -44,9 +44,6 @@ build-backend = "setuptools.build_meta"
 
 [tool.setuptools]
 packages = ["cubist"]
-
-[tool.setuptools.dynamic]
-version = {attr = "cubist.__version__.__version__"}
 
 [tool.pytest.ini_options]
 addopts="-v -s"
