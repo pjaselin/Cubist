@@ -78,12 +78,37 @@ jobs:
         name: python-package-distributions
         path: dist/*.tar.gz
 
+  publish-to-testpypi:
+    name: >-
+      Publish Python 🐍 distribution 📦 to TestPyPI
+    if: startsWith(github.ref, 'refs/tags')
+    needs: [build_wheels, build_sdist]
+    runs-on: ubuntu-latest
+    environment:
+      name: testpypi
+      url: https://test.pypi.org/p/cubist/
+    permissions:
+      id-token: write
+
+    steps:
+    - name: Download all artifacts
+      uses: actions/download-artifact@v3
+      with:
+        name: python-package-distributions
+        path: dist/
+
+    - name: Publish distribution 📦 to Test PyPI
+      uses: pypa/gh-action-pypi-publish@release/v1
+      with:
+        repository-url: https://test.pypi.org/legacy/
+
+
   publish-to-pypi:
     # release only tagged commits to pypi / github
     name: >-
       Publish Python 🐍 distribution 📦 to PyPI
     if: startsWith(github.ref, 'refs/tags')
-    needs: [build_wheels, build_sdist]
+    needs: [publish-to-testpypi]
     runs-on: ubuntu-latest
     environment:
       name: release
@@ -111,26 +136,3 @@ jobs:
           dist/*
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-  publish-to-testpypi:
-    name: >-
-      Publish Python 🐍 distribution 📦 to TestPyPI
-    needs: [build_wheels, build_sdist]
-    runs-on: ubuntu-latest
-    environment:
-      name: testpypi
-      url: https://test.pypi.org/p/cubist/
-    permissions:
-      id-token: write
-
-    steps:
-    - name: Download all artifacts
-      uses: actions/download-artifact@v3
-      with:
-        name: python-package-distributions
-        path: dist/
-
-    - name: Publish distribution 📦 to Test PyPI
-      uses: pypa/gh-action-pypi-publish@release/v1
-      with:
-        repository-url: https://test.pypi.org/legacy/
