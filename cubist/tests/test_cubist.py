@@ -1,29 +1,11 @@
+import random
+
 import pytest
 
-import pandas as pd
 from sklearn.utils.validation import check_is_fitted
 
 from .conftest import no_raise
-from ..cubist import Cubist
-
-
-@pytest.fixture
-def titanic():
-    df = pd.read_csv(
-        "https://raw.githubusercontent.com/mwaskom/seaborn-data/master/raw/titanic.csv"
-    )
-    df = df.drop(["name", "ticket"], axis=1)
-    return df
-
-
-@pytest.fixture
-def X(titanic):
-    return titanic.drop(["fare"], axis=1)
-
-
-@pytest.fixture
-def y(titanic):
-    return titanic["fare"]
+from ..cubist import Cubist, CubistError
 
 
 @pytest.mark.parametrize("expected_output", [True])
@@ -69,16 +51,20 @@ def test_n_committees(n_committees, raises, X, y):
 
 
 @pytest.mark.parametrize(
-    "neighbors,expected,raises",
+    "neighbors,auto,expected,raises",
     [
-        (0, None, pytest.raises(ValueError)),
-        (1, 1, no_raise()),
-        (9, 9, no_raise()),
-        (10, None, pytest.raises(ValueError)),
+        (0, False, None, pytest.raises(ValueError)),
+        (1, False, 1, no_raise()),
+        (9, False, 9, no_raise()),
+        (10, False, None, pytest.raises(ValueError)),
+        (None, True, 0, no_raise()),
+        (None, False, 0, no_raise()),
+        (5.0, False, None, pytest.raises(TypeError)),
+        (5, True, None, pytest.raises(ValueError)),
     ],
 )
-def test_neighbors(neighbors, expected, raises, X, y):
-    model = Cubist(neighbors=neighbors)
+def test_neighbors(neighbors, auto, expected, raises, X, y):
+    model = Cubist(neighbors=neighbors, auto=auto)
     with raises:
         assert expected == model._check_neighbors()  # noqa W0212
         model.fit(X, y)
@@ -90,8 +76,8 @@ def test_neighbors(neighbors, expected, raises, X, y):
     [
         (True, no_raise()),
         (False, no_raise()),
-        (None, pytest.raises(ValueError)),
-        ("aasdf", pytest.raises(ValueError)),
+        (None, pytest.raises(TypeError)),
+        ("aasdf", pytest.raises(TypeError)),
     ],
 )
 def test_unbiased(unbiased, raises, X, y):
@@ -108,6 +94,7 @@ def test_unbiased(unbiased, raises, X, y):
         (1.0, no_raise()),
         (-0.1, pytest.raises(ValueError)),
         (1.01, pytest.raises(ValueError)),
+        (1, pytest.raises(TypeError)),
     ],
 )
 def test_extrapolation(extrapolation, raises, X, y):
@@ -125,6 +112,7 @@ def test_extrapolation(extrapolation, raises, X, y):
         (1.0, pytest.raises(ValueError)),
         (-0.1, pytest.raises(ValueError)),
         (1.01, pytest.raises(ValueError)),
+        (0, pytest.raises(TypeError)),
     ],
 )
 def test_sample(sample, raises, X, y):
@@ -152,15 +140,15 @@ def test_cv(cv, expected, raises, X, y):
 
 
 @pytest.mark.parametrize(
-    "auto,expected,n,raises",
+    "auto,n,expected,raises",
     [
-        (True, "auto", 5, no_raise()),
-        (False, "yes", 5, no_raise()),
-        (False, "no", 0, no_raise()),
-        ("1234", "", 5, pytest.raises(ValueError)),
+        (True, 5, "auto", no_raise()),
+        (False, 5, "yes", no_raise()),
+        (False, 0, "no", no_raise()),
+        ("1234", 5, "", pytest.raises(TypeError)),
     ],
 )
-def test_auto(auto, expected, n, raises, X, y):
+def test_auto(auto, n, expected, raises, X, y):
     model = Cubist(auto=auto)
     with raises:
         assert expected == model._check_composite(n)  # noqa W0212
@@ -184,3 +172,31 @@ def test_missing_column_name(i, raises, X, y):
     with raises:
         model.fit(X, y)
         check_is_fitted(model)
+
+
+def test_verbose(capfd, X, y):
+    model = Cubist(verbose=True)
+    model.fit(X, y)
+    out, _ = capfd.readouterr()
+    assert out
+
+
+@pytest.mark.parametrize(
+    "df_set_name, raises",
+    [
+        ("(X, y)", no_raise()),
+        ("dfs", pytest.raises(CubistError)),
+    ],
+)
+def test_training_errors(df_set_name, raises, df_set):
+    with raises:
+        model = Cubist()
+        model.fit(*df_set[df_set_name])
+        check_is_fitted(model)
+
+
+def test_sample_colnames(X, y):
+    X.columns = [random.choice(["sample", "Sample"]) + col for col in list(X.columns)]
+    model = Cubist()
+    model.fit(X, y)
+    check_is_fitted(model)
