@@ -45,7 +45,7 @@ jobs:
     - name: Add sys/time.h for Windows
       if: matrix.os == 'windows-latest'
       run: |
-        mv winsys/ cubist/sys
+        cp winsys/ cubist/sys
 
     - name: Install dependencies
       run: |
