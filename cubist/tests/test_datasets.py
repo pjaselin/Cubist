@@ -3,6 +3,7 @@ import random
 import pytest
 
 import pandas as pd
+import numpy as np
 from sklearn.datasets import (
     load_diabetes,
     fetch_california_housing,
@@ -15,9 +16,11 @@ from sklearn.utils.validation import check_is_fitted
 from ..cubist import Cubist
 
 
-def test_sklearn_diabetes():
+def test_sklearn_diabetes_nan():
     X, y = load_diabetes(return_X_y=True, as_frame=True)
-    model = Cubist()
+    # randomly dropping cells with 20% probability
+    X = X.mask(np.random.random(X.shape) < 0.2)
+    model = Cubist(verbose=True)
     model.fit(X, y)
     check_is_fitted(model)
 
