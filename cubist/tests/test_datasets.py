@@ -20,7 +20,7 @@ def test_sklearn_diabetes_nan():
     X, y = load_diabetes(return_X_y=True, as_frame=True)
     # randomly dropping cells with 20% probability
     X = X.mask(np.random.random(X.shape) < 0.2)
-    model = Cubist(verbose=True)
+    model = Cubist()
     model.fit(X, y)
     check_is_fitted(model)
 
