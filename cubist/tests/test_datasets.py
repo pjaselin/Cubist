@@ -23,6 +23,7 @@ def test_sklearn_diabetes_nan():
     model = Cubist()
     model.fit(X, y)
     check_is_fitted(model)
+    model.predict(X)
 
 
 def test_sklearn_california_housing():
@@ -30,6 +31,7 @@ def test_sklearn_california_housing():
     model = Cubist()
     model.fit(X, y)
     check_is_fitted(model)
+    model.predict(X)
 
 
 def test_sklearn_regression():
@@ -37,6 +39,7 @@ def test_sklearn_regression():
     model = Cubist()
     model.fit(X, y)
     check_is_fitted(model)
+    model.predict(X)
 
 
 def test_sklearn_sparse_uncorrelated():
@@ -44,6 +47,7 @@ def test_sklearn_sparse_uncorrelated():
     model = Cubist()
     model.fit(X, y)
     check_is_fitted(model)
+    model.predict(X)
 
 
 # def test_openml_titanic():
@@ -68,3 +72,13 @@ def test_small_ds_warning():
         model = Cubist(sample=0.8)
         model.fit(X, y)
         check_is_fitted(model)
+        model.predict(X)
+
+
+def test_dataset_mismatch():
+    X, y = make_sparse_uncorrelated(random_state=0)
+    model = Cubist()
+    model.fit(X, y)
+    check_is_fitted(model)
+    X, y = make_sparse_uncorrelated(random_state=1)
+    model.predict(X * 100)

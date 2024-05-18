@@ -193,6 +193,7 @@ def test_training_errors(df_set_name, raises, df_set):
         model = Cubist()
         model.fit(*df_set[df_set_name])
         check_is_fitted(model)
+        model.predict(df_set[df_set_name][0])
 
 
 def test_sample_colnames(X, y):
