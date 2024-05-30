@@ -64,7 +64,11 @@ def _make_data_string(x, y=None, w=None):
             x[col] = x[col].astype(str)
 
     # remove leading whitespace from all elements
-    x = x.applymap(lambda a: a.lstrip())
+    # handling pandas 2.2.2 feature change (applymap -> map)
+    if hasattr(x, "map"):
+        x = x.map(lambda a: a.lstrip())
+    else:  # pragma: no cover
+        x = x.applymap(lambda a: a.lstrip())
 
     # replace missing values with ?
     x = x.fillna("?")
