@@ -17,7 +17,7 @@ int_series = pd.Series(random.sample(range(10, 30), 5))
 float_series = pd.Series(np.random.uniform(low=0.5, high=13.3, size=(5,)))
 str_series = pd.Series(["test0", "test1", "test2", "test3", "test4"])
 complex_series = pd.Series([complex(0, i) for i in range(5)])
-date_series = pd.Series(pd.date_range("2018-01-01", periods=5, freq="H"))
+date_series = pd.Series(pd.date_range("2018-01-01", periods=5, freq="h"))
 unsupported_series = pd.Series(["test0", "test1", "test2", "test3", np])
 good_df = pd.DataFrame(
     {"a": int_series, "b": float_series, "c": str_series, "d": date_series}
