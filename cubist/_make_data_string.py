@@ -3,27 +3,7 @@ from pandas.api.types import is_string_dtype, is_numeric_dtype
 import numpy as np
 
 from ._make_names_string import _escapes
-
-
-def _r_format(x: float, digits: int = 15) -> str:
-    """Python version of the R format function to return a number formatted as a 
-    string rounded to `digits` number of digits from the left."""
-    # if x is NA return NA
-    if pd.isna(x):
-        return x
-    if np.iscomplex(x):
-        raise ValueError("Complex numbers not supported")
-
-    # get the count of whole number digits, i.e. the number of digits to the 
-    # left of the decimal place
-    whole_nums_count = len(str(int(x)))
-    # Where there are decimal places that need to be rounded, round to digits 
-    # - whole_nums_count decimal places
-    if whole_nums_count < digits:
-        remaining_decimals = digits - whole_nums_count
-        return str(round(x, remaining_decimals))
-    # Where there are no decimals that need to/can be rounded
-    return str(x)
+from ._utils import _format
 
 
 def _make_data_string(x, y=None, w=None):
@@ -37,24 +17,24 @@ def _make_data_string(x, y=None, w=None):
 
     y : pd.Series
         The predicted values.
-    
+
     w : ndarray of shape (n_samples,)
         Instance weights.
 
     Returns
     -------
     x : str
-        Input dataset converted to a string and formatted per Cubist's 
+        Input dataset converted to a string and formatted per Cubist's
         requirements.
     """
     x = x.copy(deep=True)
-    
+
     # apply the escapes function to all string columns
     for col in x:
         if is_string_dtype(x[col]):
             x[col] = _escapes(x[col].astype(str))
 
-    # if y is None for model predictions, set y as a column of NaN values, 
+    # if y is None for model predictions, set y as a column of NaN values,
     # # which will become ?'s later
     if y is None:
         y = [np.nan] * x.shape[0]
@@ -78,13 +58,17 @@ def _make_data_string(x, y=None, w=None):
     # convert all columns to strings
     for col in x:
         if is_numeric_dtype(x[col]):
-            x[col] = x[col].apply(_r_format)
+            x[col] = x[col].apply(_format)
             x[col] = x[col].astype(str)
         else:
             x[col] = x[col].astype(str)
 
     # remove leading whitespace from all elements
-    x = x.applymap(lambda a: a.lstrip())
+    # handling pandas 2.2.2 feature change (applymap -> map)
+    if hasattr(x, "map"):
+        x = x.map(lambda a: a.lstrip())
+    else:  # pragma: no cover
+        x = x.applymap(lambda a: a.lstrip())
 
     # replace missing values with ?
     x = x.fillna("?")
@@ -94,7 +78,7 @@ def _make_data_string(x, y=None, w=None):
     x = x.to_numpy().tolist()
 
     # merge each sublist into single strings with entries separated by commas
-    x = [','.join(row) for row in x]
+    x = [",".join(row) for row in x]
 
     # join all row strings into a single string separated by \n's
     x = "\n".join(x)
