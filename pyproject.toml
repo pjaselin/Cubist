@@ -36,6 +36,7 @@ dependencies = [
 
 [project.optional-dependencies]
 dev = ["pre-commit", "pytest", "ruff", "coverage"]
+viz = []
 
 [project.urls]
 Homepage = "https://github.com/pjaselin/Cubist"
