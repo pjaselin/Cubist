@@ -82,4 +82,4 @@ def test_get_data_format(test_input, expected, raises):
 )
 def test_quinlan_attributes(test_input, expected, raises):
     with raises:
-        assert type(_quinlan_attributes(test_input)) == expected
+        assert type(_quinlan_attributes(test_input)) is expected
