@@ -46,6 +46,17 @@ def test_sklearn_sparse_uncorrelated():
     check_is_fitted(model)
 
 
+def test_one_model_one_committee():
+    # n = 20
+    X, y = fetch_california_housing(return_X_y=True, as_frame=True)
+    model = Cubist(n_rules=2, n_committees=3, verbose=1)
+    model.fit(X, y)
+    check_is_fitted(model)
+    assert model.rules_ is not None
+    print(model.rules_)
+    print(model.coeff_)
+
+
 # def test_openml_titanic():
 #     X, y = fetch_openml(
 #         "titanic", version=2, as_frame=True, return_X_y=True, parser="auto"

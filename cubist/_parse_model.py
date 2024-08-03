@@ -1,6 +1,7 @@
 import re
 import math
 import operator
+from collections import deque
 
 import pandas as pd
 import numpy as np
@@ -34,9 +35,49 @@ def _split_to_groups(x, f):
 
 def _parse_model(model, x):
     # split on newline
-    model = model.split("\n")
-    # remove empty strings
-    model = [c for c in model if c.strip() != ""]
+    print(model)
+    model = deque(model.split("\n"))
+
+    # get the cubist model version and build date
+    cubist_version = model.popleft()  # noqa F841
+    # get the global model statistics
+    global_stats = model.popleft()  # noqa F841
+    # get the attribute statistics
+    attribute_statistics = []
+    while model[0].startswith("att="):
+        attribute_statistics.append(model.popleft())
+    # get the number of committees
+    committee_meta = model.popleft()
+    i_entries = committee_meta.find("entries")
+    # get the error reduction from using committees
+    if committee_meta.startswith("redn"):
+        error_reduction = float(committee_meta[5:i_entries].strip().strip('"'))  # noqa F841
+    else:
+        error_reduction = None  # noqa F841
+    num_committees = int(committee_meta[i_entries + 8 :].strip('"'))
+    print(num_committees)
+
+    # clean out empty strings
+    model = [m for m in model if m.strip() != ""]
+
+    # parse rules by committee
+    com_idx = 0
+    rules_idx = 1  # noqa F841
+    num_rules = 0  # noqa F841
+    for line in model:
+        # a committe entry startswith a rule count
+        if line.startswith("rules"):
+            com_idx += 1
+            rules_idx = 1  # noqa F841
+            print(_parser(line))
+            num_rules = int(_parser(line)[0]["rules"].strip('"'))  # noqa F841
+        # rule stats
+        if line.startswith("conds"):
+            pass
+        # parse rule info
+        if line.startswith("coeff"):
+            print(_parser(line))
+
     # get model length
     model_len = len(model)
 
@@ -82,7 +123,7 @@ def _parse_model(model, x):
     split_cats = [""] * model_len
     split_dir = [""] * model_len
     split_type = [""] * model_len
-
+    print("model", model, len(model))
     # handle continuous (type 2) rules
     is_type2 = [i for i, c in enumerate(model) if re.search('^type="2"', c)]
     for i in is_type2:
@@ -108,7 +149,7 @@ def _parse_model(model, x):
         split_cats[i] = categorical_split["val"]
 
     # if there are no continuous or categorical splits, return no splits
-    if is_type2 == [] and is_type3 == []:
+    if not is_type2 and not is_type3:
         split_data = None
     else:
         split_data = pd.DataFrame(
@@ -143,14 +184,14 @@ def _parse_model(model, x):
     # get the indices of rows in model that contain model coefficients
     is_eqn = [i for i, c in enumerate(model) if "coeff=" in c]
     # extract the model coefficients from the row
-    coefs = [_eqn(model[i], var_names=list(x.columns)) for i in is_eqn]
-    out = pd.DataFrame(coefs)
+    coeffs = [_eqn(model[i], var_names=list(x.columns)) for i in is_eqn]
+    coeffs = pd.DataFrame(coeffs)
     # get the committee number
-    out["committee"] = [com_num[i] for i in is_eqn]
+    coeffs["committee"] = [com_num[i] for i in is_eqn]
     # get the rule number for the committee
-    out["rule"] = [rule_num[i] for i in is_eqn]
+    coeffs["rule"] = [rule_num[i] for i in is_eqn]
 
-    return split_data, out
+    return split_data, coeffs  # rules, coefficients
 
 
 def _type2(x, dig=3):
