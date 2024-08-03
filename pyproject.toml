@@ -43,7 +43,7 @@ Repository = "https://github.com/pjaselin/Cubist.git"
 Issues = "https://github.com/pjaselin/Cubist/issues"
 
 [tool.setuptools]
-packages = ["cubist"]
+packages = ["cubist", "cubist.src"]
 
 [tool.pytest.ini_options]
 addopts="-v -s"
