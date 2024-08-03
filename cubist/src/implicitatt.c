@@ -654,7 +654,7 @@ void DefSemanticsError(int Fi, String Msg, int OpCode)
       sprintf(Op, "%s", "%");
       break;
     case OP_POW:
-      snprintf(Op, "%s", "^");
+      sprintf(Op, "%s", "^");
       break;
     case OP_SIN:
       sprintf(Op, "%s", "sin");
