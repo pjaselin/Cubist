@@ -69,14 +69,14 @@ def _parse_model(model, x):
         if line.startswith("rules"):
             com_idx += 1
             rules_idx = 1  # noqa F841
-            print(_parser(line))
-            num_rules = int(_parser(line)[0]["rules"].strip('"'))  # noqa F841
+            print(_parser2(line))
+            num_rules = int(_parser2(line)["rules"])  # noqa F841
         # rule stats
         if line.startswith("conds"):
             pass
         # parse rule info
         if line.startswith("coeff"):
-            print(_parser(line))
+            print(_parser2(line))
 
     # get model length
     model_len = len(model)
@@ -271,7 +271,7 @@ def _eqn(x, var_names=None):
 def _make_parsed_dict(x):
     x = x.split("=")
     if len(x) > 1:
-        return {x[0]: x[1]}
+        return {x[0]: x[1].strip('"')}
     return None
 
 
@@ -279,3 +279,21 @@ def _parser(x):
     x = x.split(" ")
     x = [_make_parsed_dict(c) for c in x]
     return x
+
+
+def _parse_element(x):
+    # split the element on the equal sign and return without the quotes on the
+    # value of the element
+    label, value = x.split("=")
+    return (label, value.strip('"'))
+
+
+def _parser2(x):
+    """Parses a row of the Cubist model string
+    Takes: redn="0.967" entries="3"
+    and converts to: {"redn": "0.967", "entries": "3"}
+    """
+    # split on the space separating each element in the rule
+    x = x.split(" ")
+    # create dictionary key value pairs for each element in the rule
+    return dict([_parse_element(entry) for entry in x])
