@@ -431,12 +431,14 @@ class Cubist(BaseEstimator, RegressorMixin):
 
         # store a dictionary containing all the training dataset columns and
         # those that were used by the model
-        if self.rules_ is not None:
-            used_variables = set(self.rules_["variable"]).union(set(not_na_cols))
-            self.variables_ = {  # pylint: disable=W0201
-                "all": list(self.feature_names_in_),
-                "used": list(used_variables),
-            }
+        used_variables = set(self.rules_.variable[self.rules_.variable != ""]).union(
+            set(not_na_cols)
+        )
+        self.variables_ = {  # pylint: disable=W0201
+            "all": list(self.feature_names_in_),
+            "used": list(used_variables),
+        }
+
         return self
 
     def predict(self, X):

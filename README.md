@@ -70,10 +70,15 @@ The following parameters can be passed as arguments to the ```Cubist()``` class 
 
 The following attributes are exposed to understand the Cubist model results:
 
-- feature_importances_ (pd.DataFrame): Table of how training data variables are used in the Cubist model.
+- version_ (str): The Cubist model version.
 - rules_ (pd.DataFrame): Table of the rules built by the Cubist model and the percentage of data for which each rule condition applies.
 - coeff_ (pd.DataFrame): Table of the regression coefficients found by the Cubist model.
+- model_statistics_ (dict): Model statistics (e.g. global mean, extrapolation %, ceiling value, floor value)
+- features_statistics_ (pd.DataFrame): Statistics about dataset features.
+- committee_error_reduction_ (float): Error reduction by using committees.
+- n_committees_used_ (int): Number of committees used by Cubist.
 - variables_ (dict): Information about all the variables passed to the model and those that were actually used.
+- feature_importances_ (pd.DataFrame): Table of how training data variables are used in the Cubist model.
 - feature_names_in_ (list): List of features used to train Cubist.
 
 ## Benchmarks
