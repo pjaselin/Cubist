@@ -409,7 +409,9 @@ class Cubist(BaseEstimator, RegressorMixin):
         self.data_string_ = zlib.compress(data_string.encode())  # noqa W0201
 
         # parse model contents and store useful information
-        self.rules_, self.coeff_ = _parse_model(self.model_, X)  # noqa W0201
+        self.rules_, self.coeff_ = _parse_model(
+            self.model_, list(self.feature_names_in_)
+        )  # noqa W0201
 
         # get the input data variable usage
         self.feature_importances_ = _get_variable_usage(output, X)  # noqa W0201

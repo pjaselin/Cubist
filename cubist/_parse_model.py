@@ -1,5 +1,4 @@
 import re
-import math
 import operator
 from collections import deque
 
@@ -33,9 +32,8 @@ def _split_to_groups(x, f):
     return groups
 
 
-def _parse_model(model, x):
+def _parse_model(model: str, feature_names: list):
     # split on newline
-    print(model)
     model = deque(model.split("\n"))
 
     # get the cubist model version and build date
@@ -54,29 +52,10 @@ def _parse_model(model, x):
         error_reduction = float(committee_meta[5:i_entries].strip().strip('"'))  # noqa F841
     else:
         error_reduction = None  # noqa F841
-    num_committees = int(committee_meta[i_entries + 8 :].strip('"'))
-    print(num_committees)
+    num_committees = int(committee_meta[i_entries + 8 :].strip('"'))  # noqa F841
 
     # clean out empty strings
     model = [m for m in model if m.strip() != ""]
-
-    # parse rules by committee
-    com_idx = 0
-    rules_idx = 1  # noqa F841
-    num_rules = 0  # noqa F841
-    for line in model:
-        # a committe entry startswith a rule count
-        if line.startswith("rules"):
-            com_idx += 1
-            rules_idx = 1  # noqa F841
-            print(_parser2(line))
-            num_rules = int(_parser2(line)["rules"])  # noqa F841
-        # rule stats
-        if line.startswith("conds"):
-            pass
-        # parse rule info
-        if line.startswith("coeff"):
-            print(_parser2(line))
 
     # get model length
     model_len = len(model)
@@ -123,7 +102,7 @@ def _parse_model(model, x):
     split_cats = [""] * model_len
     split_dir = [""] * model_len
     split_type = [""] * model_len
-    print("model", model, len(model))
+
     # handle continuous (type 2) rules
     is_type2 = [i for i, c in enumerate(model) if re.search('^type="2"', c)]
     for i in is_type2:
@@ -150,9 +129,20 @@ def _parse_model(model, x):
 
     # if there are no continuous or categorical splits, return no splits
     if not is_type2 and not is_type3:
-        split_data = None
+        # there is only one rule
+        rules = pd.DataFrame(
+            {
+                "committee": [1],
+                "rule": [1],
+                "variable": [""],
+                "dir": [""],
+                "value": [""],
+                "category": [""],
+                "type": [""],
+            }
+        )
     else:
-        split_data = pd.DataFrame(
+        rules = pd.DataFrame(
             {
                 "committee": com_num,
                 "rule": rule_num,
@@ -163,35 +153,35 @@ def _parse_model(model, x):
                 "type": split_type,
             }
         )
+
         # remove missing values based on the variable column
-        split_data = split_data.dropna(subset=["variable"])
-        split_data = split_data.reset_index(drop=True)
+        rules = rules.dropna(subset=["variable"]).reset_index(drop=True)
 
         # get the percentage of data covered by this rule
-        nrows = x.shape[0]
-        for i in range(split_data.shape[0]):
-            # get the current value threshold and comparison operator
-            var_value = split_data.loc[i, "value"]
-            comp_operator = split_data.loc[i, "dir"]
-            if var_value is not None:
-                if not math.isnan(var_value):
-                    # convert the data to numeric and remove NaNs
-                    x_col = pd.to_numeric(x[split_data.loc[i, "variable"]]).dropna()
-                    # evaluate and get the percentage of data
-                    comp_total = OPERATORS[comp_operator](x_col, var_value).sum()
-                    split_data.loc[i, "percentile"] = comp_total / nrows
+        # nrows = x.shape[0]
+        # for i in range(rules.shape[0]):
+        #     # get the current value threshold and comparison operator
+        #     var_value = rules.loc[i, "value"]
+        #     comp_operator = rules.loc[i, "dir"]
+        #     if var_value is not None:
+        #         if not math.isnan(var_value):
+        #             # convert the data to numeric and remove NaNs
+        #             x_col = pd.to_numeric(x[rules.loc[i, "variable"]]).dropna()
+        #             # evaluate and get the percentage of data
+        #             comp_total = OPERATORS[comp_operator](x_col, var_value).sum()
+        #             rules.loc[i, "percentile"] = comp_total / nrows
 
     # get the indices of rows in model that contain model coefficients
-    is_eqn = [i for i, c in enumerate(model) if "coeff=" in c]
+    is_eqn = [i for i, c in enumerate(model) if c.startswith("coeff=")]
     # extract the model coefficients from the row
-    coeffs = [_eqn(model[i], var_names=list(x.columns)) for i in is_eqn]
+    coeffs = [_eqn(model[i], var_names=feature_names) for i in is_eqn]
     coeffs = pd.DataFrame(coeffs)
     # get the committee number
     coeffs["committee"] = [com_num[i] for i in is_eqn]
     # get the rule number for the committee
     coeffs["rule"] = [rule_num[i] for i in is_eqn]
 
-    return split_data, coeffs  # rules, coefficients
+    return rules, coeffs
 
 
 def _type2(x, dig=3):
@@ -279,21 +269,3 @@ def _parser(x):
     x = x.split(" ")
     x = [_make_parsed_dict(c) for c in x]
     return x
-
-
-def _parse_element(x):
-    # split the element on the equal sign and return without the quotes on the
-    # value of the element
-    label, value = x.split("=")
-    return (label, value.strip('"'))
-
-
-def _parser2(x):
-    """Parses a row of the Cubist model string
-    Takes: redn="0.967" entries="3"
-    and converts to: {"redn": "0.967", "entries": "3"}
-    """
-    # split on the space separating each element in the rule
-    x = x.split(" ")
-    # create dictionary key value pairs for each element in the rule
-    return dict([_parse_element(entry) for entry in x])
