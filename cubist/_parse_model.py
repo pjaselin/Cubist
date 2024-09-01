@@ -17,19 +17,19 @@ OPERATORS = {
 }
 
 
-def _split_to_groups(x, f):
-    """Function to convert two lists into a dictionary where the keys are
-    unique values in f and the values are lists of the corresponding values in
-    x. Analogous to the split function in R."""
-    if len(x) != len(f):
-        raise ValueError("lists x and f must be of the same length")
-    groups = {}
-    for a, b in zip(x, f):
-        if b in groups:
-            groups[b].append(a)
-        else:
-            groups[b] = [a]
-    return groups
+# def _split_to_groups(x, f):
+#     """Function to convert two lists into a dictionary where the keys are
+#     unique values in f and the values are lists of the corresponding values in
+#     x. Analogous to the split function in R."""
+#     if len(x) != len(f):
+#         raise ValueError("lists x and f must be of the same length")
+#     groups = {}
+#     for a, b in zip(x, f):
+#         if b in groups:
+#             groups[b].append(a)
+#         else:
+#             groups[b] = [a]
+#     return groups
 
 
 def _parse_model(model: str, feature_names: list):
@@ -232,7 +232,7 @@ def _type3(x):
     return {"var": var, "val": val, "text": txt}
 
 
-def _eqn(x, var_names=None):
+def _eqn(x, var_names: list):
     x = x.replace('"', "")
     starts = [m.start(0) for m in re.finditer("(coeff=)|(att=)", x)]
     tmp = [""] * len(starts)
@@ -248,13 +248,14 @@ def _eqn(x, var_names=None):
     nms = tmp[1::2]
     nms = ["(Intercept)"] + nms
     vals = dict(zip(nms, vals))
-    if var_names:
-        vars2 = [var for var in var_names if var not in nms]
-        vals2 = [np.nan] * len(vars2)
-        vals2 = dict(zip(vars2, vals2))
-        vals = {**vals, **vals2}
-        new_names = ["(Intercept)"] + var_names
-        vals = {nm: vals[nm] for nm in new_names}
+
+    # handle column headers
+    vars2 = [var for var in var_names if var not in nms]
+    vals2 = [np.nan] * len(vars2)
+    vals2 = dict(zip(vars2, vals2))
+    vals = {**vals, **vals2}
+    new_names = ["(Intercept)"] + var_names
+    vals = {nm: vals[nm] for nm in new_names}
     return vals
 
 
