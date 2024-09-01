@@ -156,13 +156,12 @@ def _parse_model(model: str, x, feature_names: list):
             # get the current value threshold and comparison operator
             var_value = rules.loc[i, "value"]
             comp_operator = rules.loc[i, "dir"]
-            if var_value is not None:
-                if not math.isnan(var_value):
-                    # convert the data to numeric and remove NaNs
-                    x_col = pd.to_numeric(x[rules.loc[i, "variable"]]).dropna()
-                    # evaluate and get the percentage of data
-                    comp_total = OPERATORS[comp_operator](x_col, var_value).sum()
-                    rules.loc[i, "percentile"] = comp_total / nrows
+            if (var_value is not None) and (not math.isnan(var_value)):
+                # convert the data to numeric and remove NaNs
+                x_col = pd.to_numeric(x[rules.loc[i, "variable"]]).dropna()
+                # evaluate and get the percentage of data
+                comp_total = OPERATORS[comp_operator](x_col, var_value).sum()
+                rules.loc[i, "percentile"] = comp_total / nrows
 
     # get the indices of rows in model that contain model coefficients
     is_eqn = [i for i, c in enumerate(model) if c.startswith("coeff=")]
@@ -262,9 +261,7 @@ def _eqn(x, var_names: list):
 
 def _make_parsed_dict(x):
     x = x.split("=")
-    if len(x) > 1:
-        return {x[0]: x[1].strip('"')}
-    return None
+    return {x[0]: x[1].strip('"')}
 
 
 def _parser(x):
