@@ -21,24 +21,29 @@ OPERATORS = {
 def _parse_model(model: str, x, feature_names: list):
     # split on newline
     model = deque(model.split("\n"))
-
     # get the cubist model version and build date
-    cubist_version = model.popleft()  # noqa F841
+    version = _parser(model.popleft())[0]["id"]
     # get the global model statistics
-    global_stats = model.popleft()  # noqa F841
-    # get the attribute statistics
-    attribute_statistics = []
+    model_statistics = {
+        k: v for feat in _parser(model.popleft()) for k, v in feat.items()
+    }  # noqa F841
+    # get the feature statistics
+    feature_statistics = []
     while model[0].startswith("att="):
-        attribute_statistics.append(model.popleft())
+        feature_statistics.append(_parser(model.popleft()))
+    feature_statistics = pd.DataFrame(
+        [{k: v for d in feat for k, v in d.items()} for feat in feature_statistics]
+    )
     # get the number of committees
     committee_meta = _parser(model.popleft())
-    error_reduction = None
-    num_committees = None
+    # set default committee error reduction and number of committees
+    committee_error_reduction = None
+    n_committees = None
     for val in committee_meta:
         if "redn" in val:
-            error_reduction = float(val["redn"])  # noqa F841
+            committee_error_reduction = float(val["redn"])  # noqa F841
         if "entries" in val:
-            num_committees = int(val["entries"])  # noqa F841
+            n_committees = int(val["entries"])  # noqa F841
 
     # clean out empty strings
     model = [m for m in model if m.strip() != ""]
@@ -168,7 +173,15 @@ def _parse_model(model: str, x, feature_names: list):
     # get the rule number for the committee
     coeffs["rule"] = [rule_num[i] for i in is_eqn]
 
-    return rules, coeffs
+    return (
+        version,
+        rules,
+        coeffs,
+        model_statistics,
+        feature_statistics,
+        committee_error_reduction,
+        n_committees,
+    )
 
 
 def _type2(x, dig=3):
