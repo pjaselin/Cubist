@@ -410,7 +410,7 @@ class Cubist(BaseEstimator, RegressorMixin):
 
         # parse model contents and store useful information
         self.rules_, self.coeff_ = _parse_model(
-            self.model_, list(self.feature_names_in_)
+            self.model_, X, list(self.feature_names_in_)
         )  # noqa W0201
 
         # get the input data variable usage

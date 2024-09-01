@@ -1,4 +1,5 @@
 import re
+import math
 import operator
 from collections import deque
 
@@ -17,7 +18,7 @@ OPERATORS = {
 }
 
 
-def _parse_model(model: str, feature_names: list):
+def _parse_model(model: str, x, feature_names: list):
     # split on newline
     model = deque(model.split("\n"))
 
@@ -124,6 +125,7 @@ def _parse_model(model: str, feature_names: list):
                 "value": [""],
                 "category": [""],
                 "type": [""],
+                "percentile": [1.0],
             }
         )
     else:
@@ -143,18 +145,18 @@ def _parse_model(model: str, feature_names: list):
         rules = rules.dropna(subset=["variable"]).reset_index(drop=True)
 
         # get the percentage of data covered by this rule
-        # nrows = x.shape[0]
-        # for i in range(rules.shape[0]):
-        #     # get the current value threshold and comparison operator
-        #     var_value = rules.loc[i, "value"]
-        #     comp_operator = rules.loc[i, "dir"]
-        #     if var_value is not None:
-        #         if not math.isnan(var_value):
-        #             # convert the data to numeric and remove NaNs
-        #             x_col = pd.to_numeric(x[rules.loc[i, "variable"]]).dropna()
-        #             # evaluate and get the percentage of data
-        #             comp_total = OPERATORS[comp_operator](x_col, var_value).sum()
-        #             rules.loc[i, "percentile"] = comp_total / nrows
+        nrows = x.shape[0]
+        for i in range(rules.shape[0]):
+            # get the current value threshold and comparison operator
+            var_value = rules.loc[i, "value"]
+            comp_operator = rules.loc[i, "dir"]
+            if var_value is not None:
+                if not math.isnan(var_value):
+                    # convert the data to numeric and remove NaNs
+                    x_col = pd.to_numeric(x[rules.loc[i, "variable"]]).dropna()
+                    # evaluate and get the percentage of data
+                    comp_total = OPERATORS[comp_operator](x_col, var_value).sum()
+                    rules.loc[i, "percentile"] = comp_total / nrows
 
     # get the indices of rows in model that contain model coefficients
     is_eqn = [i for i, c in enumerate(model) if c.startswith("coeff=")]
