@@ -45,14 +45,14 @@ def _parse_model(model: str, feature_names: list):
     while model[0].startswith("att="):
         attribute_statistics.append(model.popleft())
     # get the number of committees
-    committee_meta = model.popleft()
-    i_entries = committee_meta.find("entries")
-    # get the error reduction from using committees
-    if committee_meta.startswith("redn"):
-        error_reduction = float(committee_meta[5:i_entries].strip().strip('"'))  # noqa F841
-    else:
-        error_reduction = None  # noqa F841
-    num_committees = int(committee_meta[i_entries + 8 :].strip('"'))  # noqa F841
+    committee_meta = _parser(model.popleft())
+    error_reduction = None
+    num_committees = None
+    for val in committee_meta:
+        if "redn" in val:
+            error_reduction = float(val["redn"])  # noqa F841
+        if "entries" in val:
+            num_committees = int(val["entries"])  # noqa F841
 
     # clean out empty strings
     model = [m for m in model if m.strip() != ""]
