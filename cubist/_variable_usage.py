@@ -1,7 +1,7 @@
 import pandas as pd
 
 
-def _get_variable_usage(output, feature_names: list):
+def _get_variable_usage(output: str, feature_names: list):
     output = output.split("\n")
     # get the attribute usage section of the model output
     start_vars = [i for i, c in enumerate(output) if "\tAttribute usage" in c]
