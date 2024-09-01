@@ -52,7 +52,7 @@ def test_sklearn_sparse_uncorrelated():
 def test_one_model_one_committee():
     """test one model/one committee"""
     X, y = fetch_california_housing(return_X_y=True, as_frame=True)
-    model = Cubist(n_rules=1, n_committees=1, verbose=1)
+    model = Cubist(n_rules=1, n_committees=1)
     model.fit(X, y)
     check_is_fitted(model)
     assert model.rules_ is not None

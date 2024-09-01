@@ -25,12 +25,13 @@ def _parse_model(model: str, x, feature_names: list):
     version = _parser(model.popleft())[0]["id"]
     # get the global model statistics
     model_statistics = {
-        k: v for feat in _parser(model.popleft()) for k, v in feat.items()
-    }  # noqa F841
+        k: v for stat in _parser(model.popleft()) for k, v in stat.items()
+    }
     # get the feature statistics
     feature_statistics = []
     while model[0].startswith("att="):
         feature_statistics.append(_parser(model.popleft()))
+    # feature_statistics = None
     feature_statistics = pd.DataFrame(
         [{k: v for d in feat for k, v in d.items()} for feat in feature_statistics]
     )
@@ -267,6 +268,6 @@ def _make_parsed_dict(x):
 
 
 def _parser(x):
-    x = x.split(" ")
+    x = x.split('" ')
     x = [_make_parsed_dict(c) for c in x]
     return x
