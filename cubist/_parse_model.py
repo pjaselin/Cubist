@@ -17,21 +17,6 @@ OPERATORS = {
 }
 
 
-# def _split_to_groups(x, f):
-#     """Function to convert two lists into a dictionary where the keys are
-#     unique values in f and the values are lists of the corresponding values in
-#     x. Analogous to the split function in R."""
-#     if len(x) != len(f):
-#         raise ValueError("lists x and f must be of the same length")
-#     groups = {}
-#     for a, b in zip(x, f):
-#         if b in groups:
-#             groups[b].append(a)
-#         else:
-#             groups[b] = [a]
-#     return groups
-
-
 def _parse_model(model: str, feature_names: list):
     # split on newline
     model = deque(model.split("\n"))
