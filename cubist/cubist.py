@@ -420,7 +420,9 @@ class Cubist(BaseEstimator, RegressorMixin):
         ) = _parse_model(self.model_, X, list(self.feature_names_in_))
 
         # get the input data variable usage
-        self.feature_importances_ = _get_variable_usage(output, X)  # noqa W0201, pylint: disable=W0201
+        self.feature_importances_ = _get_variable_usage(
+            output, list(self.feature_names_in_)
+        )  # noqa W0201, pylint: disable=W0201
 
         # get the names of columns that have no nan values
         is_na_col = ~self.coeff_.isna().any()
