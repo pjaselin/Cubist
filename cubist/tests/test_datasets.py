@@ -33,7 +33,7 @@ def test_sklearn_california_housing():
 
 
 def test_sklearn_regression():
-    X, y = make_regression(random_state=0)
+    X, y, _ = make_regression(random_state=0)
     model = Cubist()
     model.fit(X, y)
     check_is_fitted(model)
