@@ -1,6 +1,7 @@
 import re
 import math
 import operator
+from collections import deque
 
 import pandas as pd
 import numpy as np
@@ -17,26 +18,37 @@ OPERATORS = {
 }
 
 
-def _split_to_groups(x, f):
-    """Function to convert two lists into a dictionary where the keys are
-    unique values in f and the values are lists of the corresponding values in
-    x. Analogous to the split function in R."""
-    if len(x) != len(f):
-        raise ValueError("lists x and f must be of the same length")
-    groups = {}
-    for a, b in zip(x, f):
-        if b in groups:
-            groups[b].append(a)
-        else:
-            groups[b] = [a]
-    return groups
-
-
-def _parse_model(model, x):
+def _parse_model(model: str, x, feature_names: list):
     # split on newline
-    model = model.split("\n")
-    # remove empty strings
-    model = [c for c in model if c.strip() != ""]
+    model = deque(model.split("\n"))
+    # get the cubist model version and build date
+    version = _parser(model.popleft())[0]["id"]
+    # get the global model statistics
+    model_statistics = {
+        k: v for stat in _parser(model.popleft()) for k, v in stat.items()
+    }
+    # get the feature statistics
+    feature_statistics = []
+    while model[0].startswith("att="):
+        feature_statistics.append(_parser(model.popleft()))
+    # feature_statistics = None
+    feature_statistics = pd.DataFrame(
+        [{k: v for d in feat for k, v in d.items()} for feat in feature_statistics]
+    )
+    # get the number of committees
+    committee_meta = _parser(model.popleft())
+    # set default committee error reduction and number of committees
+    committee_error_reduction = None
+    n_committees = None
+    for val in committee_meta:
+        if "redn" in val:
+            committee_error_reduction = float(val["redn"])  # noqa F841
+        if "entries" in val:
+            n_committees = int(val["entries"])  # noqa F841
+
+    # clean out empty strings
+    model = [m for m in model if m.strip() != ""]
+
     # get model length
     model_len = len(model)
 
@@ -108,10 +120,22 @@ def _parse_model(model, x):
         split_cats[i] = categorical_split["val"]
 
     # if there are no continuous or categorical splits, return no splits
-    if is_type2 == [] and is_type3 == []:
-        split_data = None
+    if not is_type2 and not is_type3:
+        # there is only one rule
+        rules = pd.DataFrame(
+            {
+                "committee": [1],
+                "rule": [1],
+                "variable": [""],
+                "dir": [""],
+                "value": [""],
+                "category": [""],
+                "type": [""],
+                "percentile": [1.0],
+            }
+        )
     else:
-        split_data = pd.DataFrame(
+        rules = pd.DataFrame(
             {
                 "committee": com_num,
                 "rule": rule_num,
@@ -122,35 +146,42 @@ def _parse_model(model, x):
                 "type": split_type,
             }
         )
+
         # remove missing values based on the variable column
-        split_data = split_data.dropna(subset=["variable"])
-        split_data = split_data.reset_index(drop=True)
+        rules = rules.dropna(subset=["variable"]).reset_index(drop=True)
 
         # get the percentage of data covered by this rule
         nrows = x.shape[0]
-        for i in range(split_data.shape[0]):
+        for i in range(rules.shape[0]):
             # get the current value threshold and comparison operator
-            var_value = split_data.loc[i, "value"]
-            comp_operator = split_data.loc[i, "dir"]
-            if var_value is not None:
-                if not math.isnan(var_value):
-                    # convert the data to numeric and remove NaNs
-                    x_col = pd.to_numeric(x[split_data.loc[i, "variable"]]).dropna()
-                    # evaluate and get the percentage of data
-                    comp_total = OPERATORS[comp_operator](x_col, var_value).sum()
-                    split_data.loc[i, "percentile"] = comp_total / nrows
+            var_value = rules.loc[i, "value"]
+            comp_operator = rules.loc[i, "dir"]
+            if (var_value is not None) and (not math.isnan(var_value)):
+                # convert the data to numeric and remove NaNs
+                x_col = pd.to_numeric(x[rules.loc[i, "variable"]]).dropna()
+                # evaluate and get the percentage of data
+                comp_total = OPERATORS[comp_operator](x_col, var_value).sum()
+                rules.loc[i, "percentile"] = comp_total / nrows
 
     # get the indices of rows in model that contain model coefficients
-    is_eqn = [i for i, c in enumerate(model) if "coeff=" in c]
+    is_eqn = [i for i, c in enumerate(model) if c.startswith("coeff=")]
     # extract the model coefficients from the row
-    coefs = [_eqn(model[i], var_names=list(x.columns)) for i in is_eqn]
-    out = pd.DataFrame(coefs)
+    coeffs = [_eqn(model[i], var_names=feature_names) for i in is_eqn]
+    coeffs = pd.DataFrame(coeffs)
     # get the committee number
-    out["committee"] = [com_num[i] for i in is_eqn]
+    coeffs["committee"] = [com_num[i] for i in is_eqn]
     # get the rule number for the committee
-    out["rule"] = [rule_num[i] for i in is_eqn]
+    coeffs["rule"] = [rule_num[i] for i in is_eqn]
 
-    return split_data, out
+    return (
+        version,
+        rules,
+        coeffs,
+        model_statistics,
+        feature_statistics,
+        committee_error_reduction,
+        n_committees,
+    )
 
 
 def _type2(x, dig=3):
@@ -201,7 +232,7 @@ def _type3(x):
     return {"var": var, "val": val, "text": txt}
 
 
-def _eqn(x, var_names=None):
+def _eqn(x, var_names: list):
     x = x.replace('"', "")
     starts = [m.start(0) for m in re.finditer("(coeff=)|(att=)", x)]
     tmp = [""] * len(starts)
@@ -217,24 +248,23 @@ def _eqn(x, var_names=None):
     nms = tmp[1::2]
     nms = ["(Intercept)"] + nms
     vals = dict(zip(nms, vals))
-    if var_names:
-        vars2 = [var for var in var_names if var not in nms]
-        vals2 = [np.nan] * len(vars2)
-        vals2 = dict(zip(vars2, vals2))
-        vals = {**vals, **vals2}
-        new_names = ["(Intercept)"] + var_names
-        vals = {nm: vals[nm] for nm in new_names}
+
+    # handle column headers
+    vars2 = [var for var in var_names if var not in nms]
+    vals2 = [np.nan] * len(vars2)
+    vals2 = dict(zip(vars2, vals2))
+    vals = {**vals, **vals2}
+    new_names = ["(Intercept)"] + var_names
+    vals = {nm: vals[nm] for nm in new_names}
     return vals
 
 
 def _make_parsed_dict(x):
     x = x.split("=")
-    if len(x) > 1:
-        return {x[0]: x[1]}
-    return None
+    return {x[0]: x[1].strip('"')}
 
 
 def _parser(x):
-    x = x.split(" ")
+    x = x.split('" ')
     x = [_make_parsed_dict(c) for c in x]
     return x

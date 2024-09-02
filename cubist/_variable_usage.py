@@ -1,14 +1,14 @@
 import pandas as pd
 
 
-def _get_variable_usage(output, x):
+def _get_variable_usage(output: str, feature_names: list):
     output = output.split("\n")
     # get the attribute usage section of the model output
-    start_vars = [i for i, c in enumerate(output) if '\tAttribute usage' in c]
+    start_vars = [i for i, c in enumerate(output) if "\tAttribute usage" in c]
     # if not present raise an error
     if len(start_vars) != 1:
-        raise ValueError("cannot find attribute usage data")
-    output = output[start_vars[0]:(len(output))-2]
+        raise ValueError("Cannot find attribute usage data")
+    output = output[start_vars[0] : (len(output)) - 2]
     output = [c.replace("\t", "") for c in output]
     has_pct = [i for i, c in enumerate(output) if "%" in c]
     if len(has_pct) < 1:
@@ -18,15 +18,15 @@ def _get_variable_usage(output, x):
     values = pd.DataFrame(values, columns=["Conditions", "Model"])
     values["Variable"] = [_get_variable(c) for c in output]
 
-    if values.shape[0] < x.shape[1]:
-        x_names = set(x.columns)
+    if values.shape[0] < len(feature_names):
+        x_names = set(feature_names)
         u_names = set(values["Variable"]) if values is not None else set()
         missing_vars = list(x_names - u_names)
         if missing_vars:
             zero_list = [0] * len(missing_vars)
-            usage2 = pd.DataFrame({"Conditions": zero_list,
-                                   "Model": zero_list,
-                                   "Variable": missing_vars})
+            usage2 = pd.DataFrame(
+                {"Conditions": zero_list, "Model": zero_list, "Variable": missing_vars}
+            )
             values = pd.concat([values, usage2], axis=1)
             values = values.reset_index(drop=True)
     return values
@@ -41,7 +41,7 @@ def _get_values(x):
         return x2
     if sum(has_pct) == 1:
         pct_ind = [i for i, c in enumerate(x2) if "%" in c][0]
-        if x2[1:pct_ind+1].count("") < x2[pct_ind+1:].count(""):
+        if x2[1 : pct_ind + 1].count("") < x2[pct_ind + 1 :].count(""):
             x2 = [c for c in x2 if "%" in c][0]
             x2 = float(x2.replace("%", ""))
             return [x2, 0]

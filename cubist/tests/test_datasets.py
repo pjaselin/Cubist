@@ -9,7 +9,6 @@ from sklearn.datasets import (
     fetch_california_housing,
     make_regression,
     make_sparse_uncorrelated,
-    # fetch_openml,
 )
 from sklearn.utils.validation import check_is_fitted
 
@@ -17,6 +16,7 @@ from ..cubist import Cubist
 
 
 def test_sklearn_diabetes_nan():
+    """test diabetes dataset"""
     X, y = load_diabetes(return_X_y=True, as_frame=True)
     # randomly dropping cells with 20% probability
     X = X.mask(np.random.random(X.shape) < 0.2)
@@ -26,6 +26,7 @@ def test_sklearn_diabetes_nan():
 
 
 def test_sklearn_california_housing():
+    """test california housing"""
     X, y = fetch_california_housing(return_X_y=True, as_frame=True)
     model = Cubist()
     model.fit(X, y)
@@ -33,29 +34,33 @@ def test_sklearn_california_housing():
 
 
 def test_sklearn_regression():
-    X, y = make_regression(random_state=0)
+    """test simple regression"""
+    X, y = make_regression(random_state=0)  # pylint: disable=W0632
     model = Cubist()
     model.fit(X, y)
     check_is_fitted(model)
 
 
 def test_sklearn_sparse_uncorrelated():
+    """test sparse uncorrelated"""
     X, y = make_sparse_uncorrelated(random_state=0)
     model = Cubist()
     model.fit(X, y)
     check_is_fitted(model)
 
 
-# def test_openml_titanic():
-#     X, y = fetch_openml(
-#         "titanic", version=2, as_frame=True, return_X_y=True, parser="auto"
-#     )
-#     model = Cubist()
-#     model.fit(X, y)
-#     check_is_fitted(model)
+def test_one_model_one_committee():
+    """test one model/one committee"""
+    X, y = fetch_california_housing(return_X_y=True, as_frame=True)
+    model = Cubist(n_rules=1, n_committees=1)
+    model.fit(X, y)
+    check_is_fitted(model)
+    assert model.rules_ is not None
+    assert model.coeff_ is not None
 
 
 def test_small_ds_warning():
+    """test small dataset"""
     with pytest.warns(Warning):
         X = pd.DataFrame(
             dict(

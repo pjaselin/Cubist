@@ -1,31 +1,39 @@
 import pandas as pd
-from pandas.api.types import is_string_dtype, is_numeric_dtype, \
-    is_datetime64_any_dtype, is_complex_dtype
+from pandas.api.types import (
+    is_string_dtype,
+    is_numeric_dtype,
+    is_datetime64_any_dtype,
+    is_complex_dtype,
+)
 import numpy as np
 
 
 def _is_all_float_dtype(x: pd.Series):
     """check whether all values are of float dtype"""
-    return all(j == float or np.issubdtype(j, np.floating) for j in [type(i) for i in x.values])
+    return all(
+        j is float or np.issubdtype(j, np.floating) for j in [type(i) for i in x.values]
+    )
 
 
 def _is_all_int_dtype(x: pd.Series):
     """check whether all values are of float dtype"""
-    return all(j == int or np.issubdtype(j, np.integer) for j in [type(i) for i in x.values])
+    return all(
+        j is int or np.issubdtype(j, np.integer) for j in [type(i) for i in x.values]
+    )
 
 
 def _get_data_format(x: pd.Series):
     """
     Function to obtain the data type/formatting information for a Pandas Series.
     Return "continuous." for continuous features, the set of values as a comma
-    separated string for categorical features, and the column itself for 
+    separated string for categorical features, and the column itself for
     datetime features.
 
     Parameters
     ----------
     x : pd.Series
         Pandas Series from which to extract data type.
-    
+
     Returns
     -------
     x : str
@@ -56,7 +64,7 @@ def _quinlan_attributes(df: pd.DataFrame) -> dict:
     ----------
     df : pd.DataFrame
         Pandas DataFrame from which column data attributes are obtained.
-    
+
     Returns
     -------
     x : dict
