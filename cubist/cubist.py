@@ -309,7 +309,7 @@ class Cubist(BaseEstimator, RegressorMixin):
 
         # set the feature names if it hasn't already been done
         if not hasattr(self, "feature_names_in_"):
-            self.feature_names_in_ = [f"var{i}" for i in range(X.shape[1])]  # noqa W0201
+            self.feature_names_in_ = [f"var{i}" for i in range(X.shape[1])]  # noqa W0201, pylint: disable=W0201
 
         # check to see if any of the feature names are empty
         if any(n == "" or pd.isnull(n) for n in self.feature_names_in_):
@@ -321,9 +321,9 @@ class Cubist(BaseEstimator, RegressorMixin):
         # check sample weighting
         if sample_weight is not None:
             sample_weight = _check_sample_weight(sample_weight, X)
-            self.is_sample_weighted_ = True  # noqa W0201
+            self.is_sample_weighted_ = True  # noqa W0201, pylint: disable=W0201
         else:
-            self.is_sample_weighted_ = False  # noqa W0201
+            self.is_sample_weighted_ = False  # noqa W0201, pylint: disable=W0201
 
         n_rules = self._check_n_rules()
         n_committees = self._check_n_committees()
@@ -336,9 +336,9 @@ class Cubist(BaseEstimator, RegressorMixin):
         random_state = check_random_state(self.random_state)
 
         # number of input features
-        self.n_features_in_ = X.shape[1]  # noqa W0201
+        self.n_features_in_ = X.shape[1]  # noqa W0201, pylint: disable=W0201
         # number of outputs is 1 (single output regression)
-        self.n_outputs_ = 1  # noqa W0201
+        self.n_outputs_ = 1  # noqa W0201, pylint: disable=W0201
 
         # (re)construct a dataframe from X
         X = pd.DataFrame(X, columns=self.feature_names_in_)
@@ -366,7 +366,7 @@ class Cubist(BaseEstimator, RegressorMixin):
         )
 
         # convert output from raw to strings
-        self.model_ = model.decode()
+        self.model_ = model.decode()  # pylint: disable=W0201
         output = output.decode()
 
         # raise Cubist training errors
@@ -391,9 +391,9 @@ class Cubist(BaseEstimator, RegressorMixin):
         # replace "__Sample" with "sample" if this is used in the model
         if "\n_Sample" in names_string:
             output = output.replace("_Sample", "sample")
-            self.model_ = self.model_.replace("_Sample", "sample")
+            self.model_ = self.model_.replace("_Sample", "sample")  # pylint: disable=W0201
             # clean model string when using reserved sample name
-            self.model_ = (
+            self.model_ = (  # pylint: disable=W0201
                 self.model_[: self.model_.index("sample")]
                 + self.model_[self.model_.index("entries") :]
             )
@@ -405,14 +405,24 @@ class Cubist(BaseEstimator, RegressorMixin):
             data_string = "1"
 
         # compress and save descriptors/data
-        self.names_string_ = zlib.compress(names_string.encode())  # noqa W0201
-        self.data_string_ = zlib.compress(data_string.encode())  # noqa W0201
+        self.names_string_ = zlib.compress(names_string.encode())  # noqa W0201, pylint: disable=W0201
+        self.data_string_ = zlib.compress(data_string.encode())  # noqa W0201, pylint: disable=W0201
 
         # parse model contents and store useful information
-        self.rules_, self.coeff_ = _parse_model(self.model_, X)  # noqa W0201
+        (  # noqa W0201, pylint: disable=W0201
+            self.version_,
+            self.rules_,
+            self.coeff_,
+            self.model_statistics_,
+            self.feature_statistics_,
+            self.committee_error_reduction_,
+            self.n_committees_used_,
+        ) = _parse_model(self.model_, X, list(self.feature_names_in_))
 
         # get the input data variable usage
-        self.feature_importances_ = _get_variable_usage(output, X)  # noqa W0201
+        self.feature_importances_ = _get_variable_usage(
+            output, list(self.feature_names_in_)
+        )  # noqa W0201, pylint: disable=W0201
 
         # get the names of columns that have no nan values
         is_na_col = ~self.coeff_.isna().any()
@@ -423,12 +433,14 @@ class Cubist(BaseEstimator, RegressorMixin):
 
         # store a dictionary containing all the training dataset columns and
         # those that were used by the model
-        if self.rules_ is not None:
-            used_variables = set(self.rules_["variable"]).union(set(not_na_cols))
-            self.variables_ = {
-                "all": list(self.feature_names_in_),
-                "used": list(used_variables),
-            }
+        used_variables = set(self.rules_.variable[self.rules_.variable != ""]).union(
+            set(not_na_cols)
+        )
+        self.variables_ = {  # pylint: disable=W0201
+            "all": list(self.feature_names_in_),
+            "used": list(used_variables),
+        }
+
         return self
 
     def predict(self, X):
