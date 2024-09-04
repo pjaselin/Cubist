@@ -435,7 +435,7 @@ class Cubist(BaseEstimator, RegressorMixin):
         # store a dictionary containing all the training dataset columns and
         # those that were used by the model
         # TODO: this is communicating the variables used in splits but not the ones used as coefficients
-        if not self.splits_.empty():
+        if not self.splits_.empty:
             used_variables = set(
                 self.splits_.variable[self.splits_.variable != ""]
             ).union(set(not_na_cols))
