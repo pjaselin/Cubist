@@ -55,7 +55,7 @@ def test_one_model_one_committee():
     model = Cubist(n_rules=1, n_committees=1)
     model.fit(X, y)
     check_is_fitted(model)
-    assert model.rules_ is not None
+    assert model.splits_ is not None
     assert model.coeff_ is not None
 
 

@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "cubist"
-version = "0.2.0"
+version = "1.0.0"
 authors = [
   {name = "John Ross Quinlan"},
   {name = "Max Kuhn"},
@@ -36,7 +36,7 @@ dependencies = [
 
 [project.optional-dependencies]
 dev = ["pre-commit", "pytest", "ruff", "coverage"]
-viz = []
+viz = ["matplotlib"]
 
 [project.urls]
 Homepage = "https://github.com/pjaselin/Cubist"

@@ -103,11 +103,12 @@ class Cubist(BaseEstimator, RegressorMixin):
         for which the attribute appears in the linear formula of an applicable
         rule.
 
-    rules_ : pd.DataFrame
-        Table of the rules built by the Cubist model.
+    splits_ : pd.DataFrame
+        Table of the splits built by the Cubist model for each rule.
 
     coeff_ : pd.DataFrame
-        Table of the regression coefficients found by the Cubist model.
+        Table of the regression coefficients found by the Cubist model for each
+        rule.
 
     variables_ : dict
         Information about all the variables passed to the model and those that
@@ -411,7 +412,7 @@ class Cubist(BaseEstimator, RegressorMixin):
         # parse model contents and store useful information
         (  # noqa W0201, pylint: disable=W0201
             self.version_,
-            self.rules_,
+            self.splits_,
             self.coeff_,
             self.model_statistics_,
             self.feature_statistics_,
@@ -420,9 +421,9 @@ class Cubist(BaseEstimator, RegressorMixin):
         ) = _parse_model(self.model_, X, list(self.feature_names_in_))
 
         # get the input data variable usage
-        self.feature_importances_ = _get_variable_usage(
+        self.feature_importances_ = _get_variable_usage(  # noqa W0201, pylint: disable=W0201
             output, list(self.feature_names_in_)
-        )  # noqa W0201, pylint: disable=W0201
+        )
 
         # get the names of columns that have no nan values
         is_na_col = ~self.coeff_.isna().any()
@@ -433,7 +434,7 @@ class Cubist(BaseEstimator, RegressorMixin):
 
         # store a dictionary containing all the training dataset columns and
         # those that were used by the model
-        used_variables = set(self.rules_.variable[self.rules_.variable != ""]).union(
+        used_variables = set(self.splits_.variable[self.splits_.variable != ""]).union(
             set(not_na_cols)
         )
         self.variables_ = {  # pylint: disable=W0201
@@ -459,7 +460,7 @@ class Cubist(BaseEstimator, RegressorMixin):
         """
         # make sure the model has been fitted
         check_is_fitted(
-            self, attributes=["model_", "rules_", "coeff_", "feature_importances_"]
+            self, attributes=["model_", "splits_", "coeff_", "feature_importances_"]
         )
 
         # validate input data

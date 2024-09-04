@@ -31,7 +31,7 @@ def _make_names_string(x, w=None, label="outcome"):
 
     # clean reserved sample name if it's in x
     has_sample = [i for i, c in enumerate(x.columns) if bool(re.search("^sample", c))]
-    if has_sample:
+    if has_sample != []:
         x.columns = [re.sub("^sample", "_Sample", c) for c in x.columns]
 
     # generate the comments string showing the Python version and current timestamps

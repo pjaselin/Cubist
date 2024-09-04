@@ -122,20 +122,9 @@ def _parse_model(model: str, x, feature_names: list):
     # if there are no continuous or categorical splits, return no splits
     if not is_type2 and not is_type3:
         # there is only one rule
-        rules = pd.DataFrame(
-            {
-                "committee": [1],
-                "rule": [1],
-                "variable": [""],
-                "dir": [""],
-                "value": [""],
-                "category": [""],
-                "type": [""],
-                "percentile": [1.0],
-            }
-        )
+        splits = pd.DataFrame()
     else:
-        rules = pd.DataFrame(
+        splits = pd.DataFrame(
             {
                 "committee": com_num,
                 "rule": rule_num,
@@ -148,20 +137,20 @@ def _parse_model(model: str, x, feature_names: list):
         )
 
         # remove missing values based on the variable column
-        rules = rules.dropna(subset=["variable"]).reset_index(drop=True)
+        splits = splits.dropna(subset=["variable"]).reset_index(drop=True)
 
         # get the percentage of data covered by this rule
         nrows = x.shape[0]
-        for i in range(rules.shape[0]):
+        for i in range(splits.shape[0]):
             # get the current value threshold and comparison operator
-            var_value = rules.loc[i, "value"]
-            comp_operator = rules.loc[i, "dir"]
+            var_value = splits.loc[i, "value"]
+            comp_operator = splits.loc[i, "dir"]
             if (var_value is not None) and (not math.isnan(var_value)):
                 # convert the data to numeric and remove NaNs
-                x_col = pd.to_numeric(x[rules.loc[i, "variable"]]).dropna()
+                x_col = pd.to_numeric(x[splits.loc[i, "variable"]]).dropna()
                 # evaluate and get the percentage of data
                 comp_total = OPERATORS[comp_operator](x_col, var_value).sum()
-                rules.loc[i, "percentile"] = comp_total / nrows
+                splits.loc[i, "percentile"] = comp_total / nrows
 
     # get the indices of rows in model that contain model coefficients
     is_eqn = [i for i, c in enumerate(model) if c.startswith("coeff=")]
@@ -175,7 +164,7 @@ def _parse_model(model: str, x, feature_names: list):
 
     return (
         version,
-        rules,
+        splits,
         coeffs,
         model_statistics,
         feature_statistics,

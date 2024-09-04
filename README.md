@@ -15,6 +15,20 @@ A Python package for fitting Quinlan's [Cubist](https://www.rulequest.com/cubist
 pip install --upgrade cubist
 ```
 
+### Optional Dependencies
+
+To enable visualization utilities:
+
+```bash
+pip install cubist[viz]
+```
+
+For developing:
+
+```bash
+pip install cubist[dev]
+```
+
 ## Background
 
 Cubist is a regression algorithm develped by John Ross Quinlan for generating rule-based predictive models. This has been available in the R world thanks to the work of Max Kuhn and his colleagues. It is introduced to Python with this package and made scikit-learn compatible for easy use with existing model pipelines. Cross-validation and control over whether Cubist creates a composite model is also enabled here.
@@ -71,7 +85,7 @@ The following parameters can be passed as arguments to the ```Cubist()``` class 
 The following attributes are exposed to understand the Cubist model results:
 
 - version_ (str): The Cubist model version.
-- rules_ (pd.DataFrame): Table of the rules built by the Cubist model and the percentage of data for which each rule condition applies.
+- splits_ (pd.DataFrame): Table of the splits creating by the Cubist model and the percentage of data for which each condition applies.
 - coeff_ (pd.DataFrame): Table of the regression coefficients found by the Cubist model.
 - model_statistics_ (dict): Model statistics (e.g. global mean, extrapolation %, ceiling value, floor value)
 - features_statistics_ (pd.DataFrame): Statistics about dataset features.
