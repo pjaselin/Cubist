@@ -10,6 +10,26 @@
 
 A Python package for fitting Quinlan's [Cubist](https://www.rulequest.com/cubist-unix.html) v2.07 regression model. Inspired by and based on the [R wrapper](https://github.com/topepo/Cubist) for Cubist. Designed after and inherits from the [scikit-learn](https://scikit-learn.org/stable/) framework.
 
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
+
+- [Installation](#installation)
+  - [Optional Dependencies](#optional-dependencies)
+- [Background](#background)
+- [Advantages](#advantages)
+- [Use](#use)
+- [Sample Output](#sample-output)
+- [Model Parameters](#model-parameters)
+- [Considerations](#considerations)
+- [Model Attributes](#model-attributes)
+- [Benchmarks](#benchmarks)
+- [Literature for Cubist](#literature-for-cubist)
+- [Publications Using Cubist](#publications-using-cubist)
+- [To Do](#to-do)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 ## Installation
 
 ```bash
@@ -32,7 +52,7 @@ pip install cubist[dev]
 
 ## Background
 
-Cubist is a regression algorithm develped by John Ross Quinlan for generating rule-based predictive models. This has been available in the R world thanks to the work of Max Kuhn and his colleagues. It is introduced to Python with this package and made scikit-learn compatible for easy use with existing model pipelines. Cross-validation and control over whether Cubist creates a composite model is also enabled here.
+Cubist is a regression algorithm developed by John Ross Quinlan for generating rule-based predictive models. This has been available in the R world thanks to the work of Max Kuhn and his colleagues. It is introduced to Python with this package and made scikit-learn compatible for easy use with existing model pipelines. Cross-validation and control over whether Cubist creates a composite model is also enabled here.
 
 ## Advantages
 
@@ -58,7 +78,7 @@ model.score(X, y)
 
 ![Sample Cubist output for Iris dataset](./www/iris_cubist_output.png)
 
-The above image is a sample of the verbose output produced by Cubist. It first reports the total number of _cases_ (rows) and _attributes_ (columns) in the training dataset. Below that it summarizes the model by _committee_ (if used but not in this sample) and _rule_ where each rule is definined by an if..then statement along with metrics for this rule in the training data and the linear regression equation used for each rule. The _if_ section of each rule identifies the training input columns and feature value ranges for which this rule holds true. The _then_ statement shows the linear regressor for this rule. The model performance is then summarized by the average and relative absolute errors as well as with the Pearson correlation coefficient r. Finally, the output reports the usage of training features in the model and rules as well as the time taken to complete training.
+The above image is a sample of the verbose output produced by Cubist. It first reports the total number of *cases* (rows) and *attributes* (columns) in the training dataset. Below that it summarizes the model by *committee* (if used but not in this sample) and *rule* where each rule is definined by an if..then statement along with metrics for this rule in the training data and the linear regression equation used for each rule. The *if* section of each rule identifies the training input columns and feature value ranges for which this rule holds true. The *then* statement shows the linear regressor for this rule. The model performance is then summarized by the average and relative absolute errors as well as with the Pearson correlation coefficient r. Finally, the output reports the usage of training features in the model and rules as well as the time taken to complete training.
 
 ## Model Parameters
 

@@ -23,3 +23,11 @@ repos:
     rev: v0.14.0
     hooks:
     - id: markdownlint-cli2
+  - repo: https://github.com/thlorenz/doctoc
+    rev: v2.2.0
+    hooks:
+    - id: doctoc
+  - repo: https://github.com/crate-ci/typos
+    rev: v1.25.0
+    hooks:
+    - id: typos
