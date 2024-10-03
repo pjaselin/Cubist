@@ -25,7 +25,8 @@ A Python package for fitting Quinlan's [Cubist](https://www.rulequest.com/cubist
   - [Considerations](#considerations)
 - [Benchmarks](#benchmarks)
 - [Literature for Cubist](#literature-for-cubist)
-- [Publications Using Cubist](#publications-using-cubist)
+  - [Original Paper](#original-paper)
+  - [Publications Using Cubist](#publications-using-cubist)
 - [To Do](#to-do)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
@@ -122,9 +123,11 @@ There are many literature examples demonstrating the power of Cubist and compari
 
 ## Literature for Cubist
 
+### Original Paper
+
 - [Learning with Continuous Classes](https://sci2s.ugr.es/keel/pdf/algorithm/congreso/1992-Quinlan-AI.pdf)
 
-## Publications Using Cubist
+### Publications Using Cubist
 
 - [Cubist in Use](https://www.rulequest.com/cubist-pubs.html)
 - [A Machine Learning Example in R using Cubist](https://www.linkedin.com/pulse/machine-learning-example-r-using-cubist-kirk-mettler)
