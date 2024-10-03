@@ -22,7 +22,7 @@ A Python package for fitting Quinlan's [Cubist](https://www.rulequest.com/cubist
   - [Sample Output](#sample-output)
   - [Model Parameters](#model-parameters)
   - [Model Attributes](#model-attributes)
-- [Considerations](#considerations)
+  - [Considerations](#considerations)
 - [Benchmarks](#benchmarks)
 - [Literature for Cubist](#literature-for-cubist)
 - [Publications Using Cubist](#publications-using-cubist)
@@ -111,7 +111,7 @@ The following attributes are exposed to understand the Cubist model results:
 - feature_importances_ (pd.DataFrame): Table of how training data variables are used in the Cubist model.
 - feature_names_in_ (list): List of features used to train Cubist.
 
-## Considerations
+### Considerations
 
 - For small datasets, using the `sample` parameter is probably inadvisable because Cubist won't have enough samples to produce a representative model.
 - If you are looking for fast inferencing and can spare accuracy, skip using a composite model by not setting a value for `neighbors`.
