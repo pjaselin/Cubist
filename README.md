@@ -6,6 +6,7 @@
 [![License](https://img.shields.io/pypi/l/cubist.svg)](https://pypi.python.org/pypi/cubist)
 [![PyPI - Python Version](https://img.shields.io/pypi/pyversions/cubist.svg)](https://pypi.org/project/cubist)
 [![PyPI - Downloads](https://img.shields.io/pypi/dm/cubist)](https://pypi.org/project/cubist)
+[![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit)](https://github.com/pre-commit/pre-commit)
 
 A Python package for fitting Quinlan's [Cubist](https://www.rulequest.com/cubist-unix.html) v2.07 regression model. Inspired by and based on the [R wrapper](https://github.com/topepo/Cubist) for Cubist. Designed after and inherits from the [scikit-learn](https://scikit-learn.org/stable/) framework.
 
@@ -44,10 +45,10 @@ In addition to boosting, the model can perform instance-based (nearest-neighbor)
 ## Use
 
 ```python
-from sklearn.datasets import fetch_california_housing
+from sklearn.datasets import load_iris
 from cubist import Cubist
-X, y = fetch_california_housing(return_X_y=True, as_frame=True)
-model = Cubist() # <- model parameters here
+X, y = load_iris(return_X_y=True, as_frame=True)
+model = Cubist()  # <- model parameters here, e.g. verbose=1
 model.fit(X, y)
 model.predict(X)
 model.score(X, y)
