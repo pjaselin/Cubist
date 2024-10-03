@@ -21,8 +21,8 @@ A Python package for fitting Quinlan's [Cubist](https://www.rulequest.com/cubist
 - [Use](#use)
   - [Sample Output](#sample-output)
   - [Model Parameters](#model-parameters)
+  - [Model Attributes](#model-attributes)
 - [Considerations](#considerations)
-- [Model Attributes](#model-attributes)
 - [Benchmarks](#benchmarks)
 - [Literature for Cubist](#literature-for-cubist)
 - [Publications Using Cubist](#publications-using-cubist)
@@ -96,12 +96,7 @@ The following parameters can be passed as arguments to the ```Cubist()``` class 
 - target_label (str, default="outcome"): A label for the outcome variable. This is only used for printing rules.
 - verbose (int, default=0) Should the Cubist output be printed? 1 if yes, 0 if no.
 
-## Considerations
-
-- For small datasets, using the `sample` parameter is probably inadvisable because Cubist won't have enough samples to produce a representative model.
-- If you are looking for fast inferencing and can spare accuracy, skip using a composite model by not setting a value for `neighbors`.
-
-## Model Attributes
+### Model Attributes
 
 The following attributes are exposed to understand the Cubist model results:
 
@@ -115,6 +110,11 @@ The following attributes are exposed to understand the Cubist model results:
 - variables_ (dict): Information about all the variables passed to the model and those that were actually used.
 - feature_importances_ (pd.DataFrame): Table of how training data variables are used in the Cubist model.
 - feature_names_in_ (list): List of features used to train Cubist.
+
+## Considerations
+
+- For small datasets, using the `sample` parameter is probably inadvisable because Cubist won't have enough samples to produce a representative model.
+- If you are looking for fast inferencing and can spare accuracy, skip using a composite model by not setting a value for `neighbors`.
 
 ## Benchmarks
 
