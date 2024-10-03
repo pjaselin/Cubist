@@ -19,8 +19,8 @@ A Python package for fitting Quinlan's [Cubist](https://www.rulequest.com/cubist
 - [Background](#background)
 - [Advantages](#advantages)
 - [Use](#use)
-- [Sample Output](#sample-output)
-- [Model Parameters](#model-parameters)
+  - [Sample Output](#sample-output)
+  - [Model Parameters](#model-parameters)
 - [Considerations](#considerations)
 - [Model Attributes](#model-attributes)
 - [Benchmarks](#benchmarks)
@@ -74,13 +74,13 @@ model.predict(X)
 model.score(X, y)
 ```
 
-## Sample Output
+### Sample Output
 
 ![Sample Cubist output for Iris dataset](./www/iris_cubist_output.png)
 
 The above image is a sample of the verbose output produced by Cubist. It first reports the total number of *cases* (rows) and *attributes* (columns) in the training dataset. Below that it summarizes the model by *committee* (if used but not in this sample) and *rule* where each rule is definined by an if..then statement along with metrics for this rule in the training data and the linear regression equation used for each rule. The *if* section of each rule identifies the training input columns and feature value ranges for which this rule holds true. The *then* statement shows the linear regressor for this rule. The model performance is then summarized by the average and relative absolute errors as well as with the Pearson correlation coefficient r. Finally, the output reports the usage of training features in the model and rules as well as the time taken to complete training.
 
-## Model Parameters
+### Model Parameters
 
 The following parameters can be passed as arguments to the ```Cubist()``` class instantiation:
 
