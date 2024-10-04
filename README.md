@@ -15,6 +15,7 @@ A Python package for fitting Quinlan's [Cubist](https://www.rulequest.com/cubist
 **Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
 
 - [Installation](#installation)
+  - [Model-Only](#model-only)
   - [Optional Dependencies](#optional-dependencies)
 - [Background](#background)
 - [Advantages](#advantages)
@@ -31,6 +32,8 @@ A Python package for fitting Quinlan's [Cubist](https://www.rulequest.com/cubist
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 ## Installation
+
+### Model-Only
 
 ```bash
 pip install --upgrade cubist
