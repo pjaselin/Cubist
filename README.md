@@ -47,7 +47,7 @@ To enable visualization utilities:
 pip install cubist[viz]
 ```
 
-For developing:
+For development:
 
 ```bash
 pip install cubist[dev]
