@@ -149,3 +149,6 @@ cython_debug/
 sample_data/
 notebooks/
 .ruff_cache/
+
+# images produced from matplotlib tests
+**/*.png
