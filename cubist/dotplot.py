@@ -154,39 +154,39 @@ def dotplot(
                 math.ceil(n_subplots_xy), math.floor(n_subplots_xy), hspace=0, wspace=0
             )
             ax = gs.subplots(sharex="col", sharey="row")
+            ax = ax.reshape(-1)
         fig.suptitle(f"Sharing x per column, y per row {lab}")
     else:
-        coefs = model.coeff_.copy()
-        if coefs.empty:
+        coeffs = model.coeff_.copy()
+        if coeffs.empty:
             # showing a message and stop here
             warn("No coefficients were used in this model")
             return
 
-        coefs = pd.melt(coefs, id_vars=["committee", "rule"])
-        coefs = coefs.loc[coefs.notna().all(axis="columns")]
+        coeffs = pd.melt(coeffs, id_vars=["committee", "rule"])
+        coeffs = coeffs.loc[coeffs.notna().all(axis="columns")]
 
-        if coefs.committee.max() == 1:
+        if coeffs.committee.max() == 1:
             lab = "Rule"
-            coefs["label"] = coefs.rule.apply(lambda x: str(x).replace(" ", "0"))
+            coeffs["label"] = coeffs.rule.apply(lambda x: str(x).replace(" ", "0"))
         else:
             lab = "Committee/Rule"
-            coefs["label"] = coefs.apply(
+            coeffs["label"] = coeffs.apply(
                 lambda x: f"{x.committee.replace(' ', '0')}/{x.rule.replace(' ', '0')}",
                 axis=1,
             )
         if ax is None:
             fig = plt.figure()
-            n_subplots_xy = math.sqrt(coefs.variable.nunique())
+            n_subplots_xy = math.sqrt(coeffs.variable.nunique())
             gs = fig.add_gridspec(
                 math.ceil(n_subplots_xy), math.floor(n_subplots_xy), hspace=0, wspace=0
             )
             ax = gs.subplots(sharex="col", sharey="row")
             ax = ax.reshape(-1)
-            # print(ax)
 
-        for i, var in enumerate(list(coefs.variable.unique())):
-            ax[i].scatter("value", "label", data=coefs[coefs.variable == var])
+        for i, var in enumerate(list(coeffs.variable.unique())):
+            ax[i].scatter("value", "label", data=coeffs[coeffs.variable == var])
             ax[i].set_title(var)
-        print(coefs)
+        print(coeffs)
 
     return ax
