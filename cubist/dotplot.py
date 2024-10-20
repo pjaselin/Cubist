@@ -191,7 +191,7 @@ def dotplot(
             ax[i].scatter("value", "label", data=coeffs[coeffs.variable == var])
             ax[i].set_title(var)
 
-        fig.supxlabel("Value")
+        fig.supxlabel("Coefficient Value")
         fig.supylabel(lab)
         fig.suptitle(f"Model Coefficients by {lab} and Variable")
         # TODO: make the x and y axis ticks match range and number of ticks/splits
