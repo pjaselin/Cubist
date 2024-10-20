@@ -112,7 +112,7 @@ def dotplot(
     #     fig = plt.figure()
     #     gs = fig.add_gridspec(3, hspace=0)
     #     ax = gs.subplots(sharex=True, sharey=True)
-    print(model.splits_)
+
     if what == "splits":
         splits = model.splits_.copy()
         if splits.empty:
@@ -179,7 +179,10 @@ def dotplot(
             fig = plt.figure()
             n_subplots_xy = math.sqrt(coeffs.variable.nunique())
             gs = fig.add_gridspec(
-                math.ceil(n_subplots_xy), math.floor(n_subplots_xy), hspace=0, wspace=0
+                math.ceil(n_subplots_xy),
+                math.floor(n_subplots_xy),
+                hspace=0.3,
+                wspace=0,
             )
             ax = gs.subplots(sharex="col", sharey="row")
             ax = ax.reshape(-1)
@@ -187,6 +190,11 @@ def dotplot(
         for i, var in enumerate(list(coeffs.variable.unique())):
             ax[i].scatter("value", "label", data=coeffs[coeffs.variable == var])
             ax[i].set_title(var)
+
+        fig.supxlabel("Value")
+        fig.supylabel(lab)
+        fig.suptitle(f"Model Coefficients by {lab} and Variable")
+        # TODO: make the x and y axis ticks match range and number of ticks/splits
         print(coeffs)
 
     return ax
