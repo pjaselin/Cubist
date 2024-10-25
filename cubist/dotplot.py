@@ -125,12 +125,12 @@ def dotplot(
                 raise TypeError(
                     f"`committee` must be an integer but got {type(committee)}"
                 )
-            splits = splits[splits.committee <= committee]
+            splits = splits.loc[splits.committee <= committee]
 
         if rule is not None:
             if not isinstance(rule, int):
                 raise TypeError(f"`rule` must be an integer but got {type(rule)}")
-            splits = splits[splits.rule <= rule]
+            splits = splits.loc[splits.rule <= rule]
 
         if splits.committee.max() == 1:
             lab = "Rule"
@@ -188,7 +188,7 @@ def dotplot(
             ax = ax.reshape(-1)
 
         for i, var in enumerate(list(coeffs.variable.unique())):
-            ax[i].scatter("value", "label", data=coeffs[coeffs.variable == var])
+            ax[i].scatter("value", "label", data=coeffs.loc[coeffs.variable == var])
             ax[i].set_title(var)
 
         fig.supxlabel("Coefficient Value")
