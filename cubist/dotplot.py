@@ -108,11 +108,6 @@ def dotplot(
             f"Got {what!r} instead."
         )
 
-    # if ax is None:
-    #     fig = plt.figure()
-    #     gs = fig.add_gridspec(3, hspace=0)
-    #     ax = gs.subplots(sharex=True, sharey=True)
-
     if what == "splits":
         splits = model.splits_.copy()
         if splits.empty:
@@ -151,11 +146,37 @@ def dotplot(
             fig = plt.figure()
             n_subplots_xy = math.sqrt(splits.variable.nunique())
             gs = fig.add_gridspec(
-                math.ceil(n_subplots_xy), math.floor(n_subplots_xy), hspace=0, wspace=0
+                math.ceil(n_subplots_xy),
+                math.floor(n_subplots_xy),
+                hspace=0.3,
+                wspace=0,
             )
-            ax = gs.subplots(sharex="col", sharey="row")
+            ax = gs.subplots(sharex="all", sharey="all")
             ax = ax.reshape(-1)
-        fig.suptitle(f"Sharing x per column, y per row {lab}")
+
+        splits = splits.loc[splits.type == "continuous"].reset_index(drop=True)
+
+        for i, var in enumerate(list(splits.variable.unique())):
+            # add trellis lines
+            for label in sorted(list(splits.label.unique())):
+                ax[i].plot([0, 1], [label, label], color="#e9e9e9")
+                # ax[i].set_title(var)
+                ax[i].set_xlim([-0.05, 1.05])
+            # plot data
+            for _, row in splits.loc[splits.variable == var].iterrows():
+                if "<" in row["dir"]:
+                    x = [0, row["percentile"]]
+                    color = "#1E88E5"
+                else:
+                    x = [row["percentile"], 1]
+                    color = "#ff0d57"
+                ax[i].plot(x, [row["label"], row["label"]], color=color)
+                ax[i].set_title(var)
+                # ax[i].set_xlim([-0.05, 1.05])
+
+        fig.supxlabel("Training Data Coverage")
+        fig.supylabel(lab)
+        fig.suptitle(f"Training Data Coverage by {lab} and Variable")
     else:
         coeffs = model.coeff_.copy()
         if coeffs.empty:
@@ -184,7 +205,7 @@ def dotplot(
                 hspace=0.3,
                 wspace=0,
             )
-            ax = gs.subplots(sharex="col", sharey="row")
+            ax = gs.subplots(sharex="all", sharey="all")
             ax = ax.reshape(-1)
 
         for i, var in enumerate(list(coeffs.variable.unique())):
@@ -194,7 +215,5 @@ def dotplot(
         fig.supxlabel("Coefficient Value")
         fig.supylabel(lab)
         fig.suptitle(f"Model Coefficients by {lab} and Variable")
-        # TODO: make the x and y axis ticks match range and number of ticks/splits
-        print(coeffs)
 
     return ax
