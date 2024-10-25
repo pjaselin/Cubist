@@ -160,7 +160,6 @@ def dotplot(
             # add trellis lines
             for label in sorted(list(splits.label.unique())):
                 ax[i].plot([0, 1], [label, label], color="#e9e9e9")
-                # ax[i].set_title(var)
                 ax[i].set_xlim([-0.05, 1.05])
             # plot data
             for _, row in splits.loc[splits.variable == var].iterrows():
@@ -172,7 +171,6 @@ def dotplot(
                     color = "#ff0d57"
                 ax[i].plot(x, [row["label"], row["label"]], color=color)
                 ax[i].set_title(var)
-                # ax[i].set_xlim([-0.05, 1.05])
 
         fig.supxlabel("Training Data Coverage")
         fig.supylabel(lab)
@@ -183,6 +181,18 @@ def dotplot(
             # showing a message and stop here
             warn("No coefficients were used in this model")
             return
+
+        if committee is not None:
+            if not isinstance(committee, int):
+                raise TypeError(
+                    f"`committee` must be an integer but got {type(committee)}"
+                )
+            coeffs = coeffs.loc[coeffs.committee <= committee]
+
+        if rule is not None:
+            if not isinstance(rule, int):
+                raise TypeError(f"`rule` must be an integer but got {type(rule)}")
+            coeffs = coeffs.loc[coeffs.rule <= rule]
 
         coeffs = pd.melt(coeffs, id_vars=["committee", "rule"])
         coeffs = coeffs.loc[coeffs.notna().all(axis="columns")]
