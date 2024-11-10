@@ -1,7 +1,8 @@
-from sklearn.datasets import load_iris
+# from sklearn.datasets import load_iris
 from cubist import Cubist
-from cubist.dotplot import dotplot
+from cubist.dotplot import DotplotDisplay
 import matplotlib.pyplot as plt
+import pandas as pd
 
 
 # def test_dotplot_from_estimator():
@@ -13,18 +14,28 @@ import matplotlib.pyplot as plt
 
 
 def test_dotplot_coeffs():
-    X, y = load_iris(return_X_y=True, as_frame=True)
+    X = pd.read_csv(
+        "https://raw.githubusercontent.com/selva86/datasets/refs/heads/master/BostonHousing.csv"
+    )
+    y = X.medv
+    X = X.drop(columns=["medv", "dis"])
+    # X, y = load_iris(return_X_y=True, as_frame=True)
     model = Cubist()  # <- model parameters here, e.g. verbose=1
     model.fit(X, y)
 
-    dotplot(model, what="coeffs")
+    DotplotDisplay.from_estimator(model, what="coeffs")
     plt.savefig("dotplottest.png")
 
 
 def test_dotplot_splits():
-    X, y = load_iris(return_X_y=True, as_frame=True)
+    X = pd.read_csv(
+        "https://raw.githubusercontent.com/selva86/datasets/refs/heads/master/BostonHousing.csv"
+    )
+    y = X.medv
+    X = X.drop(columns=["medv", "dis"])
+    # X, y = load_iris(return_X_y=True, as_frame=True)
     model = Cubist()  # <- model parameters here, e.g. verbose=1
     model.fit(X, y)
 
-    dotplot(model, what="splits")
+    DotplotDisplay.from_estimator(model, what="splits")
     plt.savefig("testdotplotsplits.png")

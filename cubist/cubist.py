@@ -413,7 +413,7 @@ class Cubist(BaseEstimator, RegressorMixin):
         (  # noqa W0201, pylint: disable=W0201
             self.version_,
             self.splits_,
-            self.coeff_,
+            self.coeffs_,
             self.model_statistics_,
             self.feature_statistics_,
             self.committee_error_reduction_,
@@ -426,8 +426,8 @@ class Cubist(BaseEstimator, RegressorMixin):
         )
 
         # get the names of columns that have no nan values
-        is_na_col = ~self.coeff_.isna().any()
-        not_na_cols = self.coeff_.columns[is_na_col].tolist()
+        is_na_col = ~self.coeffs_.isna().any()
+        not_na_cols = self.coeffs_.columns[is_na_col].tolist()
 
         # skip the first three since these are always filled
         not_na_cols = not_na_cols[3:]

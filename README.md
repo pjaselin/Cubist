@@ -105,7 +105,7 @@ The following attributes are exposed to understand the Cubist model results:
 
 - version_ (str): The Cubist model version.
 - splits_ (pd.DataFrame): Table of the splits creating by the Cubist model and the percentage of data for which each condition applies.
-- coeff_ (pd.DataFrame): Table of the regression coefficients found by the Cubist model.
+- coeffs_ (pd.DataFrame): Table of the regression coefficients found by the Cubist model.
 - model_statistics_ (dict): Model statistics (e.g. global mean, extrapolation %, ceiling value, floor value)
 - features_statistics_ (pd.DataFrame): Statistics about dataset features.
 - committee_error_reduction_ (float): Error reduction by using committees.
