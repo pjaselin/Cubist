@@ -1,38 +1,60 @@
-# from ._base_cubist_display import BaseCubistDisplay
+import pandas as pd
+
+from .cubist import Cubist
+from ._cubist_display_mixin import CubistDisplayMixin
 
 
-# class CubistCoefficientDisplay(BaseCubistDisplay):
-#     def __init__(self):
-#         super().__init__()
+class CubistCoefficientDisplay(CubistDisplayMixin):
+    def __init__(self, *, coeffs: pd.DataFrame):
+        self.coeffs = coeffs
 
-#     def plot(ax, df):
-#         if ax is None:
-#             nplots = df.variable.nunique()
-#             nrows = ncols = int(round(math.sqrt(nplots)))
-#             if nplots > (nrows * ncols):
-#                 nrows += 1
-#             fig, ax = plt.subplots(
-#                 ncols=ncols,
-#                 nrows=nrows,
-#                 sharex="all",
-#                 sharey="all",
-#                 gridspec_kw=dict(hspace=0.5, wspace=0),
-#             )
-#             ax = ax.reshape(-1)
-#         else:
-#             fig = plt.gcf()
+    def plot(
+        self,
+        ax=None,
+        *,
+        ylabel: str = None,
+        scatter_kwargs: dict = None,
+        line_kwargs: dict = None,
+        gridspec_kwargs: dict = None,
+    ):
+        self.fig_, self.ax_ = self._make_fig(ax=ax, df=self.coeffs)
 
-#         for i, var in enumerate(list(df.variable.unique())):
-#             ax[i].scatter("value", "label", data=df.loc[df.variable == var])
-#             ax[i].set_title(var)
+        for i, var in enumerate(list(self.coeffs.variable.unique())):
+            self.ax_[i].scatter(
+                "value", "label", data=self.coeffs.loc[self.coeffs.variable == var]
+            )
+            self.ax_[i].set_title(var)
 
-#         for j in range(i + 1, ax.shape[0]):
-#             ax[j].set_axis_off()
+        for j in range(i + 1, self.ax_.shape[0]):
+            self.ax_[j].set_axis_off()
 
-#         fig.supxlabel("Coefficient Value")
-#         fig.supylabel(lab)
-#         fig.suptitle(f"Model Coefficients by {lab} and Variable")
+        self.fig_.supxlabel("Coefficient Value")
+        self.fig_.supylabel(ylabel)
+        self.fig_.suptitle(f"Model Coefficients by {ylabel} and Variable")
 
-#     @classmethod
-#     def from_predictions(cls, estimator):
-#         return super()._from_predictions("splits", estimator)
+    @classmethod
+    def from_estimator(
+        cls,
+        estimator: Cubist,
+        committee: int = None,
+        rule: int = None,
+        ax=None,
+        scatter_kwargs=None,
+        line_kwargs=None,
+        gridspec_kwargs=None,
+    ):
+        df = estimator.splits_.copy()
+
+        df, ylabel = cls._validate_from_estimator_params(
+            df=df, committee=committee, rule=rule
+        )
+
+        viz = cls(coeffs=df)
+
+        return viz.plot(
+            ax=ax,
+            ylabel=ylabel,
+            scatter_kwargs=scatter_kwargs,
+            line_kwargs=line_kwargs,
+            gridspec_kwargs=gridspec_kwargs,
+        )

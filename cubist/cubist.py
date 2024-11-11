@@ -462,7 +462,7 @@ class Cubist(BaseEstimator, RegressorMixin):
         """
         # make sure the model has been fitted
         check_is_fitted(
-            self, attributes=["model_", "splits_", "coeff_", "feature_importances_"]
+            self, attributes=["model_", "splits_", "coeffs_", "feature_importances_"]
         )
 
         # validate input data

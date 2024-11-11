@@ -56,7 +56,7 @@ def test_one_model_one_committee():
     model.fit(X, y)
     check_is_fitted(model)
     assert model.splits_ is not None
-    assert model.coeff_ is not None
+    assert model.coeffs_ is not None
 
 
 def test_small_ds_warning():
