@@ -15,7 +15,8 @@ into existing sklearn-based ML pipelines or scripts for experimenting.
 """
 
 from .cubist import Cubist
-from .dotplot import DotplotDisplay
+from .cubist_coefficient_display import CubistCoefficientDisplay
+from .cubist_coverage_display import CubistCoverageDisplay
 from .exceptions import CubistError
 
-__all__ = ["Cubist", "DotplotDisplay", "CubistError"]
+__all__ = ["Cubist", "CubistCoefficientDisplay", "CubistCoverageDisplay", "CubistError"]
