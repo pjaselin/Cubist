@@ -9,7 +9,9 @@ except Exception:
 
 
 class CubistDisplayMixin:
-    def _make_fig(self, *, ax=None, df: pd.DataFrame = None):
+    def _validate_plot_params(
+        self, *, ax=None, df: pd.DataFrame = None, gridspec_kwargs: dict = None
+    ):
         check_matplotlib_support(f"{self.__class__.__name__}.plot")
         import matplotlib.pyplot as plt
 
@@ -23,7 +25,7 @@ class CubistDisplayMixin:
                 nrows=nrows,
                 sharex="all",
                 sharey="all",
-                gridspec_kw=dict(hspace=0.5, wspace=0),
+                gridspec_kw=dict(hspace=0.5, wspace=0) | gridspec_kwargs,
             )
             ax = ax.reshape(-1)
         else:

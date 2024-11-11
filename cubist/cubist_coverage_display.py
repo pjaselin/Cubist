@@ -17,7 +17,9 @@ class CubistCoverageDisplay(CubistDisplayMixin):
         line_kwargs: dict = None,
         gridspec_kwargs: dict = None,
     ):
-        self.fig_, self.ax_ = self._make_fig(ax=ax, df=self.splits)
+        self.fig_, self.ax_ = self._validate_plot_params(
+            ax=ax, df=self.splits, gridspec_kwargs=gridspec_kwargs
+        )
 
         for i, var in enumerate(list(self.splits.variable.unique())):
             # add trellis lines

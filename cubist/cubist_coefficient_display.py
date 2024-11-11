@@ -17,7 +17,9 @@ class CubistCoefficientDisplay(CubistDisplayMixin):
         line_kwargs: dict = None,
         gridspec_kwargs: dict = None,
     ):
-        self.fig_, self.ax_ = self._make_fig(ax=ax, df=self.coeffs)
+        self.fig_, self.ax_ = self._validate_plot_params(
+            ax=ax, df=self.coeffs, gridspec_kwargs=gridspec_kwargs
+        )
 
         for i, var in enumerate(list(self.coeffs.variable.unique())):
             self.ax_[i].scatter(
