@@ -4,7 +4,7 @@ import pandas as pd
 
 try:
     from sklearn.utils._optional_dependencies import check_matplotlib_support
-except Exception:
+except ImportError:
     from sklearn.utils import check_matplotlib_support
 
 
