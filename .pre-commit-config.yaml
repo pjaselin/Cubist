@@ -32,7 +32,3 @@ repos:
     hooks:
       - id: typos
         args: []
-  # - repo: https://github.com/hhatto/autopep8
-  #   rev: v2.3.1
-  #   hooks:
-  #     - id: autopep8
