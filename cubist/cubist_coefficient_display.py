@@ -31,7 +31,7 @@ class CubistCoefficientDisplay(CubistDisplayMixin):
             )
             self.ax_[i].set_title(var)
 
-        for j in range(i + 1, self.ax_.shape[0]):
+        for j in range(i + 1, self.ax_.shape[0]):  # noqa W0631, pylint: disable=W0631
             self.ax_[j].set_axis_off()
 
         self.fig_.supxlabel("Coefficient Value")
