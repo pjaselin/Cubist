@@ -22,6 +22,9 @@ class CubistCoefficientDisplay(_CubistDisplayMixin):
             ax=ax, df=self.coeffs, gridspec_kwargs=gridspec_kwargs
         )
 
+        if scatter_kwargs is None:
+            scatter_kwargs = {}
+
         for i, var in enumerate(list(self.coeffs.variable.unique())):
             self.ax_[i].scatter(
                 "value",

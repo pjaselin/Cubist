@@ -22,6 +22,9 @@ class CubistCoverageDisplay(_CubistDisplayMixin):
             ax=ax, df=self.splits, gridspec_kwargs=gridspec_kwargs
         )
 
+        if line_kwargs is None:
+            line_kwargs = {}
+
         for i, var in enumerate(list(self.splits.variable.unique())):
             # add trellis lines
             for label in sorted(list(self.splits.label.unique())):
@@ -40,7 +43,7 @@ class CubistCoverageDisplay(_CubistDisplayMixin):
                 )
                 self.ax_[i].set_title(var)
 
-        for j in range(i + 1, ax.shape[0]):  # noqa W0631, pylint: disable=W0631
+        for j in range(i + 1, self.ax_.shape[0]):  # noqa W0631, pylint: disable=W0631
             self.ax_[j].set_axis_off()
 
         self.fig_.supxlabel("Training Data Coverage")

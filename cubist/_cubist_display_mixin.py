@@ -15,6 +15,9 @@ class _CubistDisplayMixin:
         check_matplotlib_support(f"{self.__class__.__name__}.plot")
         import matplotlib.pyplot as plt
 
+        if gridspec_kwargs is None:
+            gridspec_kwargs = {}
+
         if ax is None:
             nplots = df.variable.nunique()
             nrows = ncols = int(round(math.sqrt(nplots)))
