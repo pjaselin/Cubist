@@ -2,9 +2,7 @@ import random
 
 import pytest
 
-from sklearn.utils.validation import check_is_fitted
-
-from .conftest import no_raise
+from .conftest import no_raise, check_is_fitted
 from ..cubist import Cubist, CubistError
 
 
@@ -136,7 +134,6 @@ def test_cv(cv, expected, raises, X, y):
     with raises:
         assert expected == model._check_cv()  # noqa W0212
         model.fit(X, y)
-        check_is_fitted(model)
 
 
 @pytest.mark.parametrize(

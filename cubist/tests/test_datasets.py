@@ -10,8 +10,8 @@ from sklearn.datasets import (
     make_regression,
     make_sparse_uncorrelated,
 )
-from sklearn.utils.validation import check_is_fitted
 
+from .conftest import check_is_fitted
 from ..cubist import Cubist
 
 
