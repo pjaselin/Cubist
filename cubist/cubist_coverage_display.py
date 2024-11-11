@@ -13,7 +13,6 @@ class CubistCoverageDisplay(CubistDisplayMixin):
         ax=None,
         *,
         ylabel: str = None,
-        scatter_kwargs: dict = None,
         line_kwargs: dict = None,
         gridspec_kwargs: dict = None,
     ):
@@ -24,7 +23,7 @@ class CubistCoverageDisplay(CubistDisplayMixin):
         for i, var in enumerate(list(self.splits.variable.unique())):
             # add trellis lines
             for label in sorted(list(self.splits.label.unique())):
-                self.ax_[i].plot([0, 1], [label, label], color="#e9e9e9")
+                self.ax_[i].plot([0, 1], [label, label], color="#e9e9e9", **line_kwargs)
                 self.ax_[i].set_xlim([-0.05, 1.05])
             # plot data
             for _, row in self.splits.loc[self.splits.variable == var].iterrows():
@@ -34,7 +33,9 @@ class CubistCoverageDisplay(CubistDisplayMixin):
                 else:
                     x = [row["percentile"], 1]
                     color = "#ff0d57"
-                self.ax_[i].plot(x, [row["label"], row["label"]], color=color)
+                self.ax_[i].plot(
+                    x, [row["label"], row["label"]], color=color, **line_kwargs
+                )
                 self.ax_[i].set_title(var)
 
         for j in range(i + 1, ax.shape[0]):
@@ -53,7 +54,6 @@ class CubistCoverageDisplay(CubistDisplayMixin):
         committee: int = None,
         rule: int = None,
         ax=None,
-        scatter_kwargs=None,
         line_kwargs=None,
         gridspec_kwargs=None,
     ):
@@ -68,7 +68,6 @@ class CubistCoverageDisplay(CubistDisplayMixin):
         return viz.plot(
             ax=ax,
             ylabel=ylabel,
-            scatter_kwargs=scatter_kwargs,
             line_kwargs=line_kwargs,
             gridspec_kwargs=gridspec_kwargs,
         )

@@ -14,7 +14,6 @@ class CubistCoefficientDisplay(CubistDisplayMixin):
         *,
         ylabel: str = None,
         scatter_kwargs: dict = None,
-        line_kwargs: dict = None,
         gridspec_kwargs: dict = None,
     ):
         self.fig_, self.ax_ = self._validate_plot_params(
@@ -23,7 +22,10 @@ class CubistCoefficientDisplay(CubistDisplayMixin):
 
         for i, var in enumerate(list(self.coeffs.variable.unique())):
             self.ax_[i].scatter(
-                "value", "label", data=self.coeffs.loc[self.coeffs.variable == var]
+                "value",
+                "label",
+                data=self.coeffs.loc[self.coeffs.variable == var],
+                **scatter_kwargs,
             )
             self.ax_[i].set_title(var)
 
@@ -42,7 +44,6 @@ class CubistCoefficientDisplay(CubistDisplayMixin):
         rule: int = None,
         ax=None,
         scatter_kwargs=None,
-        line_kwargs=None,
         gridspec_kwargs=None,
     ):
         df = estimator.splits_.copy()
@@ -57,6 +58,5 @@ class CubistCoefficientDisplay(CubistDisplayMixin):
             ax=ax,
             ylabel=ylabel,
             scatter_kwargs=scatter_kwargs,
-            line_kwargs=line_kwargs,
             gridspec_kwargs=gridspec_kwargs,
         )
