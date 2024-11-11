@@ -23,6 +23,9 @@ A Python package for fitting Quinlan's [Cubist](https://www.rulequest.com/cubist
   - [Sample Output](#sample-output)
   - [Model Parameters](#model-parameters)
   - [Model Attributes](#model-attributes)
+  - [Visualization Utilities](#visualization-utilities)
+    - [Coefficient Display](#coefficient-display)
+    - [Coverage Display](#coverage-display)
   - [Considerations](#considerations)
 - [Benchmarks](#benchmarks)
 - [Literature for Cubist](#literature-for-cubist)
@@ -113,6 +116,12 @@ The following attributes are exposed to understand the Cubist model results:
 - variables_ (dict): Information about all the variables passed to the model and those that were actually used.
 - feature_importances_ (pd.DataFrame): Table of how training data variables are used in the Cubist model.
 - feature_names_in_ (list): List of features used to train Cubist.
+
+### Visualization Utilities
+
+#### Coefficient Display
+
+#### Coverage Display
 
 ### Considerations
 
