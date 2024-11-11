@@ -1,10 +1,10 @@
 import pandas as pd
 
 from .cubist import Cubist
-from ._cubist_display_mixin import CubistDisplayMixin
+from ._cubist_display_mixin import _CubistDisplayMixin
 
 
-class CubistCoefficientDisplay(CubistDisplayMixin):
+class CubistCoefficientDisplay(_CubistDisplayMixin):
     def __init__(self, *, coeffs: pd.DataFrame):
         self.coeffs = coeffs
         self.fig_ = None

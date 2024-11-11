@@ -8,7 +8,7 @@ except ImportError:
     from sklearn.utils import check_matplotlib_support
 
 
-class CubistDisplayMixin:
+class _CubistDisplayMixin:
     def _validate_plot_params(
         self, *, ax=None, df: pd.DataFrame = None, gridspec_kwargs: dict = None
     ):

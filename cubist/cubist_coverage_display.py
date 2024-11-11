@@ -1,10 +1,10 @@
 import pandas as pd
 
 from .cubist import Cubist
-from ._cubist_display_mixin import CubistDisplayMixin
+from ._cubist_display_mixin import _CubistDisplayMixin
 
 
-class CubistCoverageDisplay(CubistDisplayMixin):
+class CubistCoverageDisplay(_CubistDisplayMixin):
     def __init__(self, *, splits: pd.DataFrame):
         self.splits = splits
         self.fig_ = None
