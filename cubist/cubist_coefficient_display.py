@@ -7,6 +7,8 @@ from ._cubist_display_mixin import CubistDisplayMixin
 class CubistCoefficientDisplay(CubistDisplayMixin):
     def __init__(self, *, coeffs: pd.DataFrame):
         self.coeffs = coeffs
+        self.fig_ = None
+        self.ax_ = None
 
     def plot(
         self,

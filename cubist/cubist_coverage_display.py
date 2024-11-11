@@ -7,6 +7,8 @@ from ._cubist_display_mixin import CubistDisplayMixin
 class CubistCoverageDisplay(CubistDisplayMixin):
     def __init__(self, *, splits: pd.DataFrame):
         self.splits = splits
+        self.fig_ = None
+        self.ax_ = None
 
     def plot(
         self,
