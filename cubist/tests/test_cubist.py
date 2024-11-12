@@ -129,7 +129,8 @@ def test_sample(sample, raises, X, y):
         (0, None, pytest.raises(ValueError)),
     ],
 )
-def test_cv(cv, expected, raises, X, y):
+def test_cv(cv, expected, raises, X, y):  # pylint: disable=C0103
+    """test `cv` parameter"""
     model = Cubist(cv=cv)
     with raises:
         assert expected == model._check_cv()  # noqa W0212, pylint: disable=W0212
@@ -145,7 +146,8 @@ def test_cv(cv, expected, raises, X, y):
         ("1234", 5, "", pytest.raises(TypeError)),
     ],
 )
-def test_auto(auto, n, expected, raises, X, y):
+def test_auto(auto, n, expected, raises, X, y):  # pylint: disable=C0103,R0913
+    """test `auto` parameter"""
     model = Cubist(auto=auto)
     with raises:
         assert expected == model._check_composite(n)  # noqa W0212, pylint: disable=W0212
@@ -157,7 +159,8 @@ def test_auto(auto, n, expected, raises, X, y):
     "i, raises",
     [(0, no_raise()), (5, pytest.raises(ValueError)), (1, pytest.raises(ValueError))],
 )
-def test_missing_column_name(i, raises, X, y):
+def test_missing_column_name(i, raises, X, y):  # pylint: disable=C0103
+    """test for where a column name is an empty string"""
     model = Cubist()
     # get the column names as a list
     col_names = list(X.columns)
@@ -171,7 +174,8 @@ def test_missing_column_name(i, raises, X, y):
         check_is_fitted(model)
 
 
-def test_verbose(capfd, X, y):
+def test_verbose(capfd, X, y):  # pylint: disable=C0103
+    """test to make sure verbose parameter prints to stdout"""
     model = Cubist(verbose=True)
     model.fit(X, y)
     out, _ = capfd.readouterr()
