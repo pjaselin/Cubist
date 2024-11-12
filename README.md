@@ -113,7 +113,6 @@ The following attributes are exposed to understand the Cubist model results:
 - features_statistics_ (pd.DataFrame): Statistics about dataset features.
 - committee_error_reduction_ (float): Error reduction by using committees.
 - n_committees_used_ (int): Number of committees used by Cubist.
-- variables_ (dict): Information about all the variables passed to the model and those that were actually used.
 - feature_importances_ (pd.DataFrame): Table of how training data variables are used in the Cubist model.
 - feature_names_in_ (list): List of features used to train Cubist.
 

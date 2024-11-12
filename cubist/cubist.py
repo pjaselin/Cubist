@@ -110,10 +110,6 @@ class Cubist(BaseEstimator, RegressorMixin):
         Table of the regression coefficients found by the Cubist model for each
         rule.
 
-    variables_ : dict
-        Information about all the variables passed to the model and those that
-        were actually used.
-
     Examples
     --------
     >>> from cubist import Cubist
@@ -424,25 +420,6 @@ class Cubist(BaseEstimator, RegressorMixin):
         self.feature_importances_ = _get_variable_usage(  # noqa W0201, pylint: disable=W0201
             output, list(self.feature_names_in_)
         )
-
-        # get the names of columns that have no nan values
-        is_na_col = ~self.coeffs_.isna().any()
-        not_na_cols = self.coeffs_.columns[is_na_col].tolist()
-
-        # skip the first three since these are always filled
-        not_na_cols = not_na_cols[3:]
-
-        # store a dictionary containing all the training dataset columns and
-        # those that were used by the model
-        # TODO: this is communicating the variables used in splits but not the ones used as coefficients
-        if not self.splits_.empty:
-            used_variables = set(
-                self.splits_.variable[self.splits_.variable != ""]
-            ).union(set(not_na_cols))
-            self.variables_ = {  # pylint: disable=W0201
-                "all": list(self.feature_names_in_),
-                "used": list(used_variables),
-            }
 
         return self
 
