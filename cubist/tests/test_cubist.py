@@ -197,3 +197,6 @@ def test_sample_colnames(X, y):
     model = Cubist()
     model.fit(X, y)
     check_is_fitted(model)
+
+
+# TODO: test where categories are different between predict and train groups

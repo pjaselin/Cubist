@@ -15,24 +15,24 @@ def no_raise():
 
 @pytest.fixture
 def dfs():
-    X, y = fetch_openml(
+    X, y = fetch_openml(  # pylint: disable=C0103, W0621
         "titanic", version=1, as_frame=True, return_X_y=True, parser="auto"
     )
     return (X, y)
 
 
 @pytest.fixture
-def X(dfs):
+def X(dfs):  # pylint: disable=W0621
     return dfs[0].drop(["name", "ticket", "home.dest"], axis=1)
 
 
 @pytest.fixture
-def y(dfs):
+def y(dfs):  # pylint: disable=W0621
     return dfs[1]
 
 
 @pytest.fixture
-def df_set(dfs, X, y):
+def df_set(dfs, X, y):  # pylint: disable=W0621
     return {"dfs": dfs, "(X, y)": (X, y)}
 
 
