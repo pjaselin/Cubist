@@ -64,7 +64,7 @@ def test_n_committees(n_committees, raises, X, y):
 def test_neighbors(neighbors, auto, expected, raises, X, y):
     model = Cubist(neighbors=neighbors, auto=auto)
     with raises:
-        assert expected == model._check_neighbors()  # noqa W0212
+        assert expected == model._check_neighbors()  # noqa W0212, pylint: disable=W0212
         model.fit(X, y)
         check_is_fitted(model)
 
@@ -132,7 +132,7 @@ def test_sample(sample, raises, X, y):
 def test_cv(cv, expected, raises, X, y):
     model = Cubist(cv=cv)
     with raises:
-        assert expected == model._check_cv()  # noqa W0212
+        assert expected == model._check_cv()  # noqa W0212, pylint: disable=W0212
         model.fit(X, y)
 
 
@@ -148,7 +148,7 @@ def test_cv(cv, expected, raises, X, y):
 def test_auto(auto, n, expected, raises, X, y):
     model = Cubist(auto=auto)
     with raises:
-        assert expected == model._check_composite(n)  # noqa W0212
+        assert expected == model._check_composite(n)  # noqa W0212, pylint: disable=W0212
         model.fit(X, y)
         check_is_fitted(model)
 
