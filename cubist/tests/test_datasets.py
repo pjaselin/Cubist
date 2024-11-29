@@ -1,3 +1,5 @@
+"""test Cubist against a variety of datasets"""
+
 import random
 
 import pytest
@@ -18,9 +20,9 @@ from ..cubist import Cubist, CubistError
 
 def test_sklearn_diabetes_nan():
     """test diabetes dataset"""
-    X, y = load_diabetes(return_X_y=True, as_frame=True)
+    X, y = load_diabetes(return_X_y=True, as_frame=True)  # pylint: disable=C0103
     # randomly dropping cells with 20% probability
-    X = X.mask(np.random.random(X.shape) < 0.2)
+    X = X.mask(np.random.random(X.shape) < 0.2)  # pylint: disable=C0103
     model = Cubist()
     model.fit(X, y)
     check_is_fitted(model)
@@ -28,7 +30,7 @@ def test_sklearn_diabetes_nan():
 
 def test_sklearn_california_housing():
     """test california housing"""
-    X, y = fetch_california_housing(return_X_y=True, as_frame=True)
+    X, y = fetch_california_housing(return_X_y=True, as_frame=True)  # pylint: disable=C0103
     model = Cubist()
     model.fit(X, y)
     check_is_fitted(model)
@@ -36,7 +38,7 @@ def test_sklearn_california_housing():
 
 def test_sklearn_regression():
     """test simple regression"""
-    X, y = make_regression(random_state=0)  # pylint: disable=W0632
+    X, y = make_regression(random_state=0)  # pylint: disable=W0632,C0103
     model = Cubist()
     model.fit(X, y)
     check_is_fitted(model)
@@ -44,7 +46,7 @@ def test_sklearn_regression():
 
 def test_sklearn_sparse_uncorrelated():
     """test sparse uncorrelated"""
-    X, y = make_sparse_uncorrelated(random_state=0)
+    X, y = make_sparse_uncorrelated(random_state=0)  # pylint: disable=C0103
     model = Cubist()
     model.fit(X, y)
     check_is_fitted(model)
@@ -52,7 +54,7 @@ def test_sklearn_sparse_uncorrelated():
 
 def test_one_model_one_committee():
     """test one model/one committee"""
-    X, y = fetch_california_housing(return_X_y=True, as_frame=True)
+    X, y = fetch_california_housing(return_X_y=True, as_frame=True)  # pylint: disable=C0103
     model = Cubist(n_rules=1, n_committees=1)
     model.fit(X, y)
     check_is_fitted(model)
@@ -63,7 +65,7 @@ def test_one_model_one_committee():
 def test_small_ds_warning():
     """test small dataset"""
     with pytest.warns(Warning):
-        X = pd.DataFrame(
+        X = pd.DataFrame(  # pylint: disable=C0103
             {
                 "a": pd.Series(random.sample(range(10, 30), 5)),
                 "b": pd.Series(random.sample(range(10, 30), 5)),
@@ -77,16 +79,17 @@ def test_small_ds_warning():
 
 
 def test_undefined_cases():
-    X, y = load_diabetes(return_X_y=True, as_frame=True)
+    """catch when undefined cases are raised"""
+    X, y = load_diabetes(return_X_y=True, as_frame=True)  # pylint: disable=C0103
 
-    X_train, X_test, y_train, _ = train_test_split(
+    X_train, X_test, y_train, _ = train_test_split(  # pylint: disable=C0103
         X, y, test_size=0.33, random_state=42
     )
 
     new_col = np.array([random.choice("AB") for i in range(y_train.shape[0])]).reshape(
         (y_train.shape[0], 1)
     )
-    X_train = np.hstack((X_train, new_col))
+    X_train = np.hstack((X_train, new_col))  # pylint: disable=C0103
 
     model = Cubist()
     model.fit(X_train, y_train)
@@ -96,9 +99,8 @@ def test_undefined_cases():
         (X_test.shape[0], 1)
     )
 
-    X_test = np.hstack((X_test, new_col))
+    X_test = np.hstack((X_test, new_col))  # pylint: disable=C0103
 
     with pytest.raises(CubistError) as e:
         y = model.predict(X_test)
-
         assert "undefined.cases" in str(e)
