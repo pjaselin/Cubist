@@ -1,3 +1,5 @@
+"""test Cubist configuration"""
+
 import random
 
 import pytest
@@ -23,7 +25,8 @@ def test_model_instance(expected_output):
         ("asdf", pytest.raises(TypeError)),
     ],
 )
-def test_n_rules(n_rules, raises, X, y):
+def test_n_rules(n_rules, raises, X, y):  # pylint: disable=C0103
+    """test `n_rules` parameter"""
     model = Cubist(n_rules=n_rules)
     with raises:
         model.fit(X, y)
@@ -41,7 +44,8 @@ def test_n_rules(n_rules, raises, X, y):
         ("asdf", pytest.raises(TypeError)),
     ],
 )
-def test_n_committees(n_committees, raises, X, y):
+def test_n_committees(n_committees, raises, X, y):  # pylint: disable=C0103
+    """test `n_committees` parameter"""
     model = Cubist(n_committees=n_committees)
     with raises:
         model.fit(X, y)
@@ -61,7 +65,8 @@ def test_n_committees(n_committees, raises, X, y):
         (5, True, None, pytest.raises(ValueError)),
     ],
 )
-def test_neighbors(neighbors, auto, expected, raises, X, y):
+def test_neighbors(neighbors, auto, expected, raises, X, y):  # pylint: disable=C0103,R0913,R0917
+    """test `neighbors` parameter"""
     model = Cubist(neighbors=neighbors, auto=auto)
     with raises:
         assert expected == model._check_neighbors()  # noqa W0212, pylint: disable=W0212
@@ -78,7 +83,8 @@ def test_neighbors(neighbors, auto, expected, raises, X, y):
         ("aasdf", pytest.raises(TypeError)),
     ],
 )
-def test_unbiased(unbiased, raises, X, y):
+def test_unbiased(unbiased, raises, X, y):  # pylint: disable=C0103
+    """test `unbiased` parameter"""
     model = Cubist(unbiased=unbiased)
     with raises:
         model.fit(X, y)
@@ -95,7 +101,8 @@ def test_unbiased(unbiased, raises, X, y):
         (1, pytest.raises(TypeError)),
     ],
 )
-def test_extrapolation(extrapolation, raises, X, y):
+def test_extrapolation(extrapolation, raises, X, y):  # pylint: disable=C0103
+    """test `extrapolation` parameter"""
     model = Cubist(extrapolation=extrapolation)
     with raises:
         model.fit(X, y)
@@ -113,7 +120,8 @@ def test_extrapolation(extrapolation, raises, X, y):
         (0, pytest.raises(TypeError)),
     ],
 )
-def test_sample(sample, raises, X, y):
+def test_sample(sample, raises, X, y):  # pylint: disable=C0103
+    """test `sample` parameter"""
     model = Cubist(sample=sample)
     with raises:
         model.fit(X, y)
@@ -146,7 +154,7 @@ def test_cv(cv, expected, raises, X, y):  # pylint: disable=C0103
         ("1234", 5, "", pytest.raises(TypeError)),
     ],
 )
-def test_auto(auto, n, expected, raises, X, y):  # pylint: disable=C0103,R0913
+def test_auto(auto, n, expected, raises, X, y):  # pylint: disable=C0103,R0913,R0917
     """test `auto` parameter"""
     model = Cubist(auto=auto)
     with raises:
@@ -190,13 +198,15 @@ def test_verbose(capfd, X, y):  # pylint: disable=C0103
     ],
 )
 def test_training_errors(df_set_name, raises, df_set):
+    """test catching training errors"""
     with raises:
         model = Cubist()
         model.fit(*df_set[df_set_name])
         check_is_fitted(model)
 
 
-def test_sample_colnames(X, y):
+def test_sample_colnames(X, y):  # pylint: disable=C0103
+    """test using the word 'sample' as a column name"""
     X.columns = [random.choice(["sample", "Sample"]) + col for col in list(X.columns)]
     model = Cubist()
     model.fit(X, y)
