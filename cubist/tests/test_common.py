@@ -7,4 +7,5 @@ from ..cubist import Cubist
 
 @parametrize_with_checks([Cubist()])
 def test_sklearn_compatible_estimator(estimator, check):
+    """perform common scikit-learn estimator tests"""
     return check(estimator)
