@@ -15,7 +15,7 @@ from _cubist import _cubist, _predictions  # noqa E0611 # pylint: disable=E0611
 from ._make_names_string import _make_names_string
 from ._make_data_string import _make_data_string
 from ._parse_model import _parse_model
-from ._variable_usage import _get_variable_usage
+from ._variable_usage import _variable_usage
 from .exceptions import CubistError
 
 
@@ -417,7 +417,7 @@ class Cubist(BaseEstimator, RegressorMixin):
         ) = _parse_model(self.model_, X, list(self.feature_names_in_))
 
         # get the input data variable usage
-        self.feature_importances_ = _get_variable_usage(  # noqa W0201, pylint: disable=W0201
+        self.feature_importances_ = _variable_usage(  # noqa W0201, pylint: disable=W0201
             output, list(self.feature_names_in_)
         )
 
