@@ -1,4 +1,5 @@
-"""Shared pytest fixtures: https://docs.pytest.org/en/stable/reference/fixtures.html#conftest-py-sharing-fixtures-across-multiple-files"""
+"""Shared pytest fixtures:
+https://docs.pytest.org/en/stable/reference/fixtures.html#conftest-py-sharing-fixtures-across-multiple-files"""
 
 from contextlib import contextmanager
 
@@ -26,7 +27,7 @@ def dfs():
 
 
 @pytest.fixture
-def X(dfs):  # pylint: disable=W0621
+def X(dfs):  # pylint: disable=W0621,C0103
     """fixture for X array of titanic dataset"""
     return dfs[0].drop(["name", "ticket", "home.dest"], axis=1)
 
@@ -38,7 +39,7 @@ def y(dfs):  # pylint: disable=W0621
 
 
 @pytest.fixture
-def df_set(dfs, X, y):  # pylint: disable=W0621
+def df_set(dfs, X, y):  # pylint: disable=W0621,C0103
     """fixture for dictionary of titanic dataset"""
     return {"dfs": dfs, "(X, y)": (X, y)}
 
