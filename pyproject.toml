@@ -52,6 +52,7 @@ filterwarnings = "ignore:np.asscalar:DeprecationWarning"
 
 [tool.coverage.run]
 branch = true
+omit = ["*/tests/*"]
 
 [tool.coverage.report]
 skip_covered = true

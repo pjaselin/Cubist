@@ -469,13 +469,13 @@ class Cubist(BaseEstimator, RegressorMixin):
         )
 
         # decode output
-        output = output.decode()
+        if output := output.decode():
+            # raise Cubist prediction errors
+            if "***" in output or "Error" in output:
+                raise CubistError(output)
 
-        # raise Cubist prediction errors
-        if "***" in output or "Error" in output:
-            raise CubistError(output)
-
-        if output:
-            print(output)
+            # if using verbose mode, print the output
+            if self.verbose:
+                print(output)
 
         return pred

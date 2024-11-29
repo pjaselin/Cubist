@@ -4,7 +4,7 @@ import pandas as pd
 
 try:
     from sklearn.utils._optional_dependencies import check_matplotlib_support
-except ImportError:
+except ImportError:  # pragma: no cover
     from sklearn.utils import check_matplotlib_support
 
 
@@ -24,20 +24,27 @@ class _CubistDisplayMixin:
             gridspec_kwargs = {}
 
         if ax is None:
+            # number of plots to be created
             nplots = df.variable.nunique()
+            # get the number of columns and rows required to create this many plots as a square-ish grid
             nrows = ncols = int(round(math.sqrt(nplots)))
+            # if the square root of the number of plots rounds down
+            # then add 1 to the number of rows
             if nplots > (nrows * ncols):
                 nrows += 1
+            # create subplots with ncols/nrows, sharing the x and y axes, and merging in gridspec configurations
             fig, ax = plt.subplots(
                 ncols=ncols,
                 nrows=nrows,
                 sharex="all",
                 sharey="all",
-                gridspec_kw=dict(hspace=0.5, wspace=0) | gridspec_kwargs,
+                gridspec_kw={"hspace": 0.5, "wspace": 0} | gridspec_kwargs,
             )
+            # ax is a numpy array and so we reshape it to one dimension for simpler processing
             ax = ax.reshape(-1)
+        # if ax is provided, get the current figure
         else:
-            fig = plt.gcf()  # or ax.figure?
+            fig = plt.gcf()
         return fig, ax
 
     @classmethod
@@ -45,15 +52,6 @@ class _CubistDisplayMixin:
         cls, *, df: pd.DataFrame = None, committee: int = None, rule: int = None
     ):
         check_matplotlib_support(f"{cls.__name__}.from_estimator")
-
-        # get rows that are continuous-type splits
-        df = df.loc[df.type == "continuous"].reset_index(drop=True)
-
-        # if none of the rows were continuous-type splits, break here
-        if df.empty:
-            raise ValueError(
-                "No splits of continuous predictors were used in this model"
-            )
 
         # if the committee parameter is passed
         if committee is not None:
@@ -76,17 +74,13 @@ class _CubistDisplayMixin:
         if df.committee.max() == 1:
             # if there is only one committee, this is a rule-only model
             ylabel = "Rule"
-            df["label"] = df.rule.astype(str).str.replace(" ", "0", regex=False)
+            df["label"] = df.rule.astype(str)
         else:
             # otherwise report by committee and rule
             ylabel = "Committee/Rule"
-            df["label"] = (
-                df[["committee", "rule"]]
-                .astype(str)
-                .apply(
-                    lambda x: f"{x.committee.str.replace(' ', '0', regex=False)}/{x.rule.str.replace(' ', '0', regex=False)}",
-                    axis=1,
-                )
+            df["label"] = df[["committee", "rule"]].apply(
+                lambda x: f"{x.committee}/{x.rule}",
+                axis=1,
             )
 
         return df, ylabel

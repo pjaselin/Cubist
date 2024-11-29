@@ -183,7 +183,7 @@ def _type2(x, dig=3):
     val_ind = x.find("val=")
 
     missing_rule = cut_ind < 1 and val_ind > 0
-    if missing_rule:
+    if missing_rule:  # TODO: is this supposed to indicate continuous rules?
         var = x[att_ind + 4 : cut_ind - 1]
         val = None
         result = "="

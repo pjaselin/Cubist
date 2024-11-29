@@ -7,8 +7,6 @@ from ._cubist_display_mixin import _CubistDisplayMixin
 class CubistCoverageDisplay(_CubistDisplayMixin):
     def __init__(self, *, splits: pd.DataFrame):
         self.splits = splits
-        self.fig_ = None
-        self.ax_ = None
 
     def plot(
         self,
@@ -40,7 +38,7 @@ class CubistCoverageDisplay(_CubistDisplayMixin):
         display : :class:`~cubist.CubistCoefficientDisplay`
             Object that stores computed values.
         """
-        self.fig_, self.ax_ = self._validate_plot_params(
+        self.figure_, self.ax_ = self._validate_plot_params(
             ax=ax, df=self.splits, gridspec_kwargs=gridspec_kwargs
         )
 
@@ -73,9 +71,9 @@ class CubistCoverageDisplay(_CubistDisplayMixin):
         for j in range(i + 1, self.ax_.shape[0]):  # noqa W0631, pylint: disable=W0631
             self.ax_[j].set_axis_off()
 
-        self.fig_.supxlabel("Training Data Coverage")
-        self.fig_.supylabel(ylabel)
-        self.fig_.suptitle(f"Training Data Coverage by {ylabel} and Variable")
+        self.figure_.supxlabel("Training Data Coverage")
+        self.figure_.supylabel(ylabel)
+        self.figure_.suptitle(f"Training Data Coverage by {ylabel} and Variable")
 
         return self
 
@@ -90,6 +88,15 @@ class CubistCoverageDisplay(_CubistDisplayMixin):
         gridspec_kwargs=None,
     ):
         df = estimator.splits_.copy()
+
+        # get rows that are continuous-type splits
+        df = df.loc[df.type == "continuous"]
+
+        # if none of the rows were continuous-type splits, break here
+        if df.empty:
+            raise ValueError(
+                "No splits of continuous predictors were used in this model"
+            )
 
         df, ylabel = cls._validate_from_estimator_params(
             df=df, committee=committee, rule=rule
