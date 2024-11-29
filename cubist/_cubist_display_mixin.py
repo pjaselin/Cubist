@@ -1,3 +1,5 @@
+"""base class for Cubist plotting utilities"""
+
 import math
 
 import pandas as pd
@@ -8,17 +10,18 @@ except ImportError:  # pragma: no cover
     from sklearn.utils import check_matplotlib_support
 
 
-class _CubistDisplayMixin:
+class _CubistDisplayMixin:  # pylint: disable=R0903
     """Mixin class to be used in Displays for Cubist.
 
-    The aim of this class is to centralize some validations for generating the matplotlib figure and axes as well as for processing the data to be plotted.
+    The aim of this class is to centralize some validations for generating the
+    matplotlib figure and axes as well as for processing the data to be plotted.
     """
 
     def _validate_plot_params(
         self, *, ax=None, df: pd.DataFrame = None, gridspec_kwargs: dict = None
     ):
         check_matplotlib_support(f"{self.__class__.__name__}.plot")
-        import matplotlib.pyplot as plt
+        import matplotlib.pyplot as plt  # pylint: disable=C0415
 
         if gridspec_kwargs is None:
             gridspec_kwargs = {}
@@ -26,13 +29,15 @@ class _CubistDisplayMixin:
         if ax is None:
             # number of plots to be created
             nplots = df.variable.nunique()
-            # get the number of columns and rows required to create this many plots as a square-ish grid
+            # get the number of columns and rows required to create this many
+            # plots as a square-ish grid
             nrows = ncols = int(round(math.sqrt(nplots)))
             # if the square root of the number of plots rounds down
             # then add 1 to the number of rows
             if nplots > (nrows * ncols):
                 nrows += 1
-            # create subplots with ncols/nrows, sharing the x and y axes, and merging in gridspec configurations
+            # create subplots with ncols/nrows, sharing the x and y axes, and
+            # merging in gridspec configurations
             fig, ax = plt.subplots(
                 ncols=ncols,
                 nrows=nrows,
