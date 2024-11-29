@@ -1,3 +1,5 @@
+"""tests for utility functions"""
+
 import pytest
 
 from .conftest import no_raise
@@ -20,5 +22,6 @@ from .._utils import _format
     ],
 )
 def test_format(val, raises, returns):
+    """test formatting numeric values"""
     with raises:
         assert _format(val) == returns
