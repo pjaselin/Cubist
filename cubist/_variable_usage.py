@@ -1,8 +1,11 @@
 import pandas as pd
 
 
-def _variable_usage(output: str, feature_names: list):
+def _variable_usage(output: str, feature_names: list | set):
+    # split output at newline character
     output = output.split("\n")
+    # convert feature_names to set
+    feature_names = set(feature_names)
     # get the attribute usage section of the model output
     start_vars = [i for i, c in enumerate(output) if "\tAttribute usage" in c]
     # if not present raise an error
@@ -19,10 +22,8 @@ def _variable_usage(output: str, feature_names: list):
     values["Variable"] = [_get_variable(c) for c in output]
 
     if values.shape[0] < len(feature_names):
-        x_names = set(feature_names)
         u_names = set(values["Variable"]) if values is not None else set()
-        missing_vars = list(x_names - u_names)
-        if missing_vars:
+        if missing_vars := list(feature_names - u_names):
             zero_list = [0] * len(missing_vars)
             usage2 = pd.DataFrame(
                 {"Conditions": zero_list, "Model": zero_list, "Variable": missing_vars}

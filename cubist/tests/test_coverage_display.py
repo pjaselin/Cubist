@@ -1,26 +1,21 @@
-# from sklearn.datasets import load_iris
-from cubist import Cubist, CubistCoverageDisplay
+"""test for CubistCoverageDisplay"""
+
 import matplotlib.pyplot as plt
 import pandas as pd
 import pytest
 
-
-# def test_dotplot_from_estimator():
-#     DotplotDisplay.from_estimator()
-
-
-# def test_dotplot_from_predictions():
-#     DotplotDisplay.from_predictions()
+from cubist import Cubist, CubistCoverageDisplay
 
 
 def test_coverage_display():
+    """test creating plot"""
     X = pd.read_csv(
         "https://raw.githubusercontent.com/selva86/datasets/refs/heads/master/BostonHousing.csv"
     )
     y = X.medv
     X = X.drop(columns=["medv", "dis"])
-    # X, y = load_iris(return_X_y=True, as_frame=True)
-    model = Cubist()  # <- model parameters here, e.g. verbose=1
+
+    model = Cubist()
     model.fit(X, y)
 
     CubistCoverageDisplay.from_estimator(model)
@@ -28,19 +23,20 @@ def test_coverage_display():
 
 
 def test_coverage_display_line_kwargs():
+    """test line_kwargs parameter"""
     X = pd.read_csv(
         "https://raw.githubusercontent.com/selva86/datasets/refs/heads/master/BostonHousing.csv"
     )
     y = X.medv
     X = X.drop(columns=["medv", "dis"])
-    # X, y = load_iris(return_X_y=True, as_frame=True)
-    model = Cubist()  # <- model parameters here, e.g. verbose=1
+    model = Cubist()
     model.fit(X, y)
 
     CubistCoverageDisplay.from_estimator(model, line_kwargs={"linewidth": 2})
 
 
 def test_validate_from_estimator_params_empty_dataframe():
+    """test checking for empty dataframe"""
     X = pd.read_csv(
         "https://raw.githubusercontent.com/selva86/datasets/refs/heads/master/BostonHousing.csv"
     )
@@ -53,17 +49,3 @@ def test_validate_from_estimator_params_empty_dataframe():
     model.splits_.type = "categorical"
     with pytest.raises(ValueError):
         CubistCoverageDisplay.from_estimator(model, line_kwargs={"linewidth": 2})
-
-
-# def test_dotplot_splits():
-# X = pd.read_csv(
-#     "https://raw.githubusercontent.com/selva86/datasets/refs/heads/master/BostonHousing.csv"
-# )
-# y = X.medv
-# X = X.drop(columns=["medv", "dis"])
-# # X, y = load_iris(return_X_y=True, as_frame=True)
-# model = Cubist()  # <- model parameters here, e.g. verbose=1
-# model.fit(X, y)
-
-# DotplotDisplay.from_estimator(model, what="splits")
-# plt.savefig("testdotplotsplits.png")

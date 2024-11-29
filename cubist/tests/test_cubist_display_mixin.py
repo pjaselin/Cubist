@@ -55,4 +55,4 @@ def test_validate_from_estimator_params_invalid_rule():
 
     display = _CubistDisplayMixin()
     with pytest.raises(TypeError):
-        display._validate_from_estimator_params(df=model.splits_, rule=2.0)
+        display._validate_from_estimator_params(df=model.splits_, rule=2.0)  # pylint: disable=W0212
