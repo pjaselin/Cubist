@@ -107,7 +107,7 @@ The following parameters can be passed as arguments to the ```Cubist()``` class 
 The following attributes are exposed to understand the Cubist model results:
 
 - version_ (str): The Cubist model version.
-- splits_ (pd.DataFrame): Table of the splits creating by the Cubist model and the percentage of data for which each condition applies.
+- splits_ (pd.DataFrame): Table of the splits created by the Cubist model and the percentage of data for which each condition applies.
 - coeffs_ (pd.DataFrame): Table of the regression coefficients found by the Cubist model.
 - model_statistics_ (dict): Model statistics (e.g. global mean, extrapolation %, ceiling value, floor value)
 - features_statistics_ (pd.DataFrame): Statistics about dataset features.
@@ -126,6 +126,7 @@ The following attributes are exposed to understand the Cubist model results:
 
 - For small datasets, using the `sample` parameter is probably inadvisable because Cubist won't have enough samples to produce a representative model.
 - If you are looking for fast inferencing and can spare accuracy, skip using a composite model by not setting a value for `neighbors`.
+- Models that produce one or more rules without splits (i.e. a single linear model is created that holds true for the entire dataset), will return an empty `splits_`attribute while the coefficients will be available in the `coeffs_` attribute.
 
 ## Benchmarks
 
