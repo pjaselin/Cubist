@@ -1,3 +1,5 @@
+"""functions to create the Cubist namesv_ input"""
+
 import re
 import sys
 from datetime import datetime
@@ -7,8 +9,9 @@ from ._quinlan_attributes import _quinlan_attributes
 
 def _make_names_string(x, w=None, label="outcome"):
     """
-    Create the names string to pass to Cubist. This string contains information about Python and the time of run along
-    with the column names and their data types.
+    Create the names string to pass to Cubist. This string contains information
+    about Python and the time of run along with the column names and their data
+    types.
 
     Parameters
     ----------
