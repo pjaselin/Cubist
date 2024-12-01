@@ -1,3 +1,6 @@
+"""functions for determining the data types of input datasets in order to
+describe them for Cubist"""
+
 import pandas as pd
 from pandas.api.types import (
     is_string_dtype,
