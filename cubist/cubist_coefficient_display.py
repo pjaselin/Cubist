@@ -1,3 +1,5 @@
+"""Visualization class for the Cubist Coefficient Display"""
+
 import pandas as pd
 
 from .cubist import Cubist
@@ -52,6 +54,8 @@ class CubistCoefficientDisplay(_CubistDisplayMixin):
 
     def __init__(self, *, coeffs: pd.DataFrame):
         self.coeffs = coeffs
+        self.ax_ = None
+        self.figure_ = None
 
     def plot(
         self,
@@ -73,10 +77,12 @@ class CubistCoefficientDisplay(_CubistDisplayMixin):
             Y-axis label for plot.
 
         **gridspec_kwargs : dict
-            Additional keywords arguments passed to matplotlib `matplotlib.pyplot.subplots` function.
+            Additional keywords arguments passed to matplotlib
+            `matplotlib.pyplot.subplots` function.
 
         **scatter_kwargs : dict
-            Additional keywords arguments passed to matplotlib `matplotlib.pyplot.scatter` function.
+            Additional keywords arguments passed to matplotlib
+            `matplotlib.pyplot.scatter` function.
 
         Returns
         -------
@@ -111,7 +117,7 @@ class CubistCoefficientDisplay(_CubistDisplayMixin):
         self.figure_.suptitle(f"Model Coefficients by {ylabel} and Variable")
 
     @classmethod
-    def from_estimator(
+    def from_estimator(  # pylint: disable=R0913
         cls,
         estimator: Cubist,
         *,

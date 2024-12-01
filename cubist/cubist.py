@@ -1,3 +1,5 @@
+"""main Cubist estimator class"""
+
 import zlib
 from warnings import warn
 
@@ -15,11 +17,11 @@ from _cubist import _cubist, _predictions  # noqa E0611 # pylint: disable=E0611
 from ._make_names_string import _make_names_string
 from ._make_data_string import _make_data_string
 from ._parse_model import _parse_model
-from ._variable_usage import _variable_usage
+from ._attribute_usage import _attribute_usage
 from .exceptions import CubistError
 
 
-class Cubist(BaseEstimator, RegressorMixin):
+class Cubist(BaseEstimator, RegressorMixin):  # pylint: disable=R0902
     """
     Cubist Regression Model (Public v2.07) developed by Quinlan.
 
@@ -125,7 +127,7 @@ class Cubist(BaseEstimator, RegressorMixin):
     >>> model.score(X_test, y_test)
     """
 
-    def __init__(
+    def __init__(  # pylint: disable=R0913
         self,
         n_rules: int = 500,
         *,
@@ -187,7 +189,8 @@ class Cubist(BaseEstimator, RegressorMixin):
         if self.auto:
             if self.neighbors is not None:
                 raise ValueError(
-                    f"When `auto`=True, `neighbors` should be None as Cubist will choose this parameter but got {self.neighbors}."
+                    "When `auto`=True, `neighbors` should be None as Cubist ",
+                    f"will choose this parameter but got {self.neighbors}.",
                 )
             return 0
         # default value must be zero even when not used
@@ -245,7 +248,7 @@ class Cubist(BaseEstimator, RegressorMixin):
         if not isinstance(self.sample, float):
             raise TypeError(f"`sample` must be a float but got {type(self.sample)}")
         # validate sample value
-        if not (0.0 < self.sample < 1.0):
+        if not 0.0 < self.sample < 1.0:
             raise ValueError(
                 f"`sample` must be between 0.0 and 1.0 but got {self.sample}"
             )
@@ -274,7 +277,7 @@ class Cubist(BaseEstimator, RegressorMixin):
             raise ValueError(f"`cv` must be greater than 1 but got {self.cv}")
         return self.cv
 
-    def fit(self, X, y, sample_weight=None):
+    def fit(self, X, y, sample_weight=None):  # pylint: disable=C0103,R0914
         """Build a Cubist regression model from training set (X, y).
 
         Parameters
@@ -414,16 +417,16 @@ class Cubist(BaseEstimator, RegressorMixin):
             self.feature_statistics_,
             self.committee_error_reduction_,
             self.n_committees_used_,
-        ) = _parse_model(self.model_, X, list(self.feature_names_in_))
+        ) = _parse_model(self.model_, list(self.feature_names_in_))
 
         # get the input data variable usage
-        self.feature_importances_ = _variable_usage(  # noqa W0201, pylint: disable=W0201
+        self.feature_importances_ = _attribute_usage(  # noqa W0201, pylint: disable=W0201
             output, list(self.feature_names_in_)
         )
 
         return self
 
-    def predict(self, X):
+    def predict(self, X):  # pylint: disable=C0103
         """Predict Cubist regression target for X.
 
         Parameters

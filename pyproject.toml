@@ -35,7 +35,7 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-dev = ["pre-commit", "pytest", "ruff", "coverage"]
+dev = ["pre-commit", "pytest", "ruff", "coverage", "pylint"]
 viz = ["matplotlib"]
 
 [project.urls]
