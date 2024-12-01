@@ -1,3 +1,6 @@
+"""exceptions for Cubist"""
+
+
 class _Error(Exception):
     """Base class for exceptions in this module."""
 
