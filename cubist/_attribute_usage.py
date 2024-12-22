@@ -30,7 +30,7 @@ def _attribute_usage(output: str, feature_names: list | set):
             usage2 = pd.DataFrame(
                 {"Conditions": zero_list, "Model": zero_list, "Variable": missing_vars}
             )
-            values = pd.concat([values, usage2], axis=1)
+            values = pd.concat([values, usage2], axis=0)
             values = values.reset_index(drop=True)
     return values
 

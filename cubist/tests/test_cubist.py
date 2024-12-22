@@ -32,7 +32,6 @@ def test_n_rules(n_rules, raises, X, y):
     with raises:
         model.fit(X, y)
         check_is_fitted(model)
-        print(model.committee_error_reduction_, model.n_committees_used_)
 
 
 @pytest.mark.parametrize(
@@ -212,3 +211,15 @@ def test_sample_colnames(X, y):
     model = Cubist()
     model.fit(X, y)
     check_is_fitted(model)
+
+
+def test_feature_importances(X, y):
+    """test `feature_importances_` attribute"""
+    model = Cubist()
+    model.fit(X, y)
+    check_is_fitted(model)
+    assert list(model.feature_importances_.columns) == [
+        "Conditions",
+        "Model",
+        "Variable",
+    ]
