@@ -157,8 +157,16 @@ class Cubist(BaseEstimator, RegressorMixin):  # pylint: disable=R0902
         self.verbose = verbose
 
     def _more_tags(self):
-        """scikit-learn estimator configuration method"""
+        """scikit-learn estimator configuration method (retained for backwards compatibility)"""
         return {"allow_nan": True, "X_types": ["2darray", "string"]}
+
+    def __sklearn_tags__(self):
+        """scikit-learn estimator configuration method"""
+        tags = super().__sklearn_tags__()
+        tags.estimator_type = "regressor"
+        tags.input_tags.allow_nan = True
+        tags.input_tags.string = True
+        return tags
 
     def _check_n_rules(self):
         # validate number of rules
