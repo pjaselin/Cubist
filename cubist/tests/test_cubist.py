@@ -183,7 +183,7 @@ def test_missing_column_name(i, raises, X, y):
 
 def test_verbose(capfd, X, y):
     """test to make sure verbose parameter prints to stdout"""
-    model = Cubist(verbose=True)
+    model = Cubist(verbose=True, target_label="new outcome label")
     model.fit(X, y)
     out, _ = capfd.readouterr()
     assert out
