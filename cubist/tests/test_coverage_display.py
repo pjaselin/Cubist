@@ -15,7 +15,7 @@ def test_coverage_display():
     y = X.medv
     X = X.drop(columns=["medv", "dis"])
 
-    model = Cubist(n_rules=4, n_committees=1, unbiased=False, extrapolation=1.0)
+    model = Cubist(n_rules=2)
     model.fit(X, y)
 
     CubistCoverageDisplay.from_estimator(model, X)

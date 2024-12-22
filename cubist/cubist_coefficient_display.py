@@ -7,6 +7,8 @@ try:
 except ImportError:  # pragma: no cover
     from sklearn.utils import check_matplotlib_support
 
+from sklearn.utils.validation import check_is_fitted
+
 from .cubist import Cubist
 from ._cubist_display_mixin import _CubistDisplayMixin
 
@@ -14,9 +16,11 @@ from ._cubist_display_mixin import _CubistDisplayMixin
 class CubistCoefficientDisplay(_CubistDisplayMixin):
     """Visualization of the regression coefficients used in the Cubist model.
 
-    This tool can display "residuals vs predicted" or "actual vs predicted"
-    using scatter plots to qualitatively assess the behavior of a regressor,
-    preferably on held-out data points.
+    This tool plots the linear coefficients and intercepts created for a Cubist
+    model and stored in the `coeffs_` attribute. One subplot is created for
+    each variable or intercept with the rule number or committee/rule pair on
+    the y-axis. The coefficient values for the given variable and rule pair or
+    variable and committee/rule pair are plotted along the x-axis.
 
     See the details in the docstrings of
     :func:`~cubist.CubistCoefficientDisplay.from_estimator`to
@@ -26,8 +30,9 @@ class CubistCoefficientDisplay(_CubistDisplayMixin):
 
     Parameters
     ----------
-    coeffs : Pandas DataFrame of shape (n_samples,)
-        True values.
+    coeffs : pd.DataFrame
+        DataFrame containing the linear model coefficients by variable,
+        committee, and rule.
 
     Attributes
     ----------
@@ -45,14 +50,11 @@ class CubistCoefficientDisplay(_CubistDisplayMixin):
     Examples
     --------
     >>> import matplotlib.pyplot as plt
-    >>> from sklearn.datasets import load_diabetes
-    >>> from sklearn.linear_model import Ridge
-    >>> from sklearn.metrics import PredictionErrorDisplay
-    >>> X, y = load_diabetes(return_X_y=True)
-    >>> ridge = Ridge().fit(X, y)
-    >>> y_pred = ridge.predict(X)
-    >>> display = PredictionErrorDisplay(y_true=y, y_pred=y_pred)
-    >>> display.plot()
+    >>> from sklearn.datasets import load_iris
+    >>> from cubist import Cubist, CubistCoefficientDisplay
+    >>> X, y = load_iris(return_X_y=True, as_frame=True)
+    >>> model = Cubist(n_rules=2).fit(X, y)
+    >>> display = CubistCoefficientDisplay.from_estimator(estimator=model)
     <...>
     >>> plt.show()
     """
@@ -71,6 +73,9 @@ class CubistCoefficientDisplay(_CubistDisplayMixin):
         scatter_kwargs: dict = None,
     ):
         """Plot visualization.
+
+        Extra keyword arguments will be passed to matplotlib's ``subplots`` and
+        ``scatter``.
 
         Parameters
         ----------
@@ -143,11 +148,6 @@ class CubistCoefficientDisplay(_CubistDisplayMixin):
     ):
         """Plot the coefficients used in the Cubist model.
 
-        For general information regarding `scikit-learn` visualization tools,
-        read more in the :ref:`Visualization Guide <visualizations>`.
-        For details regarding interpreting these plots, refer to the
-        :ref:`Model Evaluation Guide <visualization_regression_evaluation>`.
-
         .. versionadded:: 1.0.0
 
         Parameters
@@ -180,20 +180,23 @@ class CubistCoefficientDisplay(_CubistDisplayMixin):
 
         See Also
         --------
-        CubistCoefficientDisplay :
+        CubistCoefficientDisplay : Cubist coefficient visualization.
 
         Examples
         --------
-        >>> from sklearn.datasets import load_diabetes
+        >>> import matplotlib.pyplot as plt
+        >>> from sklearn.datasets import load_iris
         >>> from cubist import Cubist, CubistCoefficientDisplay
-        >>> X, y = load_diabetes(return_X_y=True)
-        >>> model = Cubist().fit(X, y)
-        >>> disp = CubistCoefficientDisplay.from_estimator(model)
+        >>> X, y = load_iris(return_X_y=True, as_frame=True)
+        >>> model = Cubist(n_rules=2).fit(X, y)
+        >>> display = CubistCoefficientDisplay.from_estimator(estimator=model)
+        <...>
         >>> plt.show()
         """
-        df = estimator.coeffs_.copy()
-        # melt dataframe to show each coefficient variable/value pair by committee/rule
-        df = pd.melt(df, id_vars=["committee", "rule"])
+        check_is_fitted(estimator)
+
+        # melt coeffs dataframe to show each coefficient variable/value pair by committee/rule
+        df = pd.melt(estimator.coeffs_, id_vars=["committee", "rule"])
         df = df.loc[df.notna().all(axis="columns")]
 
         df, ylabel = cls._validate_from_estimator_params(

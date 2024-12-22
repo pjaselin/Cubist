@@ -126,14 +126,22 @@ class Cubist(RegressorMixin, BaseEstimator):  # pylint: disable=R0902
     version_ : str
         The Cubist version with the time of local build/install.
 
+        .. versionadded:: 1.0.0
+
     feature_statistics_ : pd.DataFrame
         Table of statistics Cubist generated for each input attribute.
+
+        .. versionadded:: 1.0.0
 
     committee_error_reduction_ : float
         The reduction in error by using committees.
 
+        .. versionadded:: 1.0.0
+
     n_committees_used_ : int
         Number of committees actually used by Cubist.
+
+        .. versionadded:: 1.0.0
 
     Examples
     --------

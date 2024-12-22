@@ -3,6 +3,7 @@
 import operator
 
 import pandas as pd
+from sklearn.utils.validation import check_is_fitted
 
 from .cubist import Cubist
 from ._cubist_display_mixin import _CubistDisplayMixin
@@ -18,11 +19,14 @@ OPERATORS = {
 
 
 class CubistCoverageDisplay(_CubistDisplayMixin):
-    """Visualization of the regression coefficients used in the Cubist model.
+    """Visualization of rule coverage for input variables for a trained Cubist
+    model.
 
-    This tool can display "residuals vs predicted" or "actual vs predicted"
-    using scatter plots to qualitatively assess the behavior of a regressor,
-    preferably on held-out data points.
+    This tool plots the percents and ranges (coverage) per rule of input
+    variables from a given dataset. One subplot is created for each variable
+    used to make splits with the rule number or committee/rule pair on the
+    y-axis. The coverage percentages for the given variable and rule pair or
+    variable and committee/rule pair are plotted along the x-axis.
 
     See the details in the docstrings of
     :func:`~cubist.CubistCoefficientDisplay.from_estimator`to
@@ -32,8 +36,9 @@ class CubistCoverageDisplay(_CubistDisplayMixin):
 
     Parameters
     ----------
-    coeffs : Pandas DataFrame of shape (n_samples,)
-        True values.
+    splits : pd.DataFrame
+        DataFrame containing the model split values by variable,
+        committee, and rule.
 
     Attributes
     ----------
@@ -45,20 +50,17 @@ class CubistCoverageDisplay(_CubistDisplayMixin):
 
     See Also
     --------
-    CubistCoefficientDisplay.from_estimator : Plot the coefficients used in the
+    CubistCoverageDisplay.from_estimator : Plot the coefficients used in the
         Cubist model.
 
     Examples
     --------
     >>> import matplotlib.pyplot as plt
-    >>> from sklearn.datasets import load_diabetes
-    >>> from sklearn.linear_model import Ridge
-    >>> from sklearn.metrics import PredictionErrorDisplay
-    >>> X, y = load_diabetes(return_X_y=True)
-    >>> ridge = Ridge().fit(X, y)
-    >>> y_pred = ridge.predict(X)
-    >>> display = PredictionErrorDisplay(y_true=y, y_pred=y_pred)
-    >>> display.plot()
+    >>> from sklearn.datasets import load_iris
+    >>> from cubist import Cubist, CubistCoverageDisplay
+    >>> X, y = load_iris(return_X_y=True, as_frame=True)
+    >>> model = Cubist(n_rules=2).fit(X, y)
+    >>> display = CubistCoverageDisplay.from_estimator(estimator=model)
     <...>
     >>> plt.show()
     """
@@ -77,6 +79,9 @@ class CubistCoverageDisplay(_CubistDisplayMixin):
         line_kwargs: dict = None,
     ):
         """Plot visualization.
+
+        Extra keyword arguments will be passed to matplotlib's ``subplots`` and
+        ``plot``.
 
         Parameters
         ----------
@@ -97,7 +102,7 @@ class CubistCoverageDisplay(_CubistDisplayMixin):
 
         Returns
         -------
-        display : :class:`~cubist.CubistCoefficientDisplay`
+        display : :class:`~cubist.CubistCoverageDisplay`
             Object that stores computed values.
         """
         self.figure_, self.ax_ = self._validate_plot_params(
@@ -154,12 +159,7 @@ class CubistCoverageDisplay(_CubistDisplayMixin):
         line_kwargs=None,
         gridspec_kwargs=None,
     ):
-        """Plot the coefficients used in the Cubist model.
-
-        For general information regarding `scikit-learn` visualization tools,
-        read more in the :ref:`Visualization Guide <visualizations>`.
-        For details regarding interpreting these plots, refer to the
-        :ref:`Model Evaluation Guide <visualization_regression_evaluation>`.
+        """Plot the input variable coverage for rules used in the Cubist model.
 
         .. versionadded:: 1.0.0
 
@@ -182,8 +182,8 @@ class CubistCoverageDisplay(_CubistDisplayMixin):
             Axes object to plot on. If `None`, a new figure and axes is
             created.
 
-        scatter_kwargs : dict, default=None
-            Dictionary with keywords passed to the `matplotlib.pyplot.scatter`
+        line_kwargs : dict, default=None
+            Dictionary with keywords passed to the `matplotlib.pyplot.plot`
             call.
 
         gridspec_kwargs : dict, default=None
@@ -192,22 +192,26 @@ class CubistCoverageDisplay(_CubistDisplayMixin):
 
         Returns
         -------
-        display : :class:`~cubist.CubistCoefficientDisplay`
+        display : :class:`~cubist.CubistCoverageDisplay`
             Object that stores the computed values.
 
         See Also
         --------
-        CubistCoefficientDisplay :
+        CubistCoverageDisplay : Cubist input variable coverage visualization.
 
         Examples
         --------
-        >>> from sklearn.datasets import load_diabetes
-        >>> from cubist import Cubist, CubistCoefficientDisplay
-        >>> X, y = load_diabetes(return_X_y=True)
-        >>> model = Cubist().fit(X, y)
-        >>> disp = CubistCoefficientDisplay.from_estimator(model)
+        >>> import matplotlib.pyplot as plt
+        >>> from sklearn.datasets import load_iris
+        >>> from cubist import Cubist, CubistCoverageDisplay
+        >>> X, y = load_iris(return_X_y=True, as_frame=True)
+        >>> model = Cubist(n_rules=2).fit(X, y)
+        >>> display = CubistCoverageDisplay.from_estimator(estimator=model)
+        <...>
         >>> plt.show()
         """
+        check_is_fitted(estimator)
+
         df = estimator.splits_.copy()
 
         # get rows that are continuous-type splits

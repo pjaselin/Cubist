@@ -74,7 +74,7 @@ In addition to boosting, the model can perform instance-based (nearest-neighbor)
 from sklearn.datasets import load_iris
 from cubist import Cubist
 X, y = load_iris(return_X_y=True, as_frame=True)
-model = Cubist(verbose=True)  # <- model parameters here
+model = Cubist(n_rules=2, verbose=True)  # <- model parameters here
 model.fit(X, y)
 model.predict(X)
 model.score(X, y)
