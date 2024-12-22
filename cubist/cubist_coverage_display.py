@@ -214,6 +214,9 @@ class CubistCoverageDisplay(_CubistDisplayMixin):
         # get rows that are continuous-type splits
         df = df.loc[df.type == "continuous"]
 
+        # remove missing values based on the variable column
+        df = df.dropna(subset=["variable"]).reset_index(drop=True)
+
         for i in range(df.shape[0]):
             # get the current value threshold and comparison operator
             var_value = df.loc[i, "value"]
