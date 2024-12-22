@@ -10,6 +10,7 @@ from sklearn.utils.validation import (
     check_random_state,
     _check_sample_weight,
 )
+from sklearn.utils import RegressorTags
 from sklearn.base import RegressorMixin, BaseEstimator
 
 from _cubist import _cubist, _predictions  # noqa E0611 # pylint: disable=E0611
@@ -21,7 +22,7 @@ from ._attribute_usage import _attribute_usage
 from .exceptions import CubistError
 
 
-class Cubist(BaseEstimator, RegressorMixin):  # pylint: disable=R0902
+class Cubist(RegressorMixin, BaseEstimator):  # pylint: disable=R0902
     """
     Cubist Regression Model (Public v2.07) developed by Quinlan.
 
@@ -161,9 +162,10 @@ class Cubist(BaseEstimator, RegressorMixin):  # pylint: disable=R0902
         return {"allow_nan": True, "X_types": ["2darray", "string"]}
 
     def __sklearn_tags__(self):
-        """scikit-learn estimator configuration method"""
+        """scikit-learn estimator configuration method (from v1.6.0 onwards)"""
         tags = super().__sklearn_tags__()
         tags.estimator_type = "regressor"
+        tags.regressor_tags = RegressorTags(poor_score=True)
         tags.input_tags.allow_nan = True
         tags.input_tags.string = True
         return tags
