@@ -2,6 +2,7 @@
 
 import zlib
 from warnings import warn
+from numbers import Integral
 
 import numpy as np
 import pandas as pd
@@ -9,9 +10,11 @@ from sklearn.utils.validation import (
     check_is_fitted,
     check_random_state,
     _check_sample_weight,
+    validate_data,
 )
 from sklearn.utils import RegressorTags
-from sklearn.base import RegressorMixin, BaseEstimator
+from sklearn.utils._param_validation import Interval, RealNotInt
+from sklearn.base import RegressorMixin, BaseEstimator, _fit_context
 
 from _cubist import _cubist, _predictions  # noqa E0611 # pylint: disable=E0611
 
@@ -128,6 +131,33 @@ class Cubist(RegressorMixin, BaseEstimator):  # pylint: disable=R0902
     >>> model.score(X_test, y_test)
     """
 
+    _parameter_constraints: dict = {
+        "n_rules": [Interval(Integral, 1, 1000000, closed="both")],
+        "n_committees": [Interval(Integral, 1, 100, closed="both")],
+        "neighbors": [Interval(Integral, 1, 9, closed="both"), None],
+        "unbiased": ["boolean"],
+        "auto": ["boolean"],
+        "extrapolation": [Interval(RealNotInt, 0.0, 1.0, closed="both")],
+        "sample": [Interval(RealNotInt, 0.0, 1.0, closed="neither"), None],
+        "cv": [Interval(Integral, 1, None, closed="neither"), None],
+        "random_state": ["random_state"],
+        "target_label": [str],
+        "verbose": ["verbose"],
+    }
+
+    def _more_tags(self):
+        """scikit-learn estimator configuration method (retained for backwards compatibility)"""
+        return {"allow_nan": True, "X_types": ["2darray", "string"]}
+
+    def __sklearn_tags__(self):
+        """scikit-learn estimator configuration method (from v1.6.0 onwards)"""
+        tags = super().__sklearn_tags__()
+        tags.estimator_type = "regressor"
+        tags.regressor_tags = RegressorTags(poor_score=True)
+        tags.input_tags.allow_nan = True
+        tags.input_tags.string = True
+        return tags
+
     def __init__(  # pylint: disable=R0913
         self,
         n_rules: int = 500,
@@ -157,43 +187,6 @@ class Cubist(RegressorMixin, BaseEstimator):  # pylint: disable=R0902
         self.target_label = target_label
         self.verbose = verbose
 
-    def _more_tags(self):
-        """scikit-learn estimator configuration method (retained for backwards compatibility)"""
-        return {"allow_nan": True, "X_types": ["2darray", "string"]}
-
-    def __sklearn_tags__(self):
-        """scikit-learn estimator configuration method (from v1.6.0 onwards)"""
-        tags = super().__sklearn_tags__()
-        tags.estimator_type = "regressor"
-        tags.regressor_tags = RegressorTags(poor_score=True)
-        tags.input_tags.allow_nan = True
-        tags.input_tags.string = True
-        return tags
-
-    def _check_n_rules(self):
-        # validate number of rules
-        if not isinstance(self.n_rules, int):
-            raise TypeError(
-                f"`n_rules` must be an integer but got {type(self.n_rules)}"
-            )
-        if self.n_rules < 1 or self.n_rules > 1000000:
-            raise ValueError(
-                f"`n_rules` must be between 1 and 1000000 but got {self.n_rules}"
-            )
-        return self.n_rules
-
-    def _check_n_committees(self):
-        # validate number of committees
-        if not isinstance(self.n_committees, int):
-            raise TypeError(
-                f"`n_committees` must be an integer but got {type(self.n_committees)}"
-            )
-        if self.n_committees < 1 or self.n_committees > 100:
-            raise ValueError(
-                f"`n_committees` must be between 1 and 100 but got {self.n_committees}"
-            )
-        return self.n_committees
-
     def _check_neighbors(self):
         # if auto is True but neighbors is set, raise an error
         if self.auto:
@@ -206,31 +199,10 @@ class Cubist(RegressorMixin, BaseEstimator):  # pylint: disable=R0902
         # default value must be zero even when not used
         if self.neighbors is None:
             return 0
-        # validate number of neighbors
-        if not isinstance(self.neighbors, int):
-            raise TypeError(
-                f"`neighbors` must be an integer but got {type(self.neighbors)}"
-            )
-        if self.neighbors < 1 or self.neighbors > 9:
-            raise ValueError(
-                f"`neighbors` must be between 1 and 9 but got {self.neighbors}"
-            )
         return self.neighbors
-
-    def _check_unbiased(self):
-        # validate unbiased option
-        if not isinstance(self.unbiased, bool):
-            raise TypeError(
-                f"`unbiased` must be a boolean but got {type(self.unbiased)}"
-            )
-        return self.unbiased
 
     def _check_composite(self, neighbors):
         # validate the auto parameter
-        if not isinstance(self.auto, bool):
-            raise TypeError(f"`auto` must be a boolean but got {type(self.auto)}")
-        # if auto=True, let cubist decide whether to use a composite model and
-        # how many neighbors to use
         if self.auto:
             return "auto"
         # if a number of neighbors is given, make a composite model
@@ -238,30 +210,10 @@ class Cubist(RegressorMixin, BaseEstimator):  # pylint: disable=R0902
             return "yes"
         return "no"
 
-    def _check_extrapolation(self):
-        # validate the range of extrapolation
-        if not isinstance(self.extrapolation, float):
-            raise TypeError(
-                f"`extrapolation` must be a float but got {type(self.extrapolation)}"
-            )
-        if self.extrapolation < 0.0 or self.extrapolation > 1.0:
-            raise ValueError(
-                f"`extrapolation` must be between 0.0 and 1.0 but got {self.extrapolation}"
-            )
-        return self.extrapolation
-
     def _check_sample(self, num_samples):
         # default value must be 0 if not used
         if self.sample is None:
             return 0
-        # validate the sample type
-        if not isinstance(self.sample, float):
-            raise TypeError(f"`sample` must be a float but got {type(self.sample)}")
-        # validate sample value
-        if not 0.0 < self.sample < 1.0:
-            raise ValueError(
-                f"`sample` must be between 0.0 and 1.0 but got {self.sample}"
-            )
         # check to see if the sample will create a very small dataset
         trained_num_samples = int(round(self.sample * num_samples, 0))
         if trained_num_samples < 10:
@@ -279,14 +231,9 @@ class Cubist(RegressorMixin, BaseEstimator):  # pylint: disable=R0902
         # default value must be 0 if not used
         if self.cv is None:
             return 0
-        # validate type
-        if not isinstance(self.cv, int):
-            raise TypeError(f"`cv` must be an integer but got {type(self.cv)}")
-        # validate value
-        if self.cv <= 1:
-            raise ValueError(f"`cv` must be greater than 1 but got {self.cv}")
         return self.cv
 
+    @_fit_context(prefer_skip_nested_validation=True)
     def fit(self, X, y, sample_weight=None):  # pylint: disable=R0914
         """Build a Cubist regression model from training set (X, y).
 
@@ -308,7 +255,8 @@ class Cubist(RegressorMixin, BaseEstimator):  # pylint: disable=R0902
         self : object
         """
         # scikit-learn data validation
-        X, y = self._validate_data(
+        X, y = validate_data(
+            self,
             X,
             y,
             dtype=None,
@@ -335,12 +283,8 @@ class Cubist(RegressorMixin, BaseEstimator):  # pylint: disable=R0902
         else:
             self.is_sample_weighted_ = False  # noqa W0201, pylint: disable=W0201
 
-        n_rules = self._check_n_rules()
-        n_committees = self._check_n_committees()
         neighbors = self._check_neighbors()
-        unbiased = self._check_unbiased()
         composite = self._check_composite(neighbors)
-        extrapolation = self._check_extrapolation()
         sample = self._check_sample(X.shape[0])
         cv = self._check_cv()
         random_state = check_random_state(self.random_state)
@@ -362,14 +306,14 @@ class Cubist(RegressorMixin, BaseEstimator):  # pylint: disable=R0902
         model, output = _cubist(
             namesv_=names_string.encode(),
             datav_=data_string.encode(),
-            unbiased_=unbiased,
+            unbiased_=self.unbiased,
             compositev_=composite.encode(),
             neighbors_=neighbors,
-            committees_=n_committees,
+            committees_=self.n_committees,
             sample_=sample,
             seed_=random_state.randint(0, 4095) % 4096,
-            rules_=n_rules,
-            extrapolation_=extrapolation,
+            rules_=self.n_rules,
+            extrapolation_=self.extrapolation,
             cv_=cv,
             modelv_=b"1",
             outputv_=b"1",
@@ -451,13 +395,11 @@ class Cubist(RegressorMixin, BaseEstimator):  # pylint: disable=R0902
             The predicted values.
         """
         # make sure the model has been fitted
-        check_is_fitted(
-            self, attributes=["model_", "splits_", "coeffs_", "feature_importances_"]
-        )
+        check_is_fitted(self)
 
         # validate input data
-        X = self._validate_data(
-            X, dtype=None, force_all_finite="allow-nan", reset=False
+        X = validate_data(
+            self, X, dtype=None, force_all_finite="allow-nan", reset=False
         )
 
         # (re)construct a dataframe from X
@@ -472,7 +414,7 @@ class Cubist(RegressorMixin, BaseEstimator):  # pylint: disable=R0902
         data_string = _make_data_string(X)
 
         # get cubist predictions from trained model
-        pred, output = _predictions(
+        y_hat, output = _predictions(
             data_string.encode(),
             zlib.decompress(self.names_string_),
             zlib.decompress(self.data_string_),
@@ -491,4 +433,4 @@ class Cubist(RegressorMixin, BaseEstimator):  # pylint: disable=R0902
             if self.verbose:
                 print(output)
 
-        return pred
+        return y_hat

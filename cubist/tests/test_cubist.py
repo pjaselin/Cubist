@@ -55,14 +55,14 @@ def test_n_committees(n_committees, raises, X, y):
 @pytest.mark.parametrize(
     "neighbors,auto,expected,raises",
     [
-        (0, False, None, pytest.raises(ValueError)),
+        (0, False, 0, pytest.raises(ValueError)),
         (1, False, 1, no_raise()),
         (9, False, 9, no_raise()),
-        (10, False, None, pytest.raises(ValueError)),
+        (10, False, 10, pytest.raises(ValueError)),
         (None, True, 0, no_raise()),
         (None, False, 0, no_raise()),
-        (5.0, False, None, pytest.raises(TypeError)),
-        (5, True, None, pytest.raises(ValueError)),
+        (5.0, False, 5.0, pytest.raises(ValueError)),
+        (5, True, 0, pytest.raises(ValueError)),
     ],
 )
 def test_neighbors(neighbors, auto, expected, raises, X, y):  # pylint: disable=R0913,R0917
@@ -129,19 +129,18 @@ def test_sample(sample, raises, X, y):
 
 
 @pytest.mark.parametrize(
-    "cv,expected,raises",
+    "cv,raises",
     [
-        (10, 10, no_raise()),
-        (-0.1, None, pytest.raises(TypeError)),
-        (1, None, pytest.raises(ValueError)),
-        (0, None, pytest.raises(ValueError)),
+        (10, no_raise()),
+        (-0.1, pytest.raises(TypeError)),
+        (1, pytest.raises(ValueError)),
+        (0, pytest.raises(ValueError)),
     ],
 )
-def test_cv(cv, expected, raises, X, y):
+def test_cv(cv, raises, X, y):
     """test `cv` parameter"""
     model = Cubist(cv=cv)
     with raises:
-        assert expected == model._check_cv()  # noqa W0212, pylint: disable=W0212
         model.fit(X, y)
 
 
@@ -151,14 +150,14 @@ def test_cv(cv, expected, raises, X, y):
         (True, 5, "auto", no_raise()),
         (False, 5, "yes", no_raise()),
         (False, 0, "no", no_raise()),
-        ("1234", 5, "", pytest.raises(TypeError)),
+        ("1234", 5, "auto", pytest.raises(TypeError)),
     ],
 )
 def test_auto(auto, n, expected, raises, X, y):  # pylint: disable=R0913,R0917
     """test `auto` parameter"""
     model = Cubist(auto=auto)
+    assert expected == model._check_composite(n)  # noqa W0212, pylint: disable=W0212
     with raises:
-        assert expected == model._check_composite(n)  # noqa W0212, pylint: disable=W0212
         model.fit(X, y)
         check_is_fitted(model)
 
