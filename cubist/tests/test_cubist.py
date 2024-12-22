@@ -3,8 +3,9 @@
 import random
 
 import pytest
+from sklearn.utils.validation import check_is_fitted
 
-from .conftest import no_raise, check_is_fitted
+from .conftest import no_raise
 from ..cubist import Cubist, CubistError
 
 

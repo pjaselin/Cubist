@@ -13,8 +13,8 @@ from sklearn.datasets import (
     make_sparse_uncorrelated,
 )
 from sklearn.model_selection import train_test_split
+from sklearn.utils.validation import check_is_fitted
 
-from .conftest import check_is_fitted
 from ..cubist import Cubist, CubistError
 
 
