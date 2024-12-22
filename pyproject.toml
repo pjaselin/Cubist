@@ -56,3 +56,8 @@ omit = ["*/tests/*"]
 
 [tool.coverage.report]
 skip_covered = true
+
+[tool.pylint.'MESSAGES CONTROL']
+disable = """
+    C0103
+"""

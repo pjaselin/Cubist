@@ -26,7 +26,7 @@ def test_coverage_display():
 
 def test_coverage_display_line_kwargs():
     """test line_kwargs parameter"""
-    X = pd.read_csv(  # pylint: disable=C0103
+    X = pd.read_csv(
         "https://raw.githubusercontent.com/selva86/datasets/refs/heads/master/BostonHousing.csv"
     )
     y = X.medv

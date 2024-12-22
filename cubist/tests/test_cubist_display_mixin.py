@@ -11,7 +11,7 @@ from ..cubist import Cubist
 def test_gridspec_kwargs_and_existing_plot():
     """test using gridspec_kwargs and passing an existing subplots object"""
     _, ax = plt.subplots()
-    X, y = load_iris(return_X_y=True, as_frame=True)  # pylint: disable=C0103
+    X, y = load_iris(return_X_y=True, as_frame=True)
     model = Cubist()
     model.fit(X, y)
     display = _CubistDisplayMixin()
