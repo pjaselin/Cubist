@@ -217,6 +217,7 @@ class CubistCoverageDisplay(_CubistDisplayMixin):
         # remove missing values based on the variable column
         df = df.dropna(subset=["variable"]).reset_index(drop=True)
 
+        # get the percentage of data covered by each rule
         for i in range(df.shape[0]):
             # get the current value threshold and comparison operator
             var_value = df.loc[i, "value"]
