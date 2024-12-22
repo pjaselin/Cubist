@@ -29,9 +29,6 @@ def _make_names_string(x, w=None, label="outcome"):
     out : str
         Case name string describing training dataset columns and their types.
     """
-    # copy Pandas objects so they aren't changed outside of this function
-    # x = x.copy(deep=True)
-
     # clean reserved sample name if it's in x
     has_sample = [i for i, c in enumerate(x.columns) if bool(re.search("^sample", c))]
     if has_sample != []:

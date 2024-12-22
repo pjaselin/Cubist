@@ -29,8 +29,6 @@ def _make_data_string(x, y=None, w=None):
         Input dataset converted to a string and formatted per Cubist's
         requirements.
     """
-    # x = x.copy(deep=True)
-
     # apply the escapes function to all string columns
     for col in x:
         if is_string_dtype(x[col]):
