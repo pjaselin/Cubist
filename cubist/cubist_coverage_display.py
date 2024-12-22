@@ -1,6 +1,5 @@
 """Visualization class for the Cubist Coverage Display"""
 
-import math
 import operator
 
 import pandas as pd
@@ -222,13 +221,12 @@ class CubistCoverageDisplay(_CubistDisplayMixin):
             # get the current value threshold and comparison operator
             var_value = df.loc[i, "value"]
             comp_operator = df.loc[i, "dir"]
-            if (var_value is not None) and (not math.isnan(var_value)):
-                # convert the data to numeric and remove NaNs
-                x_col = pd.to_numeric(X[df.loc[i, "variable"]]).dropna()
-                # evaluate and get the percentage of data
-                df.loc[i, "percentile"] = (
-                    OPERATORS[comp_operator](x_col, var_value).sum() / X.shape[0]
-                )
+            # convert the data to numeric and remove NaNs
+            x_col = pd.to_numeric(X[df.loc[i, "variable"]]).dropna()
+            # evaluate and get the percentage of data
+            df.loc[i, "percentile"] = (
+                OPERATORS[comp_operator](x_col, var_value).sum() / X.shape[0]
+            )
 
         # if none of the rows were continuous-type splits, break here
         if df.empty:
