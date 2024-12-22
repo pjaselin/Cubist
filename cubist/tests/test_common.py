@@ -6,14 +6,24 @@ from sklearn.datasets import make_regression
 from ..cubist import Cubist
 
 
-@parametrize_with_checks([Cubist()])
+def expected_failed_checks(estimator):
+    """callable to pass sklearn checks that are known to fail"""
+    if isinstance(estimator, Cubist):
+        return {
+            "check_sample_weight_equivalence_on_dense_data": "Cubist only accepts integers for `cv`",  # pylint: disable=C0301
+        }
+    return {}
+
+
+@parametrize_with_checks([Cubist()], expected_failed_checks=expected_failed_checks)
 def test_sklearn_compatible_estimator(estimator, check):
     """perform common scikit-learn estimator tests"""
     return check(estimator)
 
 
 def test_reasonable_score():
-    """determine whether Cubist returns a 'reasonable' score per:
+    """
+    determine whether Cubist returns a 'reasonable' score per:
     https://scikit-learn.org/stable/modules/generated/sklearn.utils.RegressorTags.html#sklearn.utils.RegressorTags
     """
     X, y = make_regression(  # pylint: disable=W0632
