@@ -22,7 +22,7 @@ def test_gridspec_kwargs_and_existing_plot():
 
 def test_plot_grid_arrangement():
     """test adding one row to the number of rows needed when determining nrows/ncols"""
-    X, y = fetch_california_housing(return_X_y=True, as_frame=True)  # pylint: disable=C0103
+    X, y = fetch_california_housing(return_X_y=True, as_frame=True)
     model = Cubist()
     # only selecting 5 columns will trigger adding one row to the number of rows needed
     model.fit(X.iloc[:, :5], y)
@@ -32,7 +32,7 @@ def test_plot_grid_arrangement():
 
 def test_validate_from_estimator_params_all_valid():
     """test using valie commmittee and rule parameters"""
-    X, y = fetch_california_housing(return_X_y=True, as_frame=True)  # pylint: disable=C0103
+    X, y = fetch_california_housing(return_X_y=True, as_frame=True)
     model = Cubist(n_committees=5)
     model.fit(X, y)
     display = _CubistDisplayMixin()
@@ -41,7 +41,7 @@ def test_validate_from_estimator_params_all_valid():
 
 def test_validate_from_estimator_params_invalid_committee():
     """test using invalid committee parameter"""
-    X, y = fetch_california_housing(return_X_y=True, as_frame=True)  # pylint: disable=C0103
+    X, y = fetch_california_housing(return_X_y=True, as_frame=True)
     model = Cubist(n_committees=5)
     model.fit(X, y)
     display = _CubistDisplayMixin()
@@ -52,7 +52,7 @@ def test_validate_from_estimator_params_invalid_committee():
 
 def test_validate_from_estimator_params_invalid_rule():
     """test using invalid rule parameter"""
-    X, y = fetch_california_housing(return_X_y=True, as_frame=True)  # pylint: disable=C0103
+    X, y = fetch_california_housing(return_X_y=True, as_frame=True)
     model = Cubist(n_committees=5)
     model.fit(X, y)
     display = _CubistDisplayMixin()

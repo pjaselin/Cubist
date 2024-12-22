@@ -9,11 +9,11 @@ from cubist import Cubist, CubistCoverageDisplay
 
 def test_coverage_display():
     """test creating plot"""
-    X = pd.read_csv(  # pylint: disable=C0103
+    X = pd.read_csv(
         "https://raw.githubusercontent.com/selva86/datasets/refs/heads/master/BostonHousing.csv"
     )
     y = X.medv
-    X = X.drop(columns=["medv", "dis"])  # pylint: disable=C0103
+    X = X.drop(columns=["medv", "dis"])
 
     model = Cubist(
         n_rules=4, n_committees=1, unbiased=False, extrapolation=1.0, verbose=True
@@ -30,7 +30,7 @@ def test_coverage_display_line_kwargs():
         "https://raw.githubusercontent.com/selva86/datasets/refs/heads/master/BostonHousing.csv"
     )
     y = X.medv
-    X = X.drop(columns=["medv", "dis"])  # pylint: disable=C0103
+    X = X.drop(columns=["medv", "dis"])
     model = Cubist()
     model.fit(X, y)
 
@@ -39,11 +39,11 @@ def test_coverage_display_line_kwargs():
 
 def test_validate_from_estimator_params_empty_dataframe():
     """test checking for empty dataframe"""
-    X = pd.read_csv(  # pylint: disable=C0103
+    X = pd.read_csv(
         "https://raw.githubusercontent.com/selva86/datasets/refs/heads/master/BostonHousing.csv"
     )
     y = X.medv
-    X = X.drop(columns=["medv", "dis"])  # pylint: disable=C0103
+    X = X.drop(columns=["medv", "dis"])
 
     model = Cubist(n_committees=5)
     model.fit(X, y)

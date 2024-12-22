@@ -8,11 +8,11 @@ from cubist import Cubist, CubistCoefficientDisplay
 
 def test_coefficient_display():
     """test creating the plot"""
-    X = pd.read_csv(  # pylint: disable=C0103
+    X = pd.read_csv(
         "https://raw.githubusercontent.com/selva86/datasets/refs/heads/master/BostonHousing.csv"
     )
     y = X.medv
-    X = X.drop(columns=["medv"])  # pylint: disable=C0103
+    X = X.drop(columns=["medv"])
     model = Cubist(n_rules=4, n_committees=1, unbiased=False, extrapolation=1.0)
     model.fit(X, y)
 
@@ -22,11 +22,11 @@ def test_coefficient_display():
 
 def test_coefficient_display_scatter_kwargs():
     """test scatter_kwargs parameter"""
-    X = pd.read_csv(  # pylint: disable=C0103
+    X = pd.read_csv(
         "https://raw.githubusercontent.com/selva86/datasets/refs/heads/master/BostonHousing.csv"
     )
     y = X.medv
-    X = X.drop(columns=["medv"])  # pylint: disable=C0103
+    X = X.drop(columns=["medv"])
     model = Cubist()
     model.fit(X, y)
     CubistCoefficientDisplay.from_estimator(model, scatter_kwargs={"alpha": 0.5})

@@ -25,7 +25,7 @@ def test_model_instance(expected_output):
         ("asdf", pytest.raises(TypeError)),
     ],
 )
-def test_n_rules(n_rules, raises, X, y):  # pylint: disable=C0103
+def test_n_rules(n_rules, raises, X, y):
     """test `n_rules` parameter"""
     model = Cubist(n_rules=n_rules)
     with raises:
@@ -44,7 +44,7 @@ def test_n_rules(n_rules, raises, X, y):  # pylint: disable=C0103
         ("asdf", pytest.raises(TypeError)),
     ],
 )
-def test_n_committees(n_committees, raises, X, y):  # pylint: disable=C0103
+def test_n_committees(n_committees, raises, X, y):
     """test `n_committees` parameter"""
     model = Cubist(n_committees=n_committees)
     with raises:
@@ -65,7 +65,7 @@ def test_n_committees(n_committees, raises, X, y):  # pylint: disable=C0103
         (5, True, None, pytest.raises(ValueError)),
     ],
 )
-def test_neighbors(neighbors, auto, expected, raises, X, y):  # pylint: disable=C0103,R0913,R0917
+def test_neighbors(neighbors, auto, expected, raises, X, y):  # pylint: disable=R0913,R0917
     """test `neighbors` parameter"""
     model = Cubist(neighbors=neighbors, auto=auto)
     with raises:
@@ -83,7 +83,7 @@ def test_neighbors(neighbors, auto, expected, raises, X, y):  # pylint: disable=
         ("aasdf", pytest.raises(TypeError)),
     ],
 )
-def test_unbiased(unbiased, raises, X, y):  # pylint: disable=C0103
+def test_unbiased(unbiased, raises, X, y):
     """test `unbiased` parameter"""
     model = Cubist(unbiased=unbiased)
     with raises:
@@ -101,7 +101,7 @@ def test_unbiased(unbiased, raises, X, y):  # pylint: disable=C0103
         (1, pytest.raises(TypeError)),
     ],
 )
-def test_extrapolation(extrapolation, raises, X, y):  # pylint: disable=C0103
+def test_extrapolation(extrapolation, raises, X, y):
     """test `extrapolation` parameter"""
     model = Cubist(extrapolation=extrapolation)
     with raises:
@@ -120,7 +120,7 @@ def test_extrapolation(extrapolation, raises, X, y):  # pylint: disable=C0103
         (0, pytest.raises(TypeError)),
     ],
 )
-def test_sample(sample, raises, X, y):  # pylint: disable=C0103
+def test_sample(sample, raises, X, y):
     """test `sample` parameter"""
     model = Cubist(sample=sample)
     with raises:
@@ -137,7 +137,7 @@ def test_sample(sample, raises, X, y):  # pylint: disable=C0103
         (0, None, pytest.raises(ValueError)),
     ],
 )
-def test_cv(cv, expected, raises, X, y):  # pylint: disable=C0103
+def test_cv(cv, expected, raises, X, y):
     """test `cv` parameter"""
     model = Cubist(cv=cv)
     with raises:
@@ -154,7 +154,7 @@ def test_cv(cv, expected, raises, X, y):  # pylint: disable=C0103
         ("1234", 5, "", pytest.raises(TypeError)),
     ],
 )
-def test_auto(auto, n, expected, raises, X, y):  # pylint: disable=C0103,R0913,R0917
+def test_auto(auto, n, expected, raises, X, y):  # pylint: disable=R0913,R0917
     """test `auto` parameter"""
     model = Cubist(auto=auto)
     with raises:
@@ -167,7 +167,7 @@ def test_auto(auto, n, expected, raises, X, y):  # pylint: disable=C0103,R0913,R
     "i, raises",
     [(0, no_raise()), (5, pytest.raises(ValueError)), (1, pytest.raises(ValueError))],
 )
-def test_missing_column_name(i, raises, X, y):  # pylint: disable=C0103
+def test_missing_column_name(i, raises, X, y):
     """test for where a column name is an empty string"""
     model = Cubist()
     # get the column names as a list
@@ -182,7 +182,7 @@ def test_missing_column_name(i, raises, X, y):  # pylint: disable=C0103
         check_is_fitted(model)
 
 
-def test_verbose(capfd, X, y):  # pylint: disable=C0103
+def test_verbose(capfd, X, y):
     """test to make sure verbose parameter prints to stdout"""
     model = Cubist(verbose=True)
     model.fit(X, y)
@@ -205,7 +205,7 @@ def test_training_errors(df_set_name, raises, df_set):
         check_is_fitted(model)
 
 
-def test_sample_colnames(X, y):  # pylint: disable=C0103
+def test_sample_colnames(X, y):
     """test using the word 'sample' as a column name"""
     X.columns = [random.choice(["sample", "Sample"]) + col for col in list(X.columns)]
     model = Cubist()

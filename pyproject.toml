@@ -58,6 +58,8 @@ omit = ["*/tests/*"]
 skip_covered = true
 
 [tool.pylint.'MESSAGES CONTROL']
-disable = """
-    C0103
-"""
+good-names = [
+    "X",
+    "X_train",
+    "X_test"
+]

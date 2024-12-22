@@ -147,7 +147,7 @@ class CubistCoverageDisplay(_CubistDisplayMixin):
     def from_estimator(  # pylint: disable=R0913
         cls,
         estimator: Cubist,
-        X,  # pylint: disable=C0103
+        X,
         *,
         committee: int = None,
         rule: int = None,

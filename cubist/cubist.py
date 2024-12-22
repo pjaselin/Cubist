@@ -277,7 +277,7 @@ class Cubist(BaseEstimator, RegressorMixin):  # pylint: disable=R0902
             raise ValueError(f"`cv` must be greater than 1 but got {self.cv}")
         return self.cv
 
-    def fit(self, X, y, sample_weight=None):  # pylint: disable=C0103,R0914
+    def fit(self, X, y, sample_weight=None):  # pylint: disable=R0914
         """Build a Cubist regression model from training set (X, y).
 
         Parameters
@@ -426,7 +426,7 @@ class Cubist(BaseEstimator, RegressorMixin):  # pylint: disable=R0902
 
         return self
 
-    def predict(self, X):  # pylint: disable=C0103
+    def predict(self, X):
         """Predict Cubist regression target for X.
 
         Parameters
