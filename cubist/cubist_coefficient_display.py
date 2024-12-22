@@ -2,6 +2,11 @@
 
 import pandas as pd
 
+try:
+    from sklearn.utils._optional_dependencies import check_matplotlib_support
+except ImportError:  # pragma: no cover
+    from sklearn.utils import check_matplotlib_support
+
 from .cubist import Cubist
 from ._cubist_display_mixin import _CubistDisplayMixin
 
@@ -89,6 +94,9 @@ class CubistCoefficientDisplay(_CubistDisplayMixin):
         display : :class:`~cubist.CubistCoefficientDisplay`
             Object that stores computed values.
         """
+        check_matplotlib_support(f"{self.__class__.__name__}.plot")
+        from matplotlib.ticker import MaxNLocator  # pylint: disable=C0415
+
         self.figure_, self.ax_ = self._validate_plot_params(
             ax=ax, df=self.coeffs, gridspec_kwargs=gridspec_kwargs
         )
@@ -98,15 +106,21 @@ class CubistCoefficientDisplay(_CubistDisplayMixin):
 
         # for each variable in the variable table
         for i, var in enumerate(list(self.coeffs.variable.unique())):
+            # get the data for the current variable/subplot
+            data = self.coeffs.loc[self.coeffs.variable == var]
+            # add gray trellis lines
+            for label in sorted(list(data.label.unique())):
+                self.ax_[i].axhline(y=label, color="#e9e9e9", linestyle="-", zorder=0)
             # make a scatter plot of the value vs. label
             self.ax_[i].scatter(
                 "value",
                 "label",
-                data=self.coeffs.loc[self.coeffs.variable == var],
+                data=data,
                 **scatter_kwargs,
             )
             # set the subplot title as the variable name
             self.ax_[i].set_title(var)
+            self.ax_[i].xaxis.set_major_locator(MaxNLocator(prune="both"))
 
         # turn off any remaining unused plots
         for j in range(i + 1, self.ax_.shape[0]):  # noqa W0631, pylint: disable=W0631
@@ -177,7 +191,10 @@ class CubistCoefficientDisplay(_CubistDisplayMixin):
         >>> disp = CubistCoefficientDisplay.from_estimator(model)
         >>> plt.show()
         """
-        df = estimator.splits_.copy()
+        df = estimator.coeffs_.copy()
+        # melt dataframe to show each coefficient variable/value pair by committee/rule
+        df = pd.melt(df, id_vars=["committee", "rule"])
+        df = df.loc[df.notna().all(axis="columns")]
 
         df, ylabel = cls._validate_from_estimator_params(
             df=df, committee=committee, rule=rule

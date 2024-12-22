@@ -1,3 +1,5 @@
+"""functions to create the Cubist datav_ input"""
+
 import pandas as pd
 from pandas.api.types import is_string_dtype, is_numeric_dtype
 import numpy as np
@@ -27,7 +29,7 @@ def _make_data_string(x, y=None, w=None):
         Input dataset converted to a string and formatted per Cubist's
         requirements.
     """
-    x = x.copy(deep=True)
+    # x = x.copy(deep=True)
 
     # apply the escapes function to all string columns
     for col in x:

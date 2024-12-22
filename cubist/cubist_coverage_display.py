@@ -1,9 +1,21 @@
 """Visualization class for the Cubist Coverage Display"""
 
+import math
+import operator
+
 import pandas as pd
 
 from .cubist import Cubist
 from ._cubist_display_mixin import _CubistDisplayMixin
+
+
+OPERATORS = {
+    "<": operator.lt,
+    "<=": operator.le,
+    ">": operator.gt,
+    ">=": operator.ge,
+    "==": operator.eq,
+}
 
 
 class CubistCoverageDisplay(_CubistDisplayMixin):
@@ -99,8 +111,7 @@ class CubistCoverageDisplay(_CubistDisplayMixin):
         for i, var in enumerate(list(self.splits.variable.unique())):
             # add gray trellis lines
             for label in sorted(list(self.splits.label.unique())):
-                self.ax_[i].plot([0, 1], [label, label], color="#e9e9e9", **line_kwargs)
-                self.ax_[i].set_xlim([-0.05, 1.05])
+                self.ax_[i].plot([0, 1], [label, label], color="#e9e9e9", zorder=0)
             # plot data
             for _, row in self.splits.loc[self.splits.variable == var].iterrows():
                 # use blue for less than plot and set x points as 0 to some value
@@ -117,14 +128,16 @@ class CubistCoverageDisplay(_CubistDisplayMixin):
                 )
                 # set the subplot title
                 self.ax_[i].set_title(var)
+                # set the x-axis limits of the subplot
+                self.ax_[i].set_xlim([-0.05, 1.05])
 
         # turn off any unused plots
         for j in range(i + 1, self.ax_.shape[0]):  # noqa W0631, pylint: disable=W0631
             self.ax_[j].set_axis_off()
 
-        self.figure_.supxlabel("Training Data Coverage")
+        self.figure_.supxlabel("Data Coverage")
         self.figure_.supylabel(ylabel)
-        self.figure_.suptitle(f"Training Data Coverage by {ylabel} and Variable")
+        self.figure_.suptitle(f"Data Coverage by {ylabel} and Variable")
 
         return self
 
@@ -132,6 +145,7 @@ class CubistCoverageDisplay(_CubistDisplayMixin):
     def from_estimator(  # pylint: disable=R0913
         cls,
         estimator: Cubist,
+        X,  # pylint: disable=C0103
         *,
         committee: int = None,
         rule: int = None,
@@ -152,6 +166,10 @@ class CubistCoverageDisplay(_CubistDisplayMixin):
         ----------
         estimator : Cubist instance
             Fitted Cubist regressor.
+
+        X : array-like of shape (n_samples, n_features)
+            Training data, where `n_samples` is the number of samples and
+            `n_features` is the number of features.
 
         committee : int
             Max committee number to be included in plot.
@@ -193,6 +211,18 @@ class CubistCoverageDisplay(_CubistDisplayMixin):
 
         # get rows that are continuous-type splits
         df = df.loc[df.type == "continuous"]
+
+        for i in range(df.shape[0]):
+            # get the current value threshold and comparison operator
+            var_value = df.loc[i, "value"]
+            comp_operator = df.loc[i, "dir"]
+            if (var_value is not None) and (not math.isnan(var_value)):
+                # convert the data to numeric and remove NaNs
+                x_col = pd.to_numeric(X[df.loc[i, "variable"]]).dropna()
+                # evaluate and get the percentage of data
+                df.loc[i, "percentile"] = (
+                    OPERATORS[comp_operator](x_col, var_value).sum() / X.shape[0]
+                )
 
         # if none of the rows were continuous-type splits, break here
         if df.empty:
