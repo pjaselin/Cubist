@@ -109,12 +109,31 @@ class Cubist(RegressorMixin, BaseEstimator):  # pylint: disable=R0902
         for which the attribute appears in the linear formula of an applicable
         rule.
 
+    n_features_in_ : int
+        Number of features seen during :term:`fit`.
+
+    feature_names_in_ : ndarray of shape (`n_features_in_`,)
+        Names of features seen during :term:`fit`. Defined only when `X`
+        has feature names that are all strings.
+
     splits_ : pd.DataFrame
         Table of the splits built by the Cubist model for each rule.
 
     coeff_ : pd.DataFrame
         Table of the regression coefficients found by the Cubist model for each
         rule.
+
+    version_ : str
+        The Cubist version with the time of local build/install.
+
+    feature_statistics_ : pd.DataFrame
+        Table of statistics Cubist generated for each input attribute.
+
+    committee_error_reduction_ : float
+        The reduction in error by using committees.
+
+    n_committees_used_ : int
+        Number of committees actually used by Cubist.
 
     Examples
     --------
@@ -367,7 +386,6 @@ class Cubist(RegressorMixin, BaseEstimator):  # pylint: disable=R0902
             self.version_,
             self.splits_,
             self.coeffs_,
-            self.model_statistics_,
             self.feature_statistics_,
             self.committee_error_reduction_,
             self.n_committees_used_,

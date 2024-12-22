@@ -108,9 +108,7 @@ def _parse_model(model: str, feature_names: list):
     # get the cubist model version and build date
     version = _parser(model.popleft())[0]["id"]
     # get the global model statistics
-    model_statistics = {
-        k: v for stat in _parser(model.popleft()) for k, v in stat.items()
-    }
+    model.popleft()
     # get the feature statistics
     feature_statistics = []
     while model[0].startswith("att="):
@@ -122,12 +120,12 @@ def _parse_model(model: str, feature_names: list):
     committee_meta = _parser(model.popleft())
     # set default committee error reduction and number of committees
     committee_error_reduction = None
-    n_committees = None
+    n_committees_used = None
     for val in committee_meta:
         if "redn" in val:
             committee_error_reduction = float(val["redn"])  # noqa F841
         if "entries" in val:
-            n_committees = int(val["entries"])  # noqa F841
+            n_committees_used = int(val["entries"])  # noqa F841
 
     # clean out empty strings
     model = [m for m in model if m.strip() != ""]
@@ -148,10 +146,9 @@ def _parse_model(model: str, feature_names: list):
         version,
         splits,
         coeffs,
-        model_statistics,
         feature_statistics,
         committee_error_reduction,
-        n_committees,
+        n_committees_used,
     )
 
 

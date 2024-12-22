@@ -32,6 +32,7 @@ def test_n_rules(n_rules, raises, X, y):
     with raises:
         model.fit(X, y)
         check_is_fitted(model)
+        print(model.committee_error_reduction_, model.n_committees_used_)
 
 
 @pytest.mark.parametrize(
