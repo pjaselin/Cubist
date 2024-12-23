@@ -58,7 +58,7 @@ jobs:
     - name: Test with pytest
       run: |
         pip install coverage pytest
-        coverage run -m pytest --junitxml=junit.xml -o junit_family=legacy
+        coverage run -m pytest --junit-xml=junit.xml -o junit_family=legacy
         coverage report -m
 
     - name: Upload test results to Codecov
