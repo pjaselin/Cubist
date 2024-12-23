@@ -50,8 +50,8 @@ class CubistCoverageDisplay(_CubistDisplayMixin):
 
     See Also
     --------
-    CubistCoverageDisplay.from_estimator : Plot the coefficients used in the
-        Cubist model.
+    CubistCoverageDisplay.from_estimator : Cubist input variable coverage
+        visualization.
 
     Examples
     --------
@@ -121,16 +121,19 @@ class CubistCoverageDisplay(_CubistDisplayMixin):
             # plot data
             for _, row in data.iterrows():
                 # use blue for less than plot and set x points as 0 to some value
-                if "<" in row["dir"]:
-                    x = [0, row["percentile"]]
-                    color = "#1E88E5"
-                # use red for greater than plot and set x points as some value to 1
-                else:
-                    x = [1 - row["percentile"], 1]
-                    color = "#ff0d57"
+                # if "<" in row["dir"]:
+                #     x = [0, row["percentile"]]
+                #     color = "#1E88E5"
+                # # use red for greater than plot and set x points as some value to 1
+                # else:
+                #     x = [1 - row["percentile"], 1]
+                #     color = "#ff0d57"
                 # plot line
                 self.ax_[i].plot(
-                    x, [row["label"], row["label"]], color=color, **line_kwargs
+                    [row["x0"], row["x1"]],
+                    [row["label"], row["label"]],
+                    color=row["color"],
+                    **line_kwargs,
                 )
                 # set the subplot title
                 self.ax_[i].set_title(var)
@@ -220,23 +223,78 @@ class CubistCoverageDisplay(_CubistDisplayMixin):
         # remove missing values based on the variable column
         df = df.dropna(subset=["variable"]).reset_index(drop=True)
 
-        # get the percentage of data covered by each rule
-        for i in range(df.shape[0]):
-            # get the current value threshold and comparison operator
-            var_value = df.loc[i, "value"]
-            comp_operator = df.loc[i, "dir"]
-            # convert the data to numeric and remove NaNs
-            x_col = pd.to_numeric(X[df.loc[i, "variable"]]).dropna()
-            # evaluate and get the percentage of data
-            df.loc[i, "percentile"] = (
-                OPERATORS[comp_operator](x_col, var_value).sum() / X.shape[0]
-            )
-
         # if none of the rows were continuous-type splits, break here
         if df.empty:
             raise ValueError(
                 "No splits of continuous predictors were used in this model"
             )
+
+        def _get_coverage(x):
+            split_coverage = []
+            for var in list(x.variable.unique()):
+                current_splits = x.loc[x.variable == var]
+
+                if current_splits.shape[0] > 1:
+                    lower_split = current_splits.loc[
+                        current_splits.dir.str.contains("<")
+                    ].to_records()[0]
+                    # get the current value threshold and comparison operator
+                    var_value = lower_split["value"]
+                    comp_operator = lower_split["dir"]
+                    # convert the data to numeric and remove NaNs
+                    x_col = pd.to_numeric(X[lower_split["variable"]]).dropna()
+                    # evaluate and get the percentage of data
+                    lower_percentile = (
+                        OPERATORS[comp_operator](x_col, var_value).sum() / X.shape[0]
+                    )
+                    upper_split = current_splits.loc[
+                        current_splits.dir.str.contains(">")
+                    ].to_records()[0]
+                    # get the current value threshold and comparison operator
+                    var_value = upper_split["value"]
+                    comp_operator = upper_split["dir"]
+                    # convert the data to numeric and remove NaNs
+                    x_col = pd.to_numeric(X[upper_split["variable"]]).dropna()
+                    # evaluate and get the percentage of data
+                    upper_percentile = (
+                        OPERATORS[comp_operator](x_col, var_value).sum() / X.shape[0]
+                    )
+                    split_coverage.append(
+                        {
+                            "variable": var,
+                            "color": "#EE7733",
+                            "x0": lower_percentile,
+                            "x1": upper_percentile,
+                        }
+                    )
+                    continue
+                current_splits = current_splits.to_records()[0]
+                # get the current value threshold and comparison operator
+                var_value = current_splits["value"]
+                comp_operator = current_splits["dir"]
+                # convert the data to numeric and remove NaNs
+                x_col = pd.to_numeric(X[current_splits["variable"]]).dropna()
+                # evaluate and get the percentage of data
+                percentile = (
+                    OPERATORS[comp_operator](x_col, var_value).sum() / X.shape[0]
+                )
+                if "<" in comp_operator:
+                    split_coverage.append(
+                        {"variable": var, "color": "#0077BB", "x0": 0, "x1": percentile}
+                    )
+                else:
+                    split_coverage.append(
+                        {
+                            "variable": var,
+                            "color": "#33BBEE",
+                            "x0": 1 - percentile,
+                            "x1": 1,
+                        }
+                    )
+
+            return pd.DataFrame(split_coverage)
+
+        df = df.groupby(["committee", "rule"]).apply(_get_coverage).reset_index()
 
         df, ylabel = cls._validate_from_estimator_params(
             df=df, committee=committee, rule=rule

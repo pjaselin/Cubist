@@ -13,7 +13,8 @@ def test_coefficient_display():
     )
     y = X.medv
     X = X.drop(columns=["medv"])
-    model = Cubist(n_rules=2)
+
+    model = Cubist()
     model.fit(X, y)
 
     CubistCoefficientDisplay.from_estimator(model)

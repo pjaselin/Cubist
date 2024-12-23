@@ -80,7 +80,7 @@ class _CubistDisplayMixin:  # pylint: disable=R0903
         if df.committee.max() == 1:
             # if there is only one committee, this is a rule-only model
             ylabel = "Rule"
-            df["label"] = df.rule.astype(str)
+            df["label"] = df.rule
         else:
             # otherwise report by committee and rule
             ylabel = "Committee/Rule"

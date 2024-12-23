@@ -8,18 +8,28 @@ from cubist import Cubist, CubistCoverageDisplay
 
 
 def test_coverage_display():
-    """test creating plot"""
+    """test creating the plot"""
     X = pd.read_csv(
         "https://raw.githubusercontent.com/selva86/datasets/refs/heads/master/BostonHousing.csv"
     )
     y = X.medv
-    X = X.drop(columns=["medv", "dis"])
+    X = X.drop(columns=["medv"])
 
-    model = Cubist(n_rules=2)
-    model.fit(X, y)
+    model = Cubist().fit(X, y)
 
     CubistCoverageDisplay.from_estimator(model, X)
     plt.savefig("coverage_display_test.png")
+
+
+def test_titanic_coverage_display(X, y):
+    """test creating titanic coverage plot"""
+
+    X = X.drop(columns=["cabin", "boat", "sex"])
+
+    model = Cubist(n_committees=1, verbose=True).fit(X, y)
+
+    CubistCoverageDisplay.from_estimator(model, X)
+    plt.savefig("titanic_coverage_display_test.png")
 
 
 def test_coverage_display_line_kwargs():
