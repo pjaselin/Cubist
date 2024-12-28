@@ -27,7 +27,7 @@ def test_coefficient_display_scatter_kwargs():
         "https://raw.githubusercontent.com/selva86/datasets/refs/heads/master/BostonHousing.csv"
     )
     y = X.medv
-    X = X.drop(columns=["medv"])
+    X = X.drop(columns=["medv", "nox"])
     model = Cubist()
     model.fit(X, y)
     CubistCoefficientDisplay.from_estimator(model, scatter_kwargs={"alpha": 0.5})
