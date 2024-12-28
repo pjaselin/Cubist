@@ -172,7 +172,7 @@ class Cubist(RegressorMixin, BaseEstimator):  # pylint: disable=R0902
         "verbose": ["verbose"],
     }
 
-    def _more_tags(self):
+    def _more_tags(self):  # pragma: no cover
         """scikit-learn estimator configuration method (retained for backwards compatibility)"""
         return {"allow_nan": True, "X_types": ["2darray", "string"]}
 
