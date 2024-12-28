@@ -59,6 +59,9 @@ class _CubistDisplayMixin:  # pylint: disable=R0903
     ):
         check_matplotlib_support(f"{cls.__name__}.from_estimator")
 
+        # make sure dataframe is sorted by committee and rule
+        df = df.sort_values(by=["committee", "rule"]).reset_index(drop=True)
+
         # if the committee parameter is passed
         if committee is not None:
             # verify committee parameter is integer
@@ -79,14 +82,24 @@ class _CubistDisplayMixin:  # pylint: disable=R0903
 
         if df.committee.max() == 1:
             # if there is only one committee, this is a rule-only model
-            ylabel = "Rule"
+            y_axis_label = "Rule"
             df["label"] = df.rule
+            # get the distinct ordered labels
+            y_label_map = df.label.drop_duplicates().reset_index(drop=True).to_dict()
+            y_labels = list(y_label_map.values())
         else:
             # otherwise report by committee and rule
-            ylabel = "Committee/Rule"
+            y_axis_label = "Committee/Rule"
+            # create label column for committee/rule pair
             df["label"] = df[["committee", "rule"]].apply(
                 lambda x: f"{x.committee}/{x.rule}",
                 axis=1,
             )
+            # get the distinct ordered labels
+            y_label_map = df.label.drop_duplicates().reset_index(drop=True).to_dict()
+            y_labels = list(y_label_map.values())
+            # replace the dataframe label column values with the index of the
+            # same value in y_labels
+            df.label = df.label.apply(y_labels.index)
 
-        return df, ylabel
+        return df, y_axis_label, y_label_map

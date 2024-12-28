@@ -70,11 +70,12 @@ class CubistCoverageDisplay(_CubistDisplayMixin):
         self.ax_ = None
         self.figure_ = None
 
-    def plot(
+    def plot(  # pylint: disable=R0913
         self,
         ax=None,
+        y_label_map: dict = None,
         *,
-        ylabel: str = None,
+        y_axis_label: str = None,
         gridspec_kwargs: dict = None,
         line_kwargs: dict = None,
     ):
@@ -89,7 +90,12 @@ class CubistCoverageDisplay(_CubistDisplayMixin):
             Axes object to plot on. If `None`, a new figure and axes is
             created.
 
-        ylabel : str, default=None
+        y_label_map : dict, default=None
+            Dictionary mapping ordered value to the y-axis tick label so that
+            matplotlib correctly orders committee/rule pairs in addition to rule
+            numbers along the y-axis.
+
+        y_axis_label : str, default=None
             Y-axis label for plot.
 
         **gridspec_kwargs : dict
@@ -120,14 +126,6 @@ class CubistCoverageDisplay(_CubistDisplayMixin):
                 self.ax_[i].plot([0, 1], [label, label], color="#e9e9e9", zorder=0)
             # plot data
             for _, row in data.iterrows():
-                # use blue for less than plot and set x points as 0 to some value
-                # if "<" in row["dir"]:
-                #     x = [0, row["percentile"]]
-                #     color = "#1E88E5"
-                # # use red for greater than plot and set x points as some value to 1
-                # else:
-                #     x = [1 - row["percentile"], 1]
-                #     color = "#ff0d57"
                 # plot line
                 self.ax_[i].plot(
                     [row["x0"], row["x1"]],
@@ -139,14 +137,18 @@ class CubistCoverageDisplay(_CubistDisplayMixin):
                 self.ax_[i].set_title(var)
                 # set the x-axis limits of the subplot
                 self.ax_[i].set_xlim([-0.05, 1.05])
+                # set the y-axis tick labels
+                self.ax_[i].set_yticks(
+                    list(y_label_map.keys()), list(y_label_map.values())
+                )
 
         # turn off any unused plots
         for j in range(i + 1, self.ax_.shape[0]):  # noqa W0631, pylint: disable=W0631
             self.ax_[j].set_axis_off()
 
         self.figure_.supxlabel("Data Coverage")
-        self.figure_.supylabel(ylabel)
-        self.figure_.suptitle(f"Data Coverage by {ylabel} and Variable")
+        self.figure_.supylabel(y_axis_label)
+        self.figure_.suptitle(f"Data Coverage by {y_axis_label} and Variable")
 
         return self
 
@@ -296,7 +298,7 @@ class CubistCoverageDisplay(_CubistDisplayMixin):
 
         df = df.groupby(["committee", "rule"]).apply(_get_coverage).reset_index()
 
-        df, ylabel = cls._validate_from_estimator_params(
+        df, y_axis_label, y_label_map = cls._validate_from_estimator_params(
             df=df, committee=committee, rule=rule
         )
 
@@ -304,7 +306,8 @@ class CubistCoverageDisplay(_CubistDisplayMixin):
 
         return viz.plot(
             ax=ax,
-            ylabel=ylabel,
+            y_label_map=y_label_map,
+            y_axis_label=y_axis_label,
             line_kwargs=line_kwargs,
             gridspec_kwargs=gridspec_kwargs,
         )

@@ -64,11 +64,12 @@ class CubistCoefficientDisplay(_CubistDisplayMixin):
         self.ax_ = None
         self.figure_ = None
 
-    def plot(
+    def plot(  # pylint: disable=R0913
         self,
         ax=None,
+        y_label_map: dict = None,
         *,
-        ylabel: str = None,
+        y_axis_label: str = None,
         gridspec_kwargs: dict = None,
         scatter_kwargs: dict = None,
     ):
@@ -83,7 +84,12 @@ class CubistCoefficientDisplay(_CubistDisplayMixin):
             Axes object to plot on. If `None`, a new figure and axes is
             created.
 
-        ylabel : str, default=None
+        y_label_map : dict, default=None
+            Dictionary mapping ordered value to the y-axis tick label so that
+            matplotlib correctly orders committee/rule pairs in addition to rule
+            numbers along the y-axis.
+
+        y_axis_label : str, default=None
             Y-axis label for plot.
 
         **gridspec_kwargs : dict
@@ -126,14 +132,16 @@ class CubistCoefficientDisplay(_CubistDisplayMixin):
             # set the subplot title as the variable name
             self.ax_[i].set_title(var)
             self.ax_[i].xaxis.set_major_locator(MaxNLocator(prune="both"))
+            # set the y-axis ticks
+            self.ax_[i].set_yticks(list(y_label_map.keys()), list(y_label_map.values()))
 
         # turn off any remaining unused plots
         for j in range(i + 1, self.ax_.shape[0]):  # noqa W0631, pylint: disable=W0631
             self.ax_[j].set_axis_off()
 
         self.figure_.supxlabel("Coefficient Value")
-        self.figure_.supylabel(ylabel)
-        self.figure_.suptitle(f"Model Coefficients by {ylabel} and Variable")
+        self.figure_.supylabel(y_axis_label)
+        self.figure_.suptitle(f"Model Coefficients by {y_axis_label} and Variable")
 
     @classmethod
     def from_estimator(  # pylint: disable=R0913
@@ -199,7 +207,7 @@ class CubistCoefficientDisplay(_CubistDisplayMixin):
         df = pd.melt(estimator.coeffs_, id_vars=["committee", "rule"])
         df = df.loc[df.notna().all(axis="columns")]
 
-        df, ylabel = cls._validate_from_estimator_params(
+        df, y_axis_label, y_label_map = cls._validate_from_estimator_params(
             df=df, committee=committee, rule=rule
         )
 
@@ -207,7 +215,8 @@ class CubistCoefficientDisplay(_CubistDisplayMixin):
 
         return viz.plot(
             ax=ax,
-            ylabel=ylabel,
+            y_label_map=y_label_map,
+            y_axis_label=y_axis_label,
             scatter_kwargs=scatter_kwargs,
             gridspec_kwargs=gridspec_kwargs,
         )
