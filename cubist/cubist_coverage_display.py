@@ -231,36 +231,41 @@ class CubistCoverageDisplay(_CubistDisplayMixin):
                 "No splits of continuous predictors were used in this model"
             )
 
-        def _get_coverage(x):
-            split_coverage = []
-            for var in list(x.variable.unique()):
-                current_splits = x.loc[x.variable == var]
+        def get_split_coverage(split):
+            """given one split for a committee/rule, return the comparison
+            operator used and the percentile of coverage in the dataset"""
+            # get the current value threshold and comparison operator
+            var_value = split["value"]
+            comp_operator = split["dir"]
+            # convert the data to numeric and remove NaNs
+            var_col = pd.to_numeric(X[split["variable"]]).dropna()
+            # evaluate and get the percentage of data
+            percentile = OPERATORS[comp_operator](var_col, var_value).sum() / X.shape[0]
+            return comp_operator, percentile
 
+        def get_rule_coverage(grp):
+            """takes the splits for a committee/rule group and returns the
+            scaled lower and upper percent coverage"""
+            split_coverage = []
+            for var in list(grp.variable.unique()):
+                # filter the split data for the current committee/rule to only
+                # one variable
+                current_splits = grp.loc[grp.variable == var]
+
+                # if there are multiple splits for this variable, then this
+                # split covers an interior range of values, between the maximum
+                # and minimum values
                 if current_splits.shape[0] > 1:
+                    # get the coverage for the lower end split
                     lower_split = current_splits.loc[
                         current_splits.dir.str.contains("<")
                     ].to_records()[0]
-                    # get the current value threshold and comparison operator
-                    var_value = lower_split["value"]
-                    comp_operator = lower_split["dir"]
-                    # convert the data to numeric and remove NaNs
-                    x_col = pd.to_numeric(X[lower_split["variable"]]).dropna()
-                    # evaluate and get the percentage of data
-                    lower_percentile = (
-                        OPERATORS[comp_operator](x_col, var_value).sum() / X.shape[0]
-                    )
+                    _, lower_percentile = get_split_coverage(lower_split)
+                    # get the coverage for the upper end split
                     upper_split = current_splits.loc[
                         current_splits.dir.str.contains(">")
                     ].to_records()[0]
-                    # get the current value threshold and comparison operator
-                    var_value = upper_split["value"]
-                    comp_operator = upper_split["dir"]
-                    # convert the data to numeric and remove NaNs
-                    x_col = pd.to_numeric(X[upper_split["variable"]]).dropna()
-                    # evaluate and get the percentage of data
-                    upper_percentile = (
-                        OPERATORS[comp_operator](x_col, var_value).sum() / X.shape[0]
-                    )
+                    _, upper_percentile = get_split_coverage(upper_split)
                     split_coverage.append(
                         {
                             "variable": var,
@@ -270,20 +275,18 @@ class CubistCoverageDisplay(_CubistDisplayMixin):
                         }
                     )
                     continue
+                # where one split is present for a variable, get the coverage
+                # for this variable
                 current_splits = current_splits.to_records()[0]
-                # get the current value threshold and comparison operator
-                var_value = current_splits["value"]
-                comp_operator = current_splits["dir"]
-                # convert the data to numeric and remove NaNs
-                x_col = pd.to_numeric(X[current_splits["variable"]]).dropna()
-                # evaluate and get the percentage of data
-                percentile = (
-                    OPERATORS[comp_operator](x_col, var_value).sum() / X.shape[0]
-                )
+                comp_operator, percentile = get_split_coverage(current_splits)
+                # if this is a less than-type split, then the range is
+                # [0, percentile]
                 if "<" in comp_operator:
                     split_coverage.append(
                         {"variable": var, "color": "#0077BB", "x0": 0, "x1": percentile}
                     )
+                # if this is a greater than-type split, then the range is
+                # [(1-percentile), 1]
                 else:
                     split_coverage.append(
                         {
@@ -296,7 +299,8 @@ class CubistCoverageDisplay(_CubistDisplayMixin):
 
             return pd.DataFrame(split_coverage)
 
-        df = df.groupby(["committee", "rule"]).apply(_get_coverage).reset_index()
+        # apply get_rule_coverage to each committee/rule group
+        df = df.groupby(["committee", "rule"]).apply(get_rule_coverage).reset_index()
 
         df, y_axis_label, y_label_map = cls._validate_from_estimator_params(
             df=df, committee=committee, rule=rule
