@@ -287,7 +287,7 @@ class Cubist(RegressorMixin, BaseEstimator):  # pylint: disable=R0902
             X,
             y,
             dtype=None,
-            force_all_finite="allow-nan",
+            ensure_all_finite="allow-nan",
             y_numeric=True,
             ensure_min_samples=2,
         )
@@ -425,7 +425,7 @@ class Cubist(RegressorMixin, BaseEstimator):  # pylint: disable=R0902
 
         # validate input data
         X = validate_data(
-            self, X, dtype=None, force_all_finite="allow-nan", reset=False
+            self, X, dtype=None, ensure_all_finite="allow-nan", reset=False
         )
 
         # (re)construct a dataframe from X

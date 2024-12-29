@@ -19,7 +19,7 @@ OPERATORS = {
 
 
 class CubistCoverageDisplay(_CubistDisplayMixin):
-    """Visualization of rule coverage for input variables for a trained Cubist
+    """Visualization of rule split coverage for input variables for a trained Cubist
     model.
 
     This tool plots the percents and ranges (coverage) per rule of input

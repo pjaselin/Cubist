@@ -4,10 +4,7 @@ import math
 
 import pandas as pd
 
-try:
-    from sklearn.utils._optional_dependencies import check_matplotlib_support
-except ImportError:  # pragma: no cover
-    from sklearn.utils import check_matplotlib_support
+from sklearn.utils._optional_dependencies import check_matplotlib_support
 
 
 class _CubistDisplayMixin:  # pylint: disable=R0903
