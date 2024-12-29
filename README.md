@@ -20,16 +20,17 @@ A Python package for fitting Quinlan's [Cubist](https://www.rulequest.com/cubist
 - [Background](#background)
 - [Advantages](#advantages)
 - [Sample Usage](#sample-usage)
+- [Cubist Model Class](#cubist-model-class)
   - [Model Parameters](#model-parameters)
   - [Model Attributes](#model-attributes)
-  - [Visualization Utilities](#visualization-utilities)
-    - [Coefficient Display](#coefficient-display)
-      - [CubistCoefficientDisplay.from_estimator Parameters](#cubistcoefficientdisplayfrom_estimator-parameters)
+- [Visualization Utilities](#visualization-utilities)
+  - [Coefficient Display](#coefficient-display)
+    - [CubistCoefficientDisplay.from_estimator Parameters](#cubistcoefficientdisplayfrom_estimator-parameters)
     - [CubistCoefficientDisplay Sample Usage](#cubistcoefficientdisplay-sample-usage)
-    - [Coverage Display](#coverage-display)
-      - [CubistCoverageDisplay.from_estimator Parameters](#cubistcoveragedisplayfrom_estimator-parameters)
+  - [Coverage Display](#coverage-display)
+    - [CubistCoverageDisplay.from_estimator Parameters](#cubistcoveragedisplayfrom_estimator-parameters)
     - [CubistCoverageDisplay Sample Usage](#cubistcoveragedisplay-sample-usage)
-  - [Considerations](#considerations)
+- [Considerations](#considerations)
 - [Benchmarks](#benchmarks)
 - [Literature for Cubist](#literature-for-cubist)
   - [Original Paper](#original-paper)
@@ -134,6 +135,8 @@ array([1.1257    , 0.        , 2.04999995, 1.25449991, 1.30480003,
 0.9543285583162371
 ```
 
+## Cubist Model Class
+
 ### Model Parameters
 
 The following parameters can be passed as arguments to the ```Cubist()``` class instantiation:
@@ -167,15 +170,15 @@ The following attributes are exposed to understand the Cubist model results:
 - committee_error_reduction_: Error reduction by using committees.
 - n_committees_used_: Number of committees used by Cubist.
 
-### Visualization Utilities
+## Visualization Utilities
 
 Based on R Cubist package, a few visualization utilities are provided to allow some exploration of trained Cubist models.
 
-#### Coefficient Display
+### Coefficient Display
 
 The `CubistCoefficientDisplay` plots the linear regression coefficients and intercepts selected by the Cubist model. One subplot is created for each variable/attribute/column with the rule number or committee/rule pair on the y-axis and the coefficient value plotted along the x-axis.
 
-##### CubistCoefficientDisplay.from_estimator Parameters
+#### CubistCoefficientDisplay.from_estimator Parameters
 
 - estimator: The trained Cubist model.
 - committee: Optional parameter to filter to only committees at or below this committee number.
@@ -193,17 +196,16 @@ The `CubistCoefficientDisplay` plots the linear regression coefficients and inte
 >>> X, y = load_iris(return_X_y=True, as_frame=True)
 >>> model = Cubist(n_rules=2).fit(X, y)
 >>> display = CubistCoverageDisplay.from_estimator(estimator=model)
-<...>
 >>> plt.show()
 ```
 
 ![Sample Cubist Coefficient Display for Iris dataset](./www/iris_coefficient_display.png)
 
-#### Coverage Display
+### Coverage Display
 
 The `CubistCoverageDisplay` is used to visualize the coverage of rule splits for a given dataset. One subplot is created per input variable/attribute/column with the rule number or comittee/rule pair plotted on the y-axis and the coverage ranges plotted along the x-axis, scaled to the percentage of the variable values.
 
-##### CubistCoverageDisplay.from_estimator Parameters
+#### CubistCoverageDisplay.from_estimator Parameters
 
 - estimator: The trained Cubist model.
 - X: An input dataset comparable to the dataset used to train the Cubist model.
@@ -222,13 +224,12 @@ The `CubistCoverageDisplay` is used to visualize the coverage of rule splits for
 >>> X, y = load_iris(return_X_y=True, as_frame=True)
 >>> model = Cubist(n_rules=2).fit(X, y)
 >>> display = CubistCoverageDisplay.from_estimator(estimator=model)
-<...>
 >>> plt.show()
 ```
 
 ![Sample Cubist Coverage Display for Iris dataset](./www/iris_coverage_display.png)
 
-### Considerations
+## Considerations
 
 - For small datasets, using the `sample` parameter is probably inadvisable because Cubist won't have enough samples to produce a representative model.
 - If you are looking for fast inferencing and can spare accuracy, skip using a composite model by not setting a value for `neighbors`.
