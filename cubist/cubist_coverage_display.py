@@ -250,21 +250,21 @@ class CubistCoverageDisplay(_CubistDisplayMixin):
             for var in list(grp.variable.unique()):
                 # filter the split data for the current committee/rule to only
                 # one variable
-                current_splits = grp.loc[grp.variable == var]
+                current_splits = grp.loc[grp.variable == var].to_records()
 
                 # if there are multiple splits for this variable, then this
                 # split covers an interior range of values, between the maximum
                 # and minimum values
-                if current_splits.shape[0] > 1:
+                if len(current_splits) > 1:
                     # get the coverage for the lower end split
-                    lower_split = current_splits.loc[
-                        current_splits.dir.str.contains("<")
-                    ].to_records()[0]
+                    lower_split = next(
+                        item for item in current_splits if "<" in item["dir"]
+                    )
                     _, lower_percentile = get_split_coverage(lower_split)
                     # get the coverage for the upper end split
-                    upper_split = current_splits.loc[
-                        current_splits.dir.str.contains(">")
-                    ].to_records()[0]
+                    upper_split = next(
+                        item for item in current_splits if ">" in item["dir"]
+                    )
                     _, upper_percentile = get_split_coverage(upper_split)
                     split_coverage.append(
                         {
@@ -277,8 +277,7 @@ class CubistCoverageDisplay(_CubistDisplayMixin):
                     continue
                 # where one split is present for a variable, get the coverage
                 # for this variable
-                current_splits = current_splits.to_records()[0]
-                comp_operator, percentile = get_split_coverage(current_splits)
+                comp_operator, percentile = get_split_coverage(current_splits[0])
                 # if this is a less than-type split, then the range is
                 # [0, percentile]
                 if "<" in comp_operator:
