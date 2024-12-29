@@ -3,6 +3,7 @@
 import matplotlib.pyplot as plt
 import pandas as pd
 import pytest
+from sklearn.datasets import load_iris
 
 from cubist import Cubist, CubistCoverageDisplay
 
@@ -21,12 +22,20 @@ def test_coverage_display():
     plt.savefig("coverage_display_test.png")
 
 
+def test_iris_coverage_display():
+    """test creating the readme iris coverage plot"""
+    X, y = load_iris(return_X_y=True, as_frame=True)
+    model = Cubist().fit(X, y)
+    CubistCoverageDisplay.from_estimator(estimator=model, X=X)
+    plt.savefig("www/iris_coverage_display.png")
+
+
 def test_titanic_coverage_display(X, y):
     """test creating titanic coverage plot"""
 
     X = X.drop(columns=["cabin", "boat", "sex"])
 
-    model = Cubist(n_rules=11, n_committees=2).fit(X, y)
+    model = Cubist(n_rules=11, n_committees=2, verbose=True).fit(X, y)
 
     CubistCoverageDisplay.from_estimator(model, X)
     plt.savefig("titanic_coverage_display_test.png")

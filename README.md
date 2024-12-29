@@ -194,7 +194,7 @@ The `CubistCoefficientDisplay` plots the linear regression coefficients and inte
 >>> from sklearn.datasets import load_iris
 >>> from cubist import Cubist, CubistCoverageDisplay
 >>> X, y = load_iris(return_X_y=True, as_frame=True)
->>> model = Cubist(n_rules=2).fit(X, y)
+>>> model = Cubist().fit(X, y)
 >>> display = CubistCoverageDisplay.from_estimator(estimator=model)
 >>> plt.show()
 ```
@@ -222,8 +222,8 @@ The `CubistCoverageDisplay` is used to visualize the coverage of rule splits for
 >>> from sklearn.datasets import load_iris
 >>> from cubist import Cubist, CubistCoverageDisplay
 >>> X, y = load_iris(return_X_y=True, as_frame=True)
->>> model = Cubist(n_rules=2).fit(X, y)
->>> display = CubistCoverageDisplay.from_estimator(estimator=model)
+>>> model = Cubist().fit(X, y)
+>>> display = CubistCoverageDisplay.from_estimator(estimator=model, X=X)
 >>> plt.show()
 ```
 
