@@ -160,6 +160,7 @@ The following attributes are exposed to understand the Cubist model results:
 - names_string_: A Cubist model parameter that describes the training dataset column names and types.
 - data_string: A Cubist model parameter containing the training data if required for instance-based correction.
 - model_: The trained Cubist model.
+- output_: The pretty print summary of the Cubist model.
 - feature_importances_: DataFrame of how input variables are used in model conditions and regression equations.
 - n_features_in_: The number of features seen during model fitting.
 - feature_names_in_: List of features used to train Cubist.

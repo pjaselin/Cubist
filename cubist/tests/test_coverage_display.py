@@ -35,7 +35,7 @@ def test_titanic_coverage_display(X, y):
 
     X = X.drop(columns=["cabin", "boat", "sex"])
 
-    model = Cubist(n_rules=11, n_committees=2, verbose=True).fit(X, y)
+    model = Cubist(n_rules=11, n_committees=2).fit(X, y)
 
     CubistCoverageDisplay.from_estimator(model, X)
     plt.savefig("titanic_coverage_display_test.png")
