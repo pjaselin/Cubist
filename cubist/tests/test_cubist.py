@@ -219,7 +219,7 @@ def test_feature_importances(X, y):
     model.fit(X, y)
     check_is_fitted(model)
     assert list(model.feature_importances_.columns) == [
-        "Conds",
+        "Conditions",
         "Model",
         "Variable",
     ]

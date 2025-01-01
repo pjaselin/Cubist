@@ -6,26 +6,27 @@ import pandas as pd
 def _attribute_usage(output: str, feature_names: list | set):
     # get the attribute usage section of the model output
     start_i = output.find("Attribute usage:")
+    # if not found raise error
     if start_i == -1:
         raise ValueError("Cannot find attribute usage data")
+    # get the end index of the attribute usage section
     end_i = min(
         i
         for i in [output.find("Time: "), output.find("Evaluation on test data")]
         if i > 0
     )
-
+    # filter output down to the string containing the attribute usage data
     output = output[start_i + 17 : end_i].rstrip("\n")
-
-    # keep only the Attribute usage section
+    # filter out empty strings
     output = [o for o in output.split("\n") if o != ""]
-    columns = output.pop(0).lstrip("\t").strip().split("  ")
+    # remove the first element as this is the column headers
+    output.pop(0)
 
-    # per line in the Attribute usage, remove the tabs and strip
-    # leading/trailing whitespace
+    # per line in the attribute usage, parse the percentages and attribute name
     output = [_parse_attribute(o.lstrip("\t").strip()) for o in output]
-    # left pad output
-    output = pd.DataFrame(output, columns=columns + ["Variable"])
-    # check to see if there are more features than reported in the Attribute
+    # create dataframe
+    output = pd.DataFrame(output, columns=["Conditions", "Model", "Variable"])
+    # check to see if there are more features than reported in the attribute
     # usage table
     if output.shape[0] < len(feature_names):
         # get the list of missing features
@@ -39,7 +40,7 @@ def _attribute_usage(output: str, feature_names: list | set):
                 output,
                 pd.DataFrame(
                     {
-                        "Conds": zero_list,
+                        "Conditions": zero_list,
                         "Model": zero_list,
                         "Variable": missing_vars,
                     }
@@ -50,7 +51,9 @@ def _attribute_usage(output: str, feature_names: list | set):
     return output
 
 
-def _parse_attribute(x):
+def _parse_attribute(x) -> list[float, float, str]:
+    """parse an attribute row from the attribute usage table and return as a
+    list of [Condition, Model, Variable]"""
     # get the variable name as the string following the last occurrence of four
     # whitespace characters
     attribute_start_i = x.rindex("    ")
@@ -58,7 +61,10 @@ def _parse_attribute(x):
     return _get_values(x[:attribute_start_i]) + [attribute_name]
 
 
-def _get_values(x) -> list[int, int]:
+def _get_values(x) -> list[float, float]:
+    """takes the string containing the percentages of usage and assigns them to
+    the conditions (index 0) or model (index 1), removes the % symbol and
+    converts to a number"""
     x2 = x.split(" ")
     has_pct = ["%" in c for c in x2]
     if sum(has_pct) == 2:
@@ -68,7 +74,7 @@ def _get_values(x) -> list[int, int]:
     if x2[1 : pct_ind + 1].count("") < x2[pct_ind + 1 :].count(""):
         x2 = [c for c in x2 if "%" in c][0]
         x2 = float(x2.replace("%", ""))
-        return [x2, 0]
+        return [x2, 0.0]
     x2 = [c for c in x2 if "%" in c][0]
     x2 = float(x2.replace("%", ""))
-    return [0, x2]
+    return [0.0, x2]
