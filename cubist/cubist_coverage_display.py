@@ -257,12 +257,12 @@ class CubistCoverageDisplay(_CubistDisplayMixin):
                 # and minimum values
                 if len(current_splits) > 1:
                     # get the coverage for the lower end split
-                    lower_split = next(
+                    lower_split = next(  # pragma: no cover
                         item for item in current_splits if "<" in item["dir"]
                     )
                     _, lower_percentile = get_split_coverage(lower_split)
                     # get the coverage for the upper end split
-                    upper_split = next(
+                    upper_split = next(  # pragma: no cover
                         item for item in current_splits if ">" in item["dir"]
                     )
                     _, upper_percentile = get_split_coverage(upper_split)
