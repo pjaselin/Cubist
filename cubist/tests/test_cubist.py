@@ -1,4 +1,4 @@
-"""test Cubist configuration"""
+"""Test cubist.cubist.Cubist configuration"""
 
 import random
 
@@ -11,7 +11,7 @@ from ..cubist import Cubist, CubistError
 
 @pytest.mark.parametrize("expected_output", [True])
 def test_model_instance(expected_output):
-    """test model instantiates with the same identity as the class"""
+    """Test model instantiates with the same identity as the class"""
     model = Cubist()
     assert isinstance(model, Cubist) == expected_output
 
@@ -26,11 +26,11 @@ def test_model_instance(expected_output):
         ("asdf", pytest.raises(TypeError)),
     ],
 )
-def test_n_rules(n_rules, raises, X, y):
-    """test `n_rules` parameter"""
+def test_n_rules(n_rules, raises, ames_housing):
+    """Test `n_rules` parameter"""
     model = Cubist(n_rules=n_rules)
     with raises:
-        model.fit(X, y)
+        model.fit(*ames_housing)
         check_is_fitted(model)
 
 
@@ -45,11 +45,11 @@ def test_n_rules(n_rules, raises, X, y):
         ("asdf", pytest.raises(TypeError)),
     ],
 )
-def test_n_committees(n_committees, raises, X, y):
-    """test `n_committees` parameter"""
+def test_n_committees(n_committees, raises, ames_housing):
+    """Test `n_committees` parameter"""
     model = Cubist(n_committees=n_committees)
     with raises:
-        model.fit(X, y)
+        model.fit(*ames_housing)
         check_is_fitted(model)
 
 
@@ -66,12 +66,12 @@ def test_n_committees(n_committees, raises, X, y):
         (5, True, 0, pytest.raises(ValueError)),
     ],
 )
-def test_neighbors(neighbors, auto, expected, raises, X, y):  # pylint: disable=R0913,R0917
-    """test `neighbors` parameter"""
+def test_neighbors(neighbors, auto, expected, raises, ames_housing):  # pylint: disable=R0913,R0917
+    """Test `neighbors` parameter"""
     model = Cubist(neighbors=neighbors, auto=auto)
     with raises:
         assert expected == model._check_neighbors()  # noqa W0212, pylint: disable=W0212
-        model.fit(X, y)
+        model.fit(*ames_housing)
         check_is_fitted(model)
 
 
@@ -84,11 +84,11 @@ def test_neighbors(neighbors, auto, expected, raises, X, y):  # pylint: disable=
         ("aasdf", pytest.raises(TypeError)),
     ],
 )
-def test_unbiased(unbiased, raises, X, y):
-    """test `unbiased` parameter"""
+def test_unbiased(unbiased, raises, ames_housing):
+    """Test `unbiased` parameter"""
     model = Cubist(unbiased=unbiased)
     with raises:
-        model.fit(X, y)
+        model.fit(*ames_housing)
         check_is_fitted(model)
 
 
@@ -102,11 +102,11 @@ def test_unbiased(unbiased, raises, X, y):
         (1, pytest.raises(TypeError)),
     ],
 )
-def test_extrapolation(extrapolation, raises, X, y):
-    """test `extrapolation` parameter"""
+def test_extrapolation(extrapolation, raises, ames_housing):
+    """Test `extrapolation` parameter"""
     model = Cubist(extrapolation=extrapolation)
     with raises:
-        model.fit(X, y)
+        model.fit(*ames_housing)
         check_is_fitted(model)
 
 
@@ -121,11 +121,11 @@ def test_extrapolation(extrapolation, raises, X, y):
         (0, pytest.raises(TypeError)),
     ],
 )
-def test_sample(sample, raises, X, y):
-    """test `sample` parameter"""
+def test_sample(sample, raises, ames_housing):
+    """Test `sample` parameter"""
     model = Cubist(sample=sample)
     with raises:
-        model.fit(X, y)
+        model.fit(*ames_housing)
         check_is_fitted(model)
 
 
@@ -138,11 +138,11 @@ def test_sample(sample, raises, X, y):
         (0, pytest.raises(ValueError)),
     ],
 )
-def test_cv(cv, raises, X, y):
-    """test `cv` parameter"""
+def test_cv(cv, raises, ames_housing):
+    """Test `cv` parameter"""
     model = Cubist(cv=cv)
     with raises:
-        model.fit(X, y)
+        model.fit(*ames_housing)
 
 
 @pytest.mark.parametrize(
@@ -154,12 +154,12 @@ def test_cv(cv, raises, X, y):
         ("1234", 5, "auto", pytest.raises(TypeError)),
     ],
 )
-def test_auto(auto, n, expected, raises, X, y):  # pylint: disable=R0913,R0917
-    """test `auto` parameter"""
+def test_auto(auto, n, expected, raises, ames_housing):  # pylint: disable=R0913,R0917
+    """Test `auto` parameter"""
     model = Cubist(auto=auto)
     assert expected == model._check_composite(n)  # noqa W0212, pylint: disable=W0212
     with raises:
-        model.fit(X, y)
+        model.fit(*ames_housing)
         check_is_fitted(model)
 
 
@@ -167,8 +167,9 @@ def test_auto(auto, n, expected, raises, X, y):  # pylint: disable=R0913,R0917
     "i, raises",
     [(0, no_raise()), (5, pytest.raises(ValueError)), (1, pytest.raises(ValueError))],
 )
-def test_missing_column_name(i, raises, X, y):
-    """test for where a column name is an empty string"""
+def test_missing_column_name(i, raises, ames_housing):
+    """Test for where a column name is an empty string"""
+    X, y = ames_housing
     model = Cubist()
     # get the column names as a list
     col_names = list(X.columns)
@@ -182,41 +183,41 @@ def test_missing_column_name(i, raises, X, y):
         check_is_fitted(model)
 
 
-def test_verbose(capfd, X, y):
-    """test to make sure verbose parameter prints to stdout"""
+def test_verbose(capfd, ames_housing):
+    """Test to make sure verbose parameter prints to stdout"""
     model = Cubist(verbose=True, target_label="new outcome label")
-    model.fit(X, y)
+    model.fit(*ames_housing)
     out, _ = capfd.readouterr()
     assert out
 
 
-@pytest.mark.parametrize(
-    "df_set_name, raises",
-    [
-        ("(X, y)", no_raise()),
-        ("dfs", pytest.raises(CubistError)),
-    ],
-)
-def test_training_errors(df_set_name, raises, df_set):
-    """test catching training errors"""
-    with raises:
-        model = Cubist()
-        model.fit(*df_set[df_set_name])
+def test_training_errors(ames_housing):
+    """Test catching training errors"""
+    # valid test
+    model = Cubist().fit(*ames_housing)
+    check_is_fitted(model)
+    X, y = ames_housing
+    # set the Sale_Condition column as a string
+    X.Sale_Condition = X.Sale_Condition.astype(str)
+    # add a bad string
+    X.loc[0, "Sale_Condition"] = "test. bad, string"
+    # training should now fail
+    with pytest.raises(CubistError):
+        model = Cubist().fit(X, y)
         check_is_fitted(model)
 
 
-def test_sample_colnames(X, y):
-    """test using the word 'sample' as a column name"""
+def test_sample_colnames(ames_housing):
+    """Test using the word 'sample' as a column name"""
+    X, y = ames_housing
     X.columns = [random.choice(["sample", "Sample"]) + col for col in list(X.columns)]
-    model = Cubist()
-    model.fit(X, y)
+    model = Cubist().fit(X, y)
     check_is_fitted(model)
 
 
-def test_feature_importances(X, y):
-    """test `feature_importances_` attribute"""
-    model = Cubist()
-    model.fit(X, y)
+def test_feature_importances(ames_housing):
+    """Test `feature_importances_` attribute"""
+    model = Cubist().fit(*ames_housing)
     check_is_fitted(model)
     assert list(model.feature_importances_.columns) == [
         "Conditions",

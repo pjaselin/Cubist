@@ -1,4 +1,4 @@
-"""test obtaining quinlan attributes from input datasets"""
+"""Tests for obtaining Quinlan attributes from input datasets"""
 
 import random
 
@@ -41,7 +41,7 @@ bad_df = pd.DataFrame(
     ],
 )
 def test_is_all_int_dtype(test_input, expected):
-    """test integer data type"""
+    """Test integer data type"""
     assert _is_all_int_dtype(test_input) == expected
 
 
@@ -56,7 +56,7 @@ def test_is_all_int_dtype(test_input, expected):
     ],
 )
 def test_is_all_float_dtype(test_input, expected):
-    """test float data type"""
+    """Test float data type"""
     assert _is_all_float_dtype(test_input) == expected
 
 
@@ -72,7 +72,7 @@ def test_is_all_float_dtype(test_input, expected):
     ],
 )
 def test_get_data_format(test_input, expected, raises):
-    """test classifying data types"""
+    """Test classifying data types"""
     with raises:
         try:
             assert any(_get_data_format(test_input) == expected)
@@ -87,6 +87,6 @@ def test_get_data_format(test_input, expected, raises):
     [(good_df, dict, no_raise()), (bad_df, dict, pytest.raises(ValueError))],
 )
 def test_quinlan_attributes(test_input, expected, raises):
-    """test obtaining quinlan attributes"""
+    """Test obtaining quinlan attributes"""
     with raises:
         assert isinstance(_quinlan_attributes(test_input), expected)

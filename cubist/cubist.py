@@ -1,4 +1,4 @@
-"""main Cubist estimator class"""
+"""Main Cubist estimator class"""
 
 import zlib
 from warnings import warn
@@ -72,7 +72,10 @@ class Cubist(RegressorMixin, BaseEstimator):  # pylint: disable=R0902
         the training dataset. Recommended value is 5% as a decimal (0.05)
 
     sample : float, default=None
-        Percentage of the data set to be randomly selected for model building.
+        Percentage of the data set to be randomly selected for model building
+        and held out for model testing. When using this parameter, Cubist will
+        report evaluation results on the testing set in addition to the training
+        set results.
 
     cv : int, default=None
         Whether to carry out cross-validation and how many folds to use
@@ -295,6 +298,7 @@ class Cubist(RegressorMixin, BaseEstimator):  # pylint: disable=R0902
             ensure_all_finite="allow-nan",
             y_numeric=True,
             ensure_min_samples=2,
+            reset=True,
         )
 
         # set the feature names if it hasn't already been done

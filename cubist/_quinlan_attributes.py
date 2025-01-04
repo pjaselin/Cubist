@@ -1,4 +1,4 @@
-"""functions for determining the data types of input datasets in order to
+"""Functions for determining the data types of input datasets in order to
 describe them for Cubist"""
 
 import pandas as pd
@@ -12,14 +12,14 @@ import numpy as np
 
 
 def _is_all_float_dtype(x: pd.Series):
-    """check whether all values are of float dtype"""
+    """Check whether all values are of float dtype"""
     return all(
         j is float or np.issubdtype(j, np.floating) for j in [type(i) for i in x.values]
     )
 
 
 def _is_all_int_dtype(x: pd.Series):
-    """check whether all values are of float dtype"""
+    """Check whether all values are of float dtype"""
     return all(
         j is int or np.issubdtype(j, np.integer) for j in [type(i) for i in x.values]
     )

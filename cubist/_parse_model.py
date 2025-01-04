@@ -1,4 +1,4 @@
-"""functions for parsing Cubist model output to extract model metadata
+"""Functions for parsing Cubist model output to extract model metadata
 as well as committee/rule/regression model breakdowns"""
 
 import re
@@ -11,7 +11,7 @@ from ._utils import _format
 
 
 def _get_splits(model: list[str]):  # pylint: disable=R0914
-    """get splits from model along with the committee and rule indexed vectors"""
+    """Get splits from model along with the committee and rule indexed vectors"""
     # get length of model
     model_len = len(model)
     # define initial lists and index variables
@@ -153,7 +153,7 @@ def _parse_model(model: str, feature_names: list):
 
 
 def _type2(x, dig=3):
-    """parse type2 (continuous) splits"""
+    """Parse type2 (continuous) splits"""
     x = x.replace('"', "")
 
     # get the indices where these keywords start
@@ -181,7 +181,7 @@ def _type2(x, dig=3):
 
 
 def _type3(x):
-    """parse type3 (categorical) splits"""
+    """Parse type3 (categorical) splits"""
     # get the indices where these keywords start
     att_ind = x.find("att=")
     elts_ind = x.find("elts=")
@@ -201,7 +201,7 @@ def _type3(x):
 
 
 def _eqn(x, var_names: list):
-    """parse out the linear equation"""
+    """Parse out the linear equation"""
     x = x.replace('"', "")
     starts = [m.start(0) for m in re.finditer("(coeff=)|(att=)", x)]
     tmp = [""] * len(starts)
@@ -229,13 +229,13 @@ def _eqn(x, var_names: list):
 
 
 def _make_parsed_dict(x):
-    """parse string to dictionary"""
+    """Parse string to dictionary"""
     x = x.split("=")
     return {x[0]: x[1].strip('"')}
 
 
 def _parser(x):
-    """parse string to list of dictionaries"""
+    """Parse string to list of dictionaries"""
     x = x.split('" ')
     x = [_make_parsed_dict(c) for c in x]
     return x

@@ -1,4 +1,4 @@
-"""base class for Cubist plotting utilities"""
+"""Base class for Cubist plotting utilities"""
 
 import math
 

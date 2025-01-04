@@ -147,7 +147,7 @@ The following parameters can be passed as arguments to the ```Cubist()``` class 
 - unbiased: Should unbiased rules be used? Since Cubist minimizes the MAE of the predicted values, the rules may be biased and the mean predicted value may differ from the actual mean. This is recommended when there are frequent occurrences of the same value in a training dataset. Note that MAE may be slightly higher.
 - auto: A value of True allows the algorithm to choose whether to use nearest-neighbor corrections and how many neighbors to use. False will leave the choice of whether to use a composite model to the value passed `neighbors`.
 - extrapolation: Adjusts how much rule predictions are adjusted to be consistent with the training dataset. Recommended value is 5% as a decimal (0.05)
-- sample: Percentage of the data set to be randomly selected for model building (0.0 or greater but less than 1.0).
+- sample: Percentage of the data set to be randomly selected for model building (0.0 or greater but less than 1.0) and held out for model testing. When using this parameter, Cubist will report evaluation results on the testing set in addition to the training set results.
 - cv: Whether to carry out cross-validation (recommended value is 10)
 - random_state: An integer to set the random seed for the C Cubist code.
 - target_label: A label for the outcome variable. This is only used for printing rules.
@@ -200,7 +200,7 @@ The `CubistCoefficientDisplay` plots the linear regression coefficients and inte
 >>> plt.show()
 ```
 
-![Sample Cubist Coefficient Display for Iris dataset](./www/iris_coefficient_display.png)
+![Sample Cubist Coefficient Display for Iris dataset](./static/iris_coefficient_display.png)
 
 ### Coverage Display
 
@@ -228,11 +228,11 @@ The `CubistCoverageDisplay` is used to visualize the coverage of rule splits for
 >>> plt.show()
 ```
 
-![Sample Cubist Coverage Display for Iris dataset](./www/iris_coverage_display.png)
+![Sample Cubist Coverage Display for Iris dataset](./static/iris_coverage_display.png)
 
 ## Considerations
 
-- For small datasets, using the `sample` parameter is probably inadvisable because Cubist won't have enough samples to produce a representative model.
+- For small datasets, using the `sample` parameter is probably inadvisable as Cubist won't have enough samples to produce a representative model.
 - If you are looking for fast inferencing and can spare accuracy, skip using a composite model by not setting a value for `neighbors`.
 - Models that produce one or more rules without splits (i.e. a single linear model is created that holds true for the entire dataset), will return an empty `splits_`attribute while the coefficients will be available in the `coeffs_` attribute.
 

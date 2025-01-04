@@ -1,4 +1,4 @@
-"""exceptions for Cubist"""
+"""Exceptions for Cubist"""
 
 
 class _Error(Exception):

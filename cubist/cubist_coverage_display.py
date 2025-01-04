@@ -9,6 +9,7 @@ from .cubist import Cubist
 from ._cubist_display_mixin import _CubistDisplayMixin
 
 
+# mapping of operator string to operator function
 OPERATORS = {
     "<": operator.lt,
     "<=": operator.le,
@@ -232,7 +233,7 @@ class CubistCoverageDisplay(_CubistDisplayMixin):
             )
 
         def get_split_coverage(split):
-            """given one split for a committee/rule, return the comparison
+            """Given one split for a committee/rule, return the comparison
             operator used and the percentile of coverage in the dataset"""
             # get the current value threshold and comparison operator
             var_value = split["value"]
@@ -244,7 +245,7 @@ class CubistCoverageDisplay(_CubistDisplayMixin):
             return comp_operator, percentile
 
         def get_rule_coverage(grp):
-            """takes the splits for a committee/rule group and returns the
+            """Takes the splits for a committee/rule group and returns the
             scaled lower and upper percent coverage"""
             split_coverage = []
             for var in list(grp.variable.unique()):
@@ -299,7 +300,11 @@ class CubistCoverageDisplay(_CubistDisplayMixin):
             return pd.DataFrame(split_coverage)
 
         # apply get_rule_coverage to each committee/rule group
-        df = df.groupby(["committee", "rule"]).apply(get_rule_coverage).reset_index()
+        df = (
+            df.groupby(["committee", "rule"])
+            .apply(get_rule_coverage, include_groups=False)
+            .reset_index()
+        )
 
         df, y_axis_label, y_label_map = cls._validate_from_estimator_params(
             df=df, committee=committee, rule=rule

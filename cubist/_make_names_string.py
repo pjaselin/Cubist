@@ -1,4 +1,4 @@
-"""functions to create the Cubist namesv_ input"""
+"""Functions to create the Cubist namesv_ input"""
 
 import re
 import sys

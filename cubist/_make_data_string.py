@@ -1,4 +1,4 @@
-"""functions to create the Cubist datav_ input"""
+"""Function to create the Cubist datav_ input"""
 
 import pandas as pd
 from pandas.api.types import is_string_dtype, is_numeric_dtype

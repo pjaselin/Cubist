@@ -1,4 +1,4 @@
-"""common scikit-learn estimator tests"""
+"""Common scikit-learn estimator tests"""
 
 from sklearn.utils.estimator_checks import parametrize_with_checks
 from sklearn.datasets import make_regression
@@ -7,7 +7,7 @@ from ..cubist import Cubist
 
 
 def expected_failed_checks(estimator):
-    """callable to pass sklearn checks that are known to fail"""
+    """Callable to pass sklearn checks that are known to fail"""
     if isinstance(estimator, Cubist):
         return {
             "check_sample_weight_equivalence_on_dense_data": "Cubist only accepts integers for `cv`",  # pylint: disable=C0301
@@ -17,13 +17,13 @@ def expected_failed_checks(estimator):
 
 @parametrize_with_checks([Cubist()], expected_failed_checks=expected_failed_checks)
 def test_sklearn_compatible_estimator(estimator, check):
-    """perform common scikit-learn estimator tests"""
+    """Perform common scikit-learn estimator tests"""
     return check(estimator)
 
 
 def test_reasonable_score():
     """
-    determine whether Cubist returns a 'reasonable' score per:
+    Determine whether Cubist returns a 'reasonable' score per:
     https://scikit-learn.org/stable/modules/generated/sklearn.utils.RegressorTags.html#sklearn.utils.RegressorTags
     """
     X, y = make_regression(  # pylint: disable=W0632

@@ -1,4 +1,4 @@
-"""tests for utility functions"""
+"""Tests for cubist._utils functions"""
 
 import pytest
 
@@ -22,6 +22,6 @@ from .._utils import _format
     ],
 )
 def test_format(val, raises, returns):
-    """test formatting numeric values"""
+    """Test formatting numeric values"""
     with raises:
         assert _format(val) == returns

@@ -152,4 +152,4 @@ notebooks/
 
 # images produced from matplotlib tests
 **/*.png
-!www/*
+!static/*
