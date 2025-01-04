@@ -123,7 +123,7 @@ def _parse_model(
         committee_error_reduction, n_committees_used
     ) : tuple
         Information parsed from the Cubist model including the model version,
-        splits dataframe, coefficients dataframe, feature statistics dataframe,
+        splits DataFrame, coefficients DataFrame, feature statistics DataFrame,
         the error reduction from using committees, and the number of committees
         actually used.
     """

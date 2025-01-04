@@ -5,19 +5,22 @@ import pandas as pd
 
 def _attribute_usage(output: str, feature_names: list | set):
     """
-    Function to collect the data formatting information for each column in a
-    Pandas DataFrame.
+    Function to convert the `Attribute usage` section of the Cubist output into
+    a Pandas DataFrame.
 
     Parameters
     ----------
-    df : pd.DataFrame
-        Pandas DataFrame from which column data attributes are obtained.
+    output : str
+        The Cubist verbose/pretty print summary of the trained model.
+
+    feature_names : list | set
+        The list of feature/attribute names used when training the model.
 
     Returns
     -------
-    x : dict
-        Dictionary with keys as column names and values as the description of
-        the data type.
+    output : pd.DataFrame
+        DataFrame of the variable/attribute usage in the conditions and linear
+        models created by Cubist.
     """
     # get the attribute usage section of the model output
     start_i = output.find("Attribute usage:")
