@@ -4,6 +4,21 @@ import pandas as pd
 
 
 def _attribute_usage(output: str, feature_names: list | set):
+    """
+    Function to collect the data formatting information for each column in a
+    Pandas DataFrame.
+
+    Parameters
+    ----------
+    df : pd.DataFrame
+        Pandas DataFrame from which column data attributes are obtained.
+
+    Returns
+    -------
+    x : dict
+        Dictionary with keys as column names and values as the description of
+        the data type.
+    """
     # get the attribute usage section of the model output
     start_i = output.find("Attribute usage:")
     # if not found raise error

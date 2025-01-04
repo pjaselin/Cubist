@@ -199,7 +199,8 @@ class CubistCoefficientDisplay(_CubistDisplayMixin):
         """
         check_is_fitted(estimator)
 
-        # melt coeffs dataframe to show each coefficient variable/value pair by committee/rule
+        # melt coeffs dataframe to show each coefficient variable/value pair by
+        # committee/rule
         df = pd.melt(estimator.coeffs_, id_vars=["committee", "rule"])
         df = df.loc[df.notna().all(axis="columns")]
 

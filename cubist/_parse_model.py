@@ -100,9 +100,33 @@ def _get_splits(model: list[str]):  # pylint: disable=R0914
     return com_num, rule_num, splits
 
 
-def _parse_model(model: str, feature_names: list):
-    """Parse Cubist model output to extract metadata and model splits as well
-    as coefficient information"""
+def _parse_model(
+    model: str, feature_names: list
+) -> list[str, pd.DataFrame, pd.DataFrame, pd.DataFrame, None | float, None | int]:
+    """
+    Parse Cubist model output to extract metadata and model splits as well as
+    coefficient information.
+
+    Parameters
+    ----------
+    model : str
+        The string holding the trained Cubist model
+
+    feature_names : list
+        The list of feature/attribute names used when training the model.
+
+    Returns
+    -------
+
+
+    ( model_version, splits, coeffs, feature_statistics,
+        committee_error_reduction, n_committees_used
+    ) : tuple
+        Information parsed from the Cubist model including the model version,
+        splits dataframe, coefficients dataframe, feature statistics dataframe,
+        the error reduction from using committees, and the number of committees
+        actually used.
+    """
     # split on newline
     model = deque(model.split("\n"))
     # get the cubist model version and build date

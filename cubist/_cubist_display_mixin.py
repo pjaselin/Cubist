@@ -43,7 +43,8 @@ class _CubistDisplayMixin:  # pylint: disable=R0903
                 gridspec_kw={"hspace": 0.5, "wspace": 0} | gridspec_kwargs,
             )
 
-            # ax is a numpy array and so we reshape it to one dimension for simpler processing
+            # ax is a numpy array and so we reshape it to one dimension for
+            # simpler processing
             ax = ax.reshape(-1)
         # if ax is provided, get the current figure
         else:
