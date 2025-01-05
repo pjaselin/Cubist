@@ -1,7 +1,9 @@
+"""Functions for parsing Cubist model output to extract model metadata
+as well as committee/rule/regression model breakdowns"""
+
 import re
-import math
-import operator
 from collections import deque
+from typing import Union
 
 import pandas as pd
 import numpy as np
@@ -9,53 +11,13 @@ import numpy as np
 from ._utils import _format
 
 
-OPERATORS = {
-    "<": operator.lt,
-    "<=": operator.le,
-    ">": operator.gt,
-    ">=": operator.ge,
-    "==": operator.eq,
-}
-
-
-def _parse_model(model: str, x, feature_names: list):
-    # split on newline
-    model = deque(model.split("\n"))
-    # get the cubist model version and build date
-    version = _parser(model.popleft())[0]["id"]
-    # get the global model statistics
-    model_statistics = {
-        k: v for stat in _parser(model.popleft()) for k, v in stat.items()
-    }
-    # get the feature statistics
-    feature_statistics = []
-    while model[0].startswith("att="):
-        feature_statistics.append(_parser(model.popleft()))
-    # feature_statistics = None
-    feature_statistics = pd.DataFrame(
-        [{k: v for d in feat for k, v in d.items()} for feat in feature_statistics]
-    )
-    # get the number of committees
-    committee_meta = _parser(model.popleft())
-    # set default committee error reduction and number of committees
-    committee_error_reduction = None
-    n_committees = None
-    for val in committee_meta:
-        if "redn" in val:
-            committee_error_reduction = float(val["redn"])  # noqa F841
-        if "entries" in val:
-            n_committees = int(val["entries"])  # noqa F841
-
-    # clean out empty strings
-    model = [m for m in model if m.strip() != ""]
-
-    # get model length
+def _get_splits(model: list[str]):  # pylint: disable=R0914
+    """Get splits from model along with the committee and rule indexed vectors"""
+    # get length of model
     model_len = len(model)
-
     # define initial lists and index variables
     com_num = [None] * model_len
     rule_num = [None] * model_len
-    cond_num = [None] * model_len
     com_idx = r_idx = 0
 
     # loop through model and indicate
@@ -86,8 +48,6 @@ def _parse_model(model: str, x, feature_names: list):
         if first_key == "type":
             # increment condition number
             c_idx += 1
-            # set the current condition number
-            cond_num[i] = c_idx
 
     split_var = [None] * model_len
     split_val = [None] * model_len
@@ -122,20 +82,9 @@ def _parse_model(model: str, x, feature_names: list):
     # if there are no continuous or categorical splits, return no splits
     if not is_type2 and not is_type3:
         # there is only one rule
-        rules = pd.DataFrame(
-            {
-                "committee": [1],
-                "rule": [1],
-                "variable": [""],
-                "dir": [""],
-                "value": [""],
-                "category": [""],
-                "type": [""],
-                "percentile": [1.0],
-            }
-        )
+        splits = pd.DataFrame()
     else:
-        rules = pd.DataFrame(
+        splits = pd.DataFrame(
             {
                 "committee": com_num,
                 "rule": rule_num,
@@ -148,26 +97,73 @@ def _parse_model(model: str, x, feature_names: list):
         )
 
         # remove missing values based on the variable column
-        rules = rules.dropna(subset=["variable"]).reset_index(drop=True)
+        splits = splits.dropna(subset=["variable"]).reset_index(drop=True)
+    return com_num, rule_num, splits
 
-        # get the percentage of data covered by this rule
-        nrows = x.shape[0]
-        for i in range(rules.shape[0]):
-            # get the current value threshold and comparison operator
-            var_value = rules.loc[i, "value"]
-            comp_operator = rules.loc[i, "dir"]
-            if (var_value is not None) and (not math.isnan(var_value)):
-                # convert the data to numeric and remove NaNs
-                x_col = pd.to_numeric(x[rules.loc[i, "variable"]]).dropna()
-                # evaluate and get the percentage of data
-                comp_total = OPERATORS[comp_operator](x_col, var_value).sum()
-                rules.loc[i, "percentile"] = comp_total / nrows
+
+def _parse_model(
+    model: str, feature_names: list
+) -> tuple[
+    str, pd.DataFrame, pd.DataFrame, pd.DataFrame, Union[None, float], Union[None, int]
+]:
+    """
+    Parse Cubist model output to extract metadata and model splits as well as
+    coefficient information.
+
+    Parameters
+    ----------
+    model : str
+        The string holding the trained Cubist model
+
+    feature_names : list
+        The list of feature/attribute names used when training the model.
+
+    Returns
+    -------
+
+
+    ( model_version, splits, coeffs, feature_statistics,
+        committee_error_reduction, n_committees_used
+    ) : tuple
+        Information parsed from the Cubist model including the model version,
+        splits DataFrame, coefficients DataFrame, feature statistics DataFrame,
+        the error reduction from using committees, and the number of committees
+        actually used.
+    """
+    # split on newline
+    model = deque(model.split("\n"))
+    # get the cubist model version and build date
+    version = _parser(model.popleft())[0]["id"]
+    # get the global model statistics
+    model.popleft()
+    # get the feature statistics
+    feature_statistics = []
+    while model[0].startswith("att="):
+        feature_statistics.append(_parser(model.popleft()))
+    feature_statistics = pd.DataFrame(
+        [{k: v for d in feat for k, v in d.items()} for feat in feature_statistics]
+    )
+    # get the number of committees
+    committee_meta = _parser(model.popleft())
+    # set default committee error reduction and number of committees
+    committee_error_reduction = None
+    n_committees_used = None
+    for val in committee_meta:
+        if "redn" in val:
+            committee_error_reduction = float(val["redn"])  # noqa F841
+        if "entries" in val:
+            n_committees_used = int(val["entries"])  # noqa F841
+
+    # clean out empty strings
+    model = [m for m in model if m.strip() != ""]
+
+    # parse model splits and get vectors for committees and rules
+    com_num, rule_num, splits = _get_splits(model)
 
     # get the indices of rows in model that contain model coefficients
     is_eqn = [i for i, c in enumerate(model) if c.startswith("coeff=")]
     # extract the model coefficients from the row
-    coeffs = [_eqn(model[i], var_names=feature_names) for i in is_eqn]
-    coeffs = pd.DataFrame(coeffs)
+    coeffs = pd.DataFrame([_eqn(model[i], var_names=feature_names) for i in is_eqn])
     # get the committee number
     coeffs["committee"] = [com_num[i] for i in is_eqn]
     # get the rule number for the committee
@@ -175,16 +171,16 @@ def _parse_model(model: str, x, feature_names: list):
 
     return (
         version,
-        rules,
+        splits,
         coeffs,
-        model_statistics,
         feature_statistics,
         committee_error_reduction,
-        n_committees,
+        n_committees_used,
     )
 
 
 def _type2(x, dig=3):
+    """Parse type2 (continuous) splits"""
     x = x.replace('"', "")
 
     # get the indices where these keywords start
@@ -212,6 +208,7 @@ def _type2(x, dig=3):
 
 
 def _type3(x):
+    """Parse type3 (categorical) splits"""
     # get the indices where these keywords start
     att_ind = x.find("att=")
     elts_ind = x.find("elts=")
@@ -220,9 +217,7 @@ def _type3(x):
     val = x[elts_ind + 5 :]
     val = val.replace("[{}]", "").replace('"', "").replace(" ", "").replace(",", ", ")
 
-    # if there are multiple values in the categorical split, just show
-    # {multiple_vals} for cleaner printing}
-    # TODO: enter all vals in dataframe but limit the column width when printing
+    # join multiple vals in categorical column into one string
     multiple_vals = "," in val
     if multiple_vals:
         val = "{" + str(multiple_vals) + "}"
@@ -233,6 +228,7 @@ def _type3(x):
 
 
 def _eqn(x, var_names: list):
+    """Parse out the linear equation"""
     x = x.replace('"', "")
     starts = [m.start(0) for m in re.finditer("(coeff=)|(att=)", x)]
     tmp = [""] * len(starts)
@@ -260,11 +256,13 @@ def _eqn(x, var_names: list):
 
 
 def _make_parsed_dict(x):
+    """Parse string to dictionary"""
     x = x.split("=")
     return {x[0]: x[1].strip('"')}
 
 
 def _parser(x):
+    """Parse string to list of dictionaries"""
     x = x.split('" ')
     x = [_make_parsed_dict(c) for c in x]
     return x

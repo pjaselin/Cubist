@@ -50,7 +50,7 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install .
+        pip install .[viz]
 
     - name: Lint with Ruff
       uses: chartboost/ruff-action@v1
@@ -58,8 +58,14 @@ jobs:
     - name: Test with pytest
       run: |
         pip install coverage pytest
-        coverage run -m pytest
+        coverage run -m pytest --junit-xml=junit.xml -o junit_family=legacy
         coverage report -m
+
+    - name: Upload test results to Codecov
+      if: ${{ !cancelled() }}
+      uses: codecov/test-results-action@v1
+      with:
+        token: ${{ secrets.CODECOV_TOKEN }}
 
     - name: Upload Coverage to Codecov
       uses: codecov/codecov-action@v4

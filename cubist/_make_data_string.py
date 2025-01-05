@@ -1,3 +1,5 @@
+"""Function to create the Cubist datav_ input"""
+
 import pandas as pd
 from pandas.api.types import is_string_dtype, is_numeric_dtype
 import numpy as np
@@ -27,8 +29,6 @@ def _make_data_string(x, y=None, w=None):
         Input dataset converted to a string and formatted per Cubist's
         requirements.
     """
-    x = x.copy(deep=True)
-
     # apply the escapes function to all string columns
     for col in x:
         if is_string_dtype(x[col]):
@@ -64,11 +64,7 @@ def _make_data_string(x, y=None, w=None):
             x[col] = x[col].astype(str)
 
     # remove leading whitespace from all elements
-    # handling pandas 2.2.2 feature change (applymap -> map)
-    if hasattr(x, "map"):  # pragma: no cover
-        x = x.map(lambda a: a.lstrip())
-    else:  # pragma: no cover
-        x = x.applymap(lambda a: a.lstrip())
+    x = x.map(lambda a: a.lstrip())
 
     # replace missing values with ?
     x = x.fillna("?")

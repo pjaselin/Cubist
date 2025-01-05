@@ -1,3 +1,6 @@
+"""Functions for determining the data types of input datasets in order to
+describe them for Cubist"""
+
 import pandas as pd
 from pandas.api.types import (
     is_string_dtype,
@@ -9,14 +12,14 @@ import numpy as np
 
 
 def _is_all_float_dtype(x: pd.Series):
-    """check whether all values are of float dtype"""
+    """Check whether all values are of float dtype"""
     return all(
         j is float or np.issubdtype(j, np.floating) for j in [type(i) for i in x.values]
     )
 
 
 def _is_all_int_dtype(x: pd.Series):
-    """check whether all values are of float dtype"""
+    """Check whether all values are of float dtype"""
     return all(
         j is int or np.issubdtype(j, np.integer) for j in [type(i) for i in x.values]
     )
@@ -58,7 +61,8 @@ def _get_data_format(x: pd.Series):
 
 def _quinlan_attributes(df: pd.DataFrame) -> dict:
     """
-    Function to collect the data formatting information for each column in a Pandas DataFrame.
+    Function to collect the data formatting information for each column in a
+    Pandas DataFrame.
 
     Parameters
     ----------

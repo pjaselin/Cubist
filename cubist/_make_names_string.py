@@ -1,3 +1,5 @@
+"""Functions to create the Cubist namesv_ input"""
+
 import re
 import sys
 from datetime import datetime
@@ -7,8 +9,9 @@ from ._quinlan_attributes import _quinlan_attributes
 
 def _make_names_string(x, w=None, label="outcome"):
     """
-    Create the names string to pass to Cubist. This string contains information about Python and the time of run along
-    with the column names and their data types.
+    Create the names string to pass to Cubist. This string contains information
+    about Python and the time of run along with the column names and their data
+    types.
 
     Parameters
     ----------
@@ -26,12 +29,9 @@ def _make_names_string(x, w=None, label="outcome"):
     out : str
         Case name string describing training dataset columns and their types.
     """
-    # copy Pandas objects so they aren't changed outside of this function
-    x = x.copy(deep=True)
-
     # clean reserved sample name if it's in x
     has_sample = [i for i, c in enumerate(x.columns) if bool(re.search("^sample", c))]
-    if has_sample:
+    if has_sample != []:
         x.columns = [re.sub("^sample", "_Sample", c) for c in x.columns]
 
     # generate the comments string showing the Python version and current timestamps

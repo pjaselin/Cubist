@@ -1,10 +1,16 @@
 [build-system]
-requires = ["setuptools", "wheel", "build", "cython", "numpy"]
+requires = [
+  "setuptools",
+  "wheel",
+  "build",
+  "cython",
+  "numpy"
+]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "cubist"
-version = "0.2.0"
+version = "1.0.0"
 authors = [
   {name = "John Ross Quinlan"},
   {name = "Max Kuhn"},
@@ -16,26 +22,36 @@ maintainers = [
 description="A Python package for fitting Quinlan's Cubist regression model."
 readme = {file = "README.md", content-type = "text/markdown"}
 classifiers = [
-    "Development Status :: 5 - Production/Stable",
-    "Intended Audience :: Developers",
-    "Intended Audience :: Science/Research",
-    "Topic :: Software Development :: Libraries",
-    "Topic :: Scientific/Engineering :: Artificial Intelligence",
-    "Topic :: Scientific/Engineering :: Mathematics",
-    "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
-    "Programming Language :: Python :: 3.8",
-    "Programming Language :: Python :: 3.9",
-    "Programming Language :: Python :: 3.10",
-    "Programming Language :: Python :: 3.11",
+  "Development Status :: 5 - Production/Stable",
+  "Intended Audience :: Developers",
+  "Intended Audience :: Science/Research",
+  "Topic :: Software Development :: Libraries",
+  "Topic :: Scientific/Engineering :: Artificial Intelligence",
+  "Topic :: Scientific/Engineering :: Mathematics",
+  "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
+  "Programming Language :: Python :: 3.9",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
 ]
 dependencies = [
-    "numpy",
-    "pandas",
-    "scikit-learn>=0.23.0",
+  "numpy",
+  "pandas>=2.2.2",
+  "scikit-learn>=1.6.0",
 ]
 
 [project.optional-dependencies]
-dev = ["pre-commit", "pytest", "ruff", "coverage"]
+dev = [
+  "pre-commit",
+  "pytest",
+  "ruff",
+  "coverage",
+  "pylint",
+  "sphinx"
+]
+viz = [
+  "matplotlib"
+]
 
 [project.urls]
 Homepage = "https://github.com/pjaselin/Cubist"
@@ -43,14 +59,27 @@ Repository = "https://github.com/pjaselin/Cubist.git"
 Issues = "https://github.com/pjaselin/Cubist/issues"
 
 [tool.setuptools]
-packages = ["cubist", "cubist.src"]
+packages = [
+  "cubist",
+  "cubist.src"
+]
 
 [tool.pytest.ini_options]
-addopts="-v -s"
+addopts = "-v -s"
 filterwarnings = "ignore:np.asscalar:DeprecationWarning"
 
 [tool.coverage.run]
 branch = true
+omit = [
+  "*/tests/*"
+]
 
 [tool.coverage.report]
 skip_covered = true
+
+[tool.pylint.'MESSAGES CONTROL']
+good-names = [
+  "X",
+  "X_train",
+  "X_test"
+]

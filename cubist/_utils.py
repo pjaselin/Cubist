@@ -1,3 +1,5 @@
+"""Common utility functions used across the library"""
+
 import pandas as pd
 import numpy as np
 
