@@ -47,7 +47,8 @@ dev = [
   "ruff",
   "coverage",
   "pylint",
-  "sphinx"
+  "sphinx",
+  "sphinx-book-theme"
 ]
 viz = [
   "matplotlib"
@@ -78,6 +79,7 @@ omit = [
 skip_covered = true
 
 [tool.pylint.'MESSAGES CONTROL']
+ignore-paths = '^docs/.*$'
 good-names = [
   "X",
   "X_train",
