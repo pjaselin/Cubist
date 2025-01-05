@@ -1,6 +1,6 @@
 """Functions for parsing the 'Attribute usage' section of the Cubist model output"""
 
-from typing import Union, List
+from typing import Union
 
 import pandas as pd
 
@@ -66,7 +66,7 @@ def _attribute_usage(output: str, feature_names: Union[list, set]):
     return output
 
 
-def _parse_attribute(x) -> List[float, float, str]:
+def _parse_attribute(x) -> list[float, float, str]:
     """Parse an attribute row from the attribute usage table and return as a
     list of [Condition, Model, Variable]"""
     # get the variable name as the string following the last occurrence of four
@@ -76,7 +76,7 @@ def _parse_attribute(x) -> List[float, float, str]:
     return _get_values(x[:attribute_start_i]) + [attribute_name]
 
 
-def _get_values(x) -> List[float, float]:
+def _get_values(x) -> list[float, float]:
     """Takes the string containing the percentages of usage and assigns them to
     the conditions (index 0) or model (index 1), removes the % symbol and
     converts to a number"""
