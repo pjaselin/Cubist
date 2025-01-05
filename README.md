@@ -8,7 +8,7 @@
 [![PyPI - Downloads](https://img.shields.io/pypi/dm/cubist)](https://pypi.org/project/cubist)
 [![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit)](https://github.com/pre-commit/pre-commit)
 
-A Python package for fitting Quinlan's [Cubist](https://www.rulequest.com/cubist-unix.html) v2.07 regression model. Inspired by and based on the [R wrapper](https://github.com/topepo/Cubist) for Cubist. Designed after and inherits from the [scikit-learn](https://scikit-learn.org/stable/) framework.
+A Python package for fitting Quinlan's [Cubist](https://www.rulequest.com/cubist-unix.html) v2.07 regression model. Inspired by and based on the [R wrapper](https://github.com/topepo/Cubist) for Cubist. Developed as a [scikit-learn](https://scikit-learn.org/stable/) compatible estimator.
 
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
@@ -62,15 +62,15 @@ pip install cubist[dev]
 
 ## Background
 
-Cubist is a regression algorithm developed by John Ross Quinlan for generating rule-based predictive models. This has been available in the R world thanks to the work of Max Kuhn and his colleagues. It is introduced to Python with this package and made scikit-learn compatible for easy use with existing model pipelines. Cross-validation and control over whether Cubist creates a composite model is also enabled here.
+Cubist is a regression algorithm developed by John Ross Quinlan for generating rule-based predictive models. This has been available in the R world thanks to the work of Max Kuhn and his colleagues. It is introduced to Python with this package and made scikit-learn compatible for use with at ecosystem. Cross-validation and control over whether Cubist creates a composite model is also enabled here.
 
 ## Advantages
 
-Unlike other ensemble models such as RandomForest and XGBoost, Cubist generates a set of rules, making it easy to understand precisely how the model makes it's predictive decisions. Thus tools such as SHAP and LIME are unnecessary as Cubist doesn't exhibit black box behavior.
+Unlike other ensemble models such as RandomForest and XGBoost, Cubist generates a set of rules, making it easy to understand precisely how the model makes it's predictive decisions. Tools such as SHAP and LIME are therefore unnecessary as Cubist doesn't exhibit black box behavior.
 
 Like XGBoost, Cubist can perform boosting by the addition of more models (called committees) that correct for the error of prior models (i.e. the second model created corrects for the prediction error of the first, the third for the error of the second, etc.).
 
-In addition to boosting, the model can perform instance-based (nearest-neighbor) corrections to create composite models, thus combining the advantages of these two methods. Note that with instance-based correction, model accuracy may be improved at the expense of computing time (this extra step takes longer) and some interpretability as the linear regression rules are no longer completely followed. It should also be noted that a composite model might be quite large as the full training dataset must be stored in order to perform instance-based corrections for inferencing. A composite model will be used when `auto=False` with `neighbors` set to an integer between 1 and 9. Cubist can be allowed to decide whether to take advantage of composite models with `auto=True`.
+In addition to boosting, the model can perform instance-based (nearest-neighbor) corrections to create composite models, combining the advantages of these two methods. Note that with instance-based correction, model accuracy may be improved at the expense of compute time (this extra step takes longer) and some interpretability as the linear regression rules are no longer completely followed. It should also be noted that a composite model might be quite large as the full training dataset must be stored in order to perform instance-based corrections for inferencing. A composite model will be used when `auto=False` with `neighbors` set to an integer between 1 and 9. Cubist can be allowed to decide whether to take advantage of composite models with `auto=True` and `neighbors` left unset.
 
 ## Sample Usage
 
@@ -157,8 +157,6 @@ The following parameters can be passed as arguments to the ```Cubist()``` class 
 
 The following attributes are exposed to understand the Cubist model results:
 
-- names_string_: A Cubist model parameter that describes the training dataset column names and types.
-- data_string: A Cubist model parameter containing the training data if required for instance-based correction.
 - model_: The trained Cubist model.
 - output_: The pretty print summary of the Cubist model.
 - feature_importances_: DataFrame of how input variables are used in model conditions and regression equations.
@@ -173,17 +171,18 @@ The following attributes are exposed to understand the Cubist model results:
 
 ## Visualization Utilities
 
-Based on R Cubist package, a few visualization utilities are provided to allow some exploration of trained Cubist models.
+Based on the R Cubist package, a few visualization utilities are provided to allow some exploration of trained Cubist models. Differing from the original package, these are extended somewhat to allow configuration of the subplots as well as for selecting a subset of variables/attributes to plot.
 
 ### Coefficient Display
 
-The `CubistCoefficientDisplay` plots the linear regression coefficients and intercepts selected by the Cubist model. One subplot is created for each variable/attribute/column with the rule number or committee/rule pair on the y-axis and the coefficient value plotted along the x-axis.
+The `CubistCoefficientDisplay` plots the linear regression coefficients and intercepts selected by the Cubist model. One subplot is created for each variable/attribute with the rule number or committee/rule pair on the y-axis and the coefficient value plotted along the x-axis.
 
 #### CubistCoefficientDisplay.from_estimator Parameters
 
 - estimator: The trained Cubist model.
 - committee: Optional parameter to filter to only committees at or below this committee number.
 - rule: Optional parameter to filter to only rules at or below this rule number.
+- feature_names: List of feature names to filter to in the plot. Leaving unselected plots all features.
 - ax: An optional Matplotlib axes object.
 - scatter_kwargs: Optional keywords to pass to `matplotlib.pyplot.scatter`.
 - gridspec_kwargs: Optional keywords to pass to `matplotlib.pyplot.subplots`.
@@ -212,6 +211,7 @@ The `CubistCoverageDisplay` is used to visualize the coverage of rule splits for
 - X: An input dataset comparable to the dataset used to train the Cubist model.
 - committee: Optional parameter to filter to only committees at or below this committee number.
 - rule: Optional parameter to filter to only rules at or below this rule number.
+- feature_names: List of feature names to filter to in the plot. Leaving unselected plots all features.
 - ax: An optional Matplotlib axes object.
 - line_kwargs: Optional keywords to pass to `matplotlib.pyplot.plot`.
 - gridspec_kwargs: Optional keywords to pass to `matplotlib.pyplot.subplots`.
@@ -233,8 +233,8 @@ The `CubistCoverageDisplay` is used to visualize the coverage of rule splits for
 ## Considerations
 
 - For small datasets, using the `sample` parameter is probably inadvisable as Cubist won't have enough samples to produce a representative model.
-- If you are looking for fast inferencing and can spare accuracy, skip using a composite model by not setting a value for `neighbors`.
-- Models that produce one or more rules without splits (i.e. a single linear model is created that holds true for the entire dataset), will return an empty `splits_`attribute while the coefficients will be available in the `coeffs_` attribute.
+- If you are looking for fast inferencing and can spare accuracy, consider skipping using a composite model by leaving `neighbors` unset.
+- Models that produce one or more rules without splits (i.e. a single linear model which holds true for the entire dataset), will return an empty `splits_`attribute while the coefficients will be available in the `coeffs_` attribute.
 
 ## Benchmarks
 
