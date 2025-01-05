@@ -96,11 +96,16 @@ class _CubistDisplayMixin:  # pylint: disable=R0903
             # filter for rows where the attribute/variable name is found in
             # the list
             df = df.loc[df.variable.isin(feature_names)]
+            # verify the dataframe is not empty now
             if df.empty:
                 raise ValueError(
                     f"No rows are available given `feature_names`: {feature_names}."
                 )
 
+        # reset the index since this is used for labelling
+        df = df.reset_index(drop=True)
+
+        # create the y-axis labels and y-tick values
         if df.committee.max() == 1:
             # if there is only one committee, this is a rule-only model
             y_axis_label = "Rule"
