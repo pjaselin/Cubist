@@ -15,7 +15,7 @@ def _attribute_usage(output: str, feature_names: Union[list, set]):
     output : str
         The Cubist verbose/pretty print summary of the trained model.
 
-    feature_names : list | set
+    feature_names : list or set
         The list of feature/attribute names used when training the model.
 
     Returns
