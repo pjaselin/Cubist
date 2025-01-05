@@ -147,21 +147,22 @@ def test_cv(cv, raises, ames_housing):
 
 
 @pytest.mark.parametrize(
-    "auto,n,expected,raises",
+    "auto,n,expected,raises,warns",
     [
-        (True, 5, "auto", no_raise()),
-        (False, 5, "yes", no_raise()),
-        (False, 0, "no", no_raise()),
-        ("1234", 5, "auto", pytest.raises(TypeError)),
+        (True, 5, "auto", no_raise(), pytest.warns(UserWarning)),
+        (False, 5, "yes", no_raise(), no_raise()),
+        (False, 0, "no", no_raise(), no_raise()),
+        ("1234", 5, "auto", pytest.raises(TypeError), no_raise()),
     ],
 )
-def test_auto(auto, n, expected, raises, ames_housing):  # pylint: disable=R0913,R0917
+def test_auto(auto, n, expected, raises, warns, iris):  # pylint: disable=R0913,R0917
     """Test `auto` parameter"""
     model = Cubist(auto=auto)
     assert expected == model._check_composite(n)  # noqa W0212, pylint: disable=W0212
     with raises:
-        model.fit(*ames_housing)
-        check_is_fitted(model)
+        with warns:
+            model.fit(*iris)
+            check_is_fitted(model)
 
 
 @pytest.mark.parametrize(
