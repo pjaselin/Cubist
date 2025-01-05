@@ -8,12 +8,14 @@ from cubist import Cubist, CubistCoverageDisplay
 
 
 def test_coverage_display(ames_housing):
-    """Test creating the plot"""
+    """Test creating a plot"""
     model = Cubist(n_committees=2).fit(*ames_housing)
+    CubistCoverageDisplay.from_estimator(model, ames_housing[0])
+    plt.savefig("coverage_display_test_ames.png")
     CubistCoverageDisplay.from_estimator(
         model, ames_housing[0], feature_names=["Gr_Liv_Area"]
     )
-    plt.savefig("coverage_display_test.png")
+    plt.savefig("coverage_display_test_ames_subselect.png")
 
 
 def test_coverage_display_for_r_parity(boston):

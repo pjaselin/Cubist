@@ -51,3 +51,17 @@ def test_validate_from_estimator_params_invalid_rule(california_housing):
     # should raise TypeError
     with pytest.raises(TypeError):
         display._validate_from_estimator_params(df=model.splits_, rule=2.0)  # pylint: disable=W0212
+
+
+def test_validate_from_estimator_params_invalid_feature_names(california_housing):
+    """Test using invalid feature_names parameter values"""
+    model = Cubist(n_committees=5).fit(*california_housing)
+    display = _CubistDisplayMixin()
+    # should raise TypeError
+    with pytest.raises(TypeError):
+        display._validate_from_estimator_params(df=model.splits_, feature_names="A")  # pylint: disable=W0212
+    # should raise ValueError
+    with pytest.raises(ValueError):
+        display._validate_from_estimator_params(  # pylint: disable=W0212
+            df=model.splits_, feature_names=["A", "B", "C"]
+        )

@@ -6,10 +6,12 @@ from cubist import Cubist, CubistCoefficientDisplay
 
 
 def test_coefficient_display(ames_housing):
-    """Test creating the plot"""
-    model = Cubist().fit(*ames_housing)
+    """Test creating a plot"""
+    model = Cubist(n_committees=2).fit(*ames_housing)
     CubistCoefficientDisplay.from_estimator(model)
-    plt.savefig("coefficient_display_test.png")
+    plt.savefig("coefficient_display_test_ames.png")
+    CubistCoefficientDisplay.from_estimator(model, feature_names=["Gr_Liv_Area"])
+    plt.savefig("coefficient_display_test_ames_subselect.png")
 
 
 def test_coefficient_display_for_r_parity(boston):

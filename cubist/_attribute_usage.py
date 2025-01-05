@@ -69,8 +69,8 @@ def _parse_attribute(x) -> list[float, float, str]:
     list of [Condition, Model, Variable]"""
     # get the variable name as the string following the last occurrence of four
     # whitespace characters
-    attribute_start_i = x.rindex("    ") + 4
-    attribute_name = x[attribute_start_i:]
+    attribute_start_i = x.rindex("    ")
+    attribute_name = x[attribute_start_i + 4 :]
     return _get_values(x[:attribute_start_i]) + [attribute_name]
 
 
