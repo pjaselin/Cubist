@@ -3,6 +3,7 @@ as well as committee/rule/regression model breakdowns"""
 
 import re
 from collections import deque
+from typing import List, Union
 
 import pandas as pd
 import numpy as np
@@ -10,7 +11,7 @@ import numpy as np
 from ._utils import _format
 
 
-def _get_splits(model: list[str]):  # pylint: disable=R0914
+def _get_splits(model: List[str]):  # pylint: disable=R0914
     """Get splits from model along with the committee and rule indexed vectors"""
     # get length of model
     model_len = len(model)
@@ -102,7 +103,9 @@ def _get_splits(model: list[str]):  # pylint: disable=R0914
 
 def _parse_model(
     model: str, feature_names: list
-) -> list[str, pd.DataFrame, pd.DataFrame, pd.DataFrame, None | float, None | int]:
+) -> List[
+    str, pd.DataFrame, pd.DataFrame, pd.DataFrame, Union[None, float], Union[None, int]
+]:
     """
     Parse Cubist model output to extract metadata and model splits as well as
     coefficient information.
