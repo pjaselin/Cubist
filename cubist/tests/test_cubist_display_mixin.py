@@ -1,7 +1,8 @@
 """Tests for cubist._cubist_display_mixin._CubistDisplayMixin"""
 
-import matplotlib.pyplot as plt
 import pytest
+
+import matplotlib.pyplot as plt
 
 from .._cubist_display_mixin import _CubistDisplayMixin
 from ..cubist import Cubist

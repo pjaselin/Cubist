@@ -12,6 +12,14 @@ def test_coefficient_display(ames_housing):
     plt.savefig("coefficient_display_test.png")
 
 
+def test_coefficient_display_for_r_parity(boston):
+    """Test creating plot from the R library"""
+    model = Cubist(n_rules=100, extrapolation=1.0)
+    model.fit(*boston)
+    CubistCoefficientDisplay.from_estimator(model)
+    plt.savefig("coefficient_display_test_r_parity.png")
+
+
 def test_coefficient_iris_display(iris):
     """Test creating the readme iris coefficient plot"""
     model = Cubist().fit(*iris)

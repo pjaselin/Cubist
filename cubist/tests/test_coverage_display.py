@@ -1,16 +1,29 @@
 """Tests for cubist.cubist_coverage_display.CubistCoverageDisplay"""
 
-import matplotlib.pyplot as plt
 import pytest
+
+import matplotlib.pyplot as plt
 
 from cubist import Cubist, CubistCoverageDisplay
 
 
 def test_coverage_display(ames_housing):
     """Test creating the plot"""
-    model = Cubist().fit(*ames_housing)
-    CubistCoverageDisplay.from_estimator(model, ames_housing[0])
+    model = Cubist(n_committees=2).fit(*ames_housing)
+    CubistCoverageDisplay.from_estimator(
+        model, ames_housing[0], feature_names=["Gr_Liv_Area"]
+    )
     plt.savefig("coverage_display_test.png")
+
+
+def test_coverage_display_for_r_parity(boston):
+    """Test creating plot from the R library"""
+    X, y = boston
+    model = Cubist(n_rules=100, extrapolation=1.0)
+    model.fit(X, y)
+
+    CubistCoverageDisplay.from_estimator(model, X)
+    plt.savefig("coverage_display_test_r_parity.png")
 
 
 def test_iris_coverage_display(iris):

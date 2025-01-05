@@ -3,6 +3,7 @@
 import math
 
 import pandas as pd
+import numpy as np
 
 from sklearn.utils._optional_dependencies import check_matplotlib_support
 
@@ -45,7 +46,11 @@ class _CubistDisplayMixin:  # pylint: disable=R0903
 
             # ax is a numpy array and so we reshape it to one dimension for
             # simpler processing
-            ax = ax.reshape(-1)
+            if isinstance(ax, np.ndarray):
+                ax = ax.reshape(-1)
+            # if there is only one plot created, place it in a numpy array
+            else:
+                ax = np.array([ax])
         # if ax is provided, get the current figure
         else:
             fig = plt.gcf()
@@ -53,7 +58,12 @@ class _CubistDisplayMixin:  # pylint: disable=R0903
 
     @classmethod
     def _validate_from_estimator_params(
-        cls, *, df: pd.DataFrame = None, committee: int = None, rule: int = None
+        cls,
+        *,
+        df: pd.DataFrame = None,
+        committee: int = None,
+        rule: int = None,
+        feature_names: list = None,
     ):
         check_matplotlib_support(f"{cls.__name__}.from_estimator")
 
@@ -65,7 +75,7 @@ class _CubistDisplayMixin:  # pylint: disable=R0903
             # verify committee parameter is integer
             if not isinstance(committee, int):
                 raise TypeError(
-                    f"`committee` must be an integer but got {type(committee)}"
+                    f"`committee` must be an integer but got {type(committee)}."
                 )
             # filter for committees below requested committee number
             df = df.loc[df.committee <= committee]
@@ -74,17 +84,27 @@ class _CubistDisplayMixin:  # pylint: disable=R0903
         if rule is not None:
             # verify rule parameter is integer
             if not isinstance(rule, int):
-                raise TypeError(f"`rule` must be an integer but got {type(rule)}")
+                raise TypeError(f"`rule` must be an integer but got {type(rule)}.")
             # filter for rules below requested rule number
             df = df.loc[df.rule <= rule]
+
+        # if feature_names parameter is passed
+        if feature_names is not None:
+            # verify feature_names is a list
+            if not isinstance(feature_names, list):
+                raise TypeError(f"`feature_names` must be a list but got {type(rule)}.")
+            # filter for rows where the attribute/variable name is found in
+            # the list
+            df = df.loc[df.variable.isin(feature_names)]
+            if df.empty:
+                raise ValueError(
+                    f"No rows are available given `feature_names`: {feature_names}."
+                )
 
         if df.committee.max() == 1:
             # if there is only one committee, this is a rule-only model
             y_axis_label = "Rule"
             df["label"] = df.rule
-            # get the distinct ordered labels
-            y_label_map = df.label.drop_duplicates().reset_index(drop=True).to_dict()
-            y_labels = list(y_label_map.values())
         else:
             # otherwise report by committee and rule
             y_axis_label = "Committee/Rule"
@@ -93,11 +113,11 @@ class _CubistDisplayMixin:  # pylint: disable=R0903
                 lambda x: f"{x.committee}/{x.rule}",
                 axis=1,
             )
-            # get the distinct ordered labels
-            y_label_map = df.label.drop_duplicates().reset_index(drop=True).to_dict()
-            y_labels = list(y_label_map.values())
-            # replace the dataframe label column values with the index of the
-            # same value in y_labels
-            df.label = df.label.apply(y_labels.index)
-
+        # get the distinct ordered labels
+        y_label_map = df.label.drop_duplicates().reset_index(drop=True).to_dict()
+        # get the labels as a list
+        y_labels = list(y_label_map.values())
+        # replace the dataframe label column values with the index of the
+        # same value in y_labels
+        df.label = df.label.apply(y_labels.index)
         return df, y_axis_label, y_label_map

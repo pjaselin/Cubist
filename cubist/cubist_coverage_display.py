@@ -161,6 +161,7 @@ class CubistCoverageDisplay(_CubistDisplayMixin):
         *,
         committee: int = None,
         rule: int = None,
+        feature_names: list = None,
         ax=None,
         line_kwargs=None,
         gridspec_kwargs=None,
@@ -183,6 +184,10 @@ class CubistCoverageDisplay(_CubistDisplayMixin):
 
         rule : int
             Max rule number to be included in plot.
+
+        feature_names : list of str
+            Feature names to filter to in the plot. Leaving unset plots all
+            features.
 
         ax : matplotlib axes, default=None
             Axes object to plot on. If `None`, a new figure and axes is
@@ -307,7 +312,7 @@ class CubistCoverageDisplay(_CubistDisplayMixin):
         )
 
         df, y_axis_label, y_label_map = cls._validate_from_estimator_params(
-            df=df, committee=committee, rule=rule
+            df=df, committee=committee, rule=rule, feature_names=feature_names
         )
 
         viz = cls(splits=df)

@@ -1,6 +1,7 @@
 """Test cubist._attribute_usage._attribute_usage functions"""
 
 import pytest
+
 from sklearn.datasets import load_iris
 
 from cubist import Cubist
@@ -19,4 +20,5 @@ def test_attribute_usage():
     in Cubist's report"""
     X, y = load_iris(return_X_y=True, as_frame=True)
     model = Cubist().fit(X, y)
-    _attribute_usage(model.output_, list(X.columns) + ["A"])
+    df = _attribute_usage(model.output_, list(X.columns) + ["A"])
+    assert df.shape[0] == len(X.columns) + 1

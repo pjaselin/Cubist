@@ -6,6 +6,7 @@ from contextlib import contextmanager
 import pytest
 
 from sklearn.datasets import fetch_openml, load_iris, fetch_california_housing
+import pandas as pd
 
 
 @contextmanager
@@ -32,3 +33,14 @@ def california_housing():
 def iris():
     """Fixture for ames housing dataset"""
     return load_iris(return_X_y=True, as_frame=True)  # pylint: disable=W0621
+
+
+@pytest.fixture
+def boston():
+    """Fixture for the Boston housing dataset"""
+    X = pd.read_csv(
+        "https://raw.githubusercontent.com/selva86/datasets/refs/heads/master/BostonHousing.csv"
+    )
+    y = X.medv
+    X = X.drop(columns=["medv"])
+    return X, y

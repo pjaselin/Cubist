@@ -49,19 +49,18 @@ def _attribute_usage(output: str, feature_names: list | set):
     if output.shape[0] < len(feature_names):
         # get the list of missing features
         missing_vars = list(set(feature_names) - set(output.Variable))
-        if missing_vars:
-            # create a list of zeros equal to the length of missing_vars
-            zero_list = [0.0] * len(missing_vars)
-            # create a dataframe of zeros for the Conditions and Model columns for
-            # each missing variable and append to values
-            missing_vars_df = pd.DataFrame(
-                {
-                    "Conditions": zero_list,
-                    "Model": zero_list,
-                    "Variable": missing_vars,
-                }
-            )
-            output = pd.concat([output, missing_vars_df], axis=0)
+        # create a list of zeros equal to the length of missing_vars
+        zero_list = [0.0] * len(missing_vars)
+        # create a dataframe of zeros for the Conditions and Model columns for
+        # each missing variable and append to values
+        missing_vars_df = pd.DataFrame(
+            {
+                "Conditions": zero_list,
+                "Model": zero_list,
+                "Variable": missing_vars,
+            }
+        )
+        output = pd.concat([output, missing_vars_df], axis=0)
     return output
 
 
@@ -70,7 +69,7 @@ def _parse_attribute(x) -> list[float, float, str]:
     list of [Condition, Model, Variable]"""
     # get the variable name as the string following the last occurrence of four
     # whitespace characters
-    attribute_start_i = x.rindex("    ")
+    attribute_start_i = x.rindex("    ") + 4
     attribute_name = x[attribute_start_i:]
     return _get_values(x[:attribute_start_i]) + [attribute_name]
 
