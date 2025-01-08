@@ -48,7 +48,7 @@ dev = [
   "coverage",
   "pylint",
   "sphinx",
-  "sphinx-book-theme"
+  "furo"
 ]
 viz = [
   "matplotlib"

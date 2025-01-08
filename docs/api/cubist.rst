@@ -1,0 +1,4 @@
+cubist
+======
+
+.. autoclass:: cubist::Cubist
