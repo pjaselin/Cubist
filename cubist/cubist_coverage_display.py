@@ -30,7 +30,7 @@ class CubistCoverageDisplay(_CubistDisplayMixin):
     variable and committee/rule pair are plotted along the x-axis.
 
     See the details in the docstrings of
-    :func:`~cubist.CubistCoefficientDisplay.from_estimator`to
+    cubist.CubistCoefficientDisplay.from_estimator to
     create a visualizer. All parameters are stored as attributes.
 
     .. versionadded:: 1.0.0
@@ -43,10 +43,10 @@ class CubistCoverageDisplay(_CubistDisplayMixin):
 
     Attributes
     ----------
-    ax_ : matplotlib Axes
+    ax\\_ : matplotlib Axes
         Axes with the different matplotlib axis.
 
-    figure_ : matplotlib Figure
+    figure\\_ : matplotlib Figure
         Figure containing the scatter and lines.
 
     See Also
@@ -99,11 +99,11 @@ class CubistCoverageDisplay(_CubistDisplayMixin):
         y_axis_label : str, default=None
             Y-axis label for plot.
 
-        **gridspec_kwargs : dict
+        \\**gridspec_kwargs : dict
             Additional keywords arguments passed to matplotlib
             `matplotlib.pyplot.subplots` function.
 
-        **line_kwargs : dict
+        \\**line_kwargs : dict
             Additional keywords arguments passed to matplotlib
             `matplotlib.pyplot.plot` function.
 
