@@ -8,7 +8,7 @@
 [![PyPI - Downloads](https://img.shields.io/pypi/dm/cubist)](https://pypi.org/project/cubist)
 [![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit)](https://github.com/pre-commit/pre-commit)
 
-A Python package and wrapper for Ross Quinlan's [Cubist](https://www.rulequest.com/cubist-unix.html) v2.07 regression model. Inspired by and based on the [R wrapper](https://github.com/topepo/Cubist) for Cubist. Developed as a [scikit-learn](https://scikit-learn.org/stable/) compatible estimator.
+A Python package and wrapper for Ross Quinlan's [Cubist](https://www.rulequest.com/cubist-unix.html) v2.07 regression model. Inspired by and based on the [R wrapper](https://github.com/topepo/Cubist) for Cubist. The model is compatible with [scikit-learn](https://scikit-learn.org/stable/) and the visualization utilities are designed after the same package.
 
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
@@ -62,11 +62,11 @@ pip install cubist[dev,viz]
 
 ## Background
 
-Cubist is a regression algorithm developed by Ross Quinlan for generating rule-based predictive models. This has been available in the R world thanks to the work of Max Kuhn and his colleagues. It is introduced to Python with this package and made scikit-learn compatible for use with at ecosystem. Cross-validation and control over whether Cubist creates a composite model is also enabled here.
+Cubist is a regression algorithm developed by Ross Quinlan for generating rule-based predictive models. This has been available in the R world thanks to the work of Max Kuhn and his colleagues and with this package is introduced to Python and made scikit-learn compatible. Cross-validation and control over whether Cubist creates a composite model is also enabled here.
 
 ## Advantages
 
-Unlike other ensemble models such as RandomForest and XGBoost, Cubist generates a set of rules, making it easy to understand precisely how the model makes it's predictive decisions. Tools such as SHAP and LIME are therefore unnecessary as Cubist doesn't exhibit black box behavior.
+Unlike other ensemble models such as [RandomForest](https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.RandomForestRegressor.html) and [XGBoost](https://xgboost.readthedocs.io/en/stable/), Cubist generates a set of rules, making it easy to understand precisely how the model makes it's predictive decisions. Tools such as [SHAP](https://shap.readthedocs.io/en/latest/) and [lime](https://github.com/marcotcr/lime) are therefore unnecessary as Cubist doesn't exhibit black box behavior.
 
 Like XGBoost, Cubist can perform boosting by the addition of more models (called committees) that correct for the error of prior models (i.e. the second model created corrects for the prediction error of the first, the third for the error of the second, etc.).
 

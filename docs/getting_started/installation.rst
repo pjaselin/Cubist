@@ -1,5 +1,5 @@
-Install
-=======
+Installation
+============
 
 pip install cubist
 
