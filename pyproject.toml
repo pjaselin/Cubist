@@ -48,7 +48,8 @@ dev = [
   "coverage",
   "pylint",
   "sphinx",
-  "furo"
+  "furo",
+  "sphinx_copybutton"
 ]
 viz = [
   "matplotlib"

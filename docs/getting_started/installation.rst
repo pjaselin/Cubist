@@ -1,8 +1,14 @@
 Installation
 ============
 
-pip install cubist
+.. code-block:: shell
 
-pip install cubist[viz]
+   pip install cubist
 
-pip install cubist[dev,viz]
+.. code-block:: shell
+
+   pip install cubist[viz]
+
+.. code-block:: shell
+
+   pip install cubist[dev,viz]
