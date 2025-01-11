@@ -2,4 +2,4 @@ Cubist Coverage Display
 =======================
 
 .. autoclass:: cubist::CubistCoverageDisplay
-    :members: from_estimator
+    :members: plot, from_estimator

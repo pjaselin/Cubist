@@ -27,9 +27,10 @@ from .exceptions import CubistError
 
 class Cubist(RegressorMixin, BaseEstimator):  # pylint: disable=R0902
     """
-    Cubist Regression Model (Public v2.07) developed by Quinlan.
+    Cubist Regression Model (Public v2.07) developed by Ross Quinlan.
 
     References:
+
     - https://www.rdocumentation.org/packages/Cubist/versions/0.3.0
     - https://www.rulequest.com/cubist-unix.html
 

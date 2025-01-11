@@ -8,7 +8,7 @@
 [![PyPI - Downloads](https://img.shields.io/pypi/dm/cubist)](https://pypi.org/project/cubist)
 [![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit)](https://github.com/pre-commit/pre-commit)
 
-A Python package for fitting Quinlan's [Cubist](https://www.rulequest.com/cubist-unix.html) v2.07 regression model. Inspired by and based on the [R wrapper](https://github.com/topepo/Cubist) for Cubist. Developed as a [scikit-learn](https://scikit-learn.org/stable/) compatible estimator.
+A Python package and wrapper for Ross Quinlan's [Cubist](https://www.rulequest.com/cubist-unix.html) v2.07 regression model. Inspired by and based on the [R wrapper](https://github.com/topepo/Cubist) for Cubist. Developed as a [scikit-learn](https://scikit-learn.org/stable/) compatible estimator.
 
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
@@ -57,12 +57,12 @@ pip install cubist[viz]
 For development:
 
 ```bash
-pip install cubist[dev]
+pip install cubist[dev,viz]
 ```
 
 ## Background
 
-Cubist is a regression algorithm developed by John Ross Quinlan for generating rule-based predictive models. This has been available in the R world thanks to the work of Max Kuhn and his colleagues. It is introduced to Python with this package and made scikit-learn compatible for use with at ecosystem. Cross-validation and control over whether Cubist creates a composite model is also enabled here.
+Cubist is a regression algorithm developed by Ross Quinlan for generating rule-based predictive models. This has been available in the R world thanks to the work of Max Kuhn and his colleagues. It is introduced to Python with this package and made scikit-learn compatible for use with at ecosystem. Cross-validation and control over whether Cubist creates a composite model is also enabled here.
 
 ## Advantages
 
@@ -80,8 +80,8 @@ In addition to boosting, the model can perform instance-based (nearest-neighbor)
 >>> from cubist import Cubist
 >>> X, y = load_iris(return_X_y=True, as_frame=True)
 >>> X_train, X_test, y_train, y_test = train_test_split(
-...     X, y, test_size=0.05, random_state=42
-... )
+        X, y, test_size=0.05, random_state=42
+    )
 >>> model = Cubist(n_rules=2, verbose=True)
 >>> model.fit(X_train, y_train)
 

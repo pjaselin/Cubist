@@ -2,4 +2,4 @@ Cubist Coefficient Display
 ==========================
 
 .. autoclass:: cubist::CubistCoefficientDisplay
-    :members: from_estimator
+    :members: plot, from_estimator

@@ -12,14 +12,14 @@ build-backend = "setuptools.build_meta"
 name = "cubist"
 version = "1.0.0"
 authors = [
-  {name = "John Ross Quinlan"},
+  {name = "Ross Quinlan"},
   {name = "Max Kuhn"},
   {name = "Patrick Aselin"},
 ]
 maintainers = [
   {name = "Patrick Aselin"}
 ]
-description="A Python package for fitting Quinlan's Cubist regression model."
+description="A Python package for fitting Ross Quinlan's Cubist regression model."
 readme = {file = "README.md", content-type = "text/markdown"}
 classifiers = [
   "Development Status :: 5 - Production/Stable",

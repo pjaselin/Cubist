@@ -30,7 +30,7 @@ class CubistCoverageDisplay(_CubistDisplayMixin):
     variable and committee/rule pair are plotted along the x-axis.
 
     See the details in the docstrings of
-    cubist.CubistCoefficientDisplay.from_estimator to
+    :func:`~cubist.CubistCoverageDisplay.from_estimator` to
     create a visualizer. All parameters are stored as attributes.
 
     .. versionadded:: 1.0.0

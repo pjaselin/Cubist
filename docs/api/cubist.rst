@@ -2,4 +2,4 @@ Cubist
 ======
 
 .. autoclass:: cubist::Cubist
-    :members: fit, predict
+    :members: fit, predict, score
