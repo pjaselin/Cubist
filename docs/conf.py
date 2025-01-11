@@ -6,6 +6,11 @@
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
+import os
+import sys
+
+sys.path.insert(0, os.path.abspath(".."))
+
 project = "cubist"
 copyright = "Patrick Aselin"
 author = "Patrick Aselin"
@@ -19,7 +24,13 @@ extensions = ["sphinx.ext.autodoc"]
 templates_path = ["_templates"]
 exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
 
-intersphinx_mapping = {"python": ("https://docs.python.org/3", None)}
+intersphinx_mapping = {
+    "python": ("https://docs.python.org/3", None),
+    "sklearn": (
+        "http://scikit-learn.org/stable",
+        (None, "./_intersphinx/sklearn-objects.inv"),
+    ),
+}
 
 # -- Options for HTML output -------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
@@ -31,4 +42,4 @@ html_theme_options = {
     "source_branch": "main",
     "source_directory": "docs/",
 }
-# html_title = "cubist"  # turns off <project> <release> documentation format
+html_title = project  # turns off <project> <release> documentation format

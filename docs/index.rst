@@ -12,14 +12,14 @@ documentation for details.
 
 .. toctree::
    :maxdepth: 2
-   :caption: Usage:
+   :caption: Usage
 
    usage/cubist
    usage/visualizations
 
 .. toctree::
    :maxdepth: 2
-   :caption: Contents:
+   :caption: API
 
    api/cubist
    api/cubist_coefficient_display
