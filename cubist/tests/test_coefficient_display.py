@@ -15,7 +15,7 @@ def test_coefficient_display(ames_housing):
 
 
 def test_coefficient_display_for_r_parity(boston):
-    """Test creating plot from the R library"""
+    """Test creating plot from the R package"""
     model = Cubist(n_rules=100, extrapolation=1.0)
     model.fit(*boston)
     CubistCoefficientDisplay.from_estimator(model)

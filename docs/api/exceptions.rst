@@ -1,0 +1,4 @@
+Exceptions
+==========
+
+.. autoclass:: cubist::CubistError

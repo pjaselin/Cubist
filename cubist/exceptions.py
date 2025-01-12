@@ -6,4 +6,4 @@ class _Error(Exception):
 
 
 class CubistError(_Error):
-    """Raised when the C Cubist library raises errors"""
+    """Raised when the C Cubist library raises errors."""
