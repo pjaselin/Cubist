@@ -19,7 +19,12 @@ release = "v1.0.0"
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
 
-extensions = ["sphinx.ext.autodoc", "sphinx.ext.intersphinx", "sphinx_copybutton"]
+extensions = [
+    "sphinx.ext.autodoc",
+    "sphinx.ext.intersphinx",
+    "sphinx_copybutton",
+    "sphinx.ext.linkcode",
+]
 
 templates_path = ["_templates"]
 exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
@@ -28,6 +33,17 @@ intersphinx_mapping = {
     "python": ("https://docs.python.org/3", None),
     "sklearn": ("http://scikit-learn.org/stable", None),
 }
+
+
+def linkcode_resolve(domain, info):
+    if domain != "py":
+        return None
+    if not info["module"]:
+        return None
+    filename = info["module"].replace(".", "/")
+    print(info)
+    return "https://github.com/pjaselin/Cubist/blob/main/%s.py" % filename
+
 
 # -- Options for HTML output -------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output

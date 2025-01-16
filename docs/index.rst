@@ -30,16 +30,15 @@ Contents
    :maxdepth: 2
    :caption: Usage
 
-   usage/cubist
+   usage/model
    usage/visualizations
 
 .. toctree::
    :maxdepth: 2
    :caption: API Docs
 
-   api/cubist
-   api/cubist_coefficient_display
-   api/cubist_coverage_display
+   api/model
+   api/visualizations
    api/exceptions
 
 Acknowledgements

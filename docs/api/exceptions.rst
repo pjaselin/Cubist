@@ -1,4 +1,7 @@
 Exceptions
 ==========
 
-.. autoclass:: cubist::CubistError
+CubistError
+-----------
+
+.. autoclass:: cubist.exceptions.CubistError
