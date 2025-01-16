@@ -44,7 +44,24 @@ Contents
 Acknowledgements
 ----------------
 
-Cubist is a regression algorithm developed by Ross Quinlan for generating rule-based predictive models. This has been available in the R world thanks to the work of Max Kuhn and his colleagues. It is introduced to Python with this package and made scikit-learn compatible for use with at ecosystem. Cross-validation and control over whether Cubist creates a composite model is also enabled here.
+
+While I appreciate the positive responses from this effort, I'm truly only a messenger. All credit is due to Ross Quinlan for his work in developing Cubist and it's related classification algorithms such as C5.0. If not for Max Kuhn and his colleagues, I wouldn't have known where to start. This project is more or less a Python translation of Max's R package so the heavylifting in understanding how to control the Cubist C library came from them.
+
+Finally I'm also grateful to my leadership at IBM, Kirk Mettler, for introducing me to Cubist and from whom I first conceived of this effort.
+ the R world thanks to the work of Max Kuhn and his colleagues. It is introduced to Python with this package and made scikit-learn compatible for use with at ecosystem. Cross-validation and control over whether Cubist creates a composite model is also enabled here.
+
 Grateful to Kirk Mettler for introducing me to the model
 Quinlan for his work on the model
 Max Kuhn for developing the R package on which this is based
+
+Besides the value of this work, this project has also served as a practical means of learning over the past few years:
+
+- Python packaging (cibuildwheel)
+- GitHub Actions
+- pytest
+- coverage/CodeCov
+- pre-commit
+- sphinx
+- cython
+- ruff
+- pylint

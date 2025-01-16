@@ -8,6 +8,7 @@
 
 import os
 import sys
+import subprocess
 
 sys.path.insert(0, os.path.abspath(".."))
 
@@ -34,6 +35,12 @@ intersphinx_mapping = {
     "sklearn": ("http://scikit-learn.org/stable", None),
 }
 
+git_revision_short_hash = (
+    subprocess.check_output(["git", "rev-parse", "--short", "HEAD"])
+    .decode("ascii")
+    .strip()
+)
+
 
 def linkcode_resolve(domain, info):
     if domain != "py":
@@ -41,8 +48,7 @@ def linkcode_resolve(domain, info):
     if not info["module"]:
         return None
     filename = info["module"].replace(".", "/")
-    print(info)
-    return "https://github.com/pjaselin/Cubist/blob/main/%s.py" % filename
+    return f"https://github.com/pjaselin/Cubist/blob/{git_revision_short_hash}/{filename}.py"
 
 
 # -- Options for HTML output -------------------------------------------------
