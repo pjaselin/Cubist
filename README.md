@@ -8,7 +8,7 @@
 [![PyPI - Downloads](https://img.shields.io/pypi/dm/cubist)](https://pypi.org/project/cubist)
 [![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit)](https://github.com/pre-commit/pre-commit)
 
-A Python package and wrapper for Ross Quinlan's [Cubist](https://www.rulequest.com/cubist-unix.html) v2.07 regression model. Inspired by and based on the [R wrapper](https://github.com/topepo/Cubist) for Cubist. The model is compatible with [scikit-learn](https://scikit-learn.org/stable/) and the visualization utilities are designed after the same package.
+A Python package and wrapper for Ross Quinlan's [Cubist](https://www.rulequest.com/cubist-unix.html) v2.07 regression model. Both inspired by and a translation of the [R wrapper](https://github.com/topepo/Cubist) for Cubist. The model is compatible with and the visualization utilities are designed after [scikit-learn](https://scikit-learn.org/stable/).
 
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->

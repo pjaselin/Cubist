@@ -32,10 +32,10 @@ class CubistCoefficientDisplay(_CubistDisplayMixin):
 
     Attributes
     ----------
-    ax\\_ : matplotlib Axes
+    ax_ : matplotlib Axes
         Axes with the different matplotlib axis.
 
-    figure\\_ : matplotlib Figure
+    figure_ : matplotlib Figure
         Figure containing the scatter and lines.
 
     See Also
@@ -88,11 +88,11 @@ class CubistCoefficientDisplay(_CubistDisplayMixin):
         y_axis_label : str, default=None
             Y-axis label for plot.
 
-        \\**gridspec_kwargs : dict
+        **gridspec_kwargs : dict
             Additional keywords arguments passed to matplotlib
             `matplotlib.pyplot.subplots` function.
 
-        \\**scatter_kwargs : dict
+        **scatter_kwargs : dict
             Additional keywords arguments passed to matplotlib
             `matplotlib.pyplot.scatter` function.
 

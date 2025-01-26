@@ -6,8 +6,13 @@ PyPI
 
 ``cubist`` is installable via ``pip`` from `PyPI <https://pypi.org/project/cubist/>`_ using any of the commands below.
 
-Model-Only Install
+Model-Only
 ^^^^^^^^^^^^^^^^^^
+
+.. code-block:: shell
+
+   python3 -m pip install --upgrade sphinx-prompt
+
 
 .. code-block:: shell
 
@@ -20,7 +25,7 @@ Enable Visualization Utilities
 
    pip install cubist[viz]
 
-Install for Development
+Development
 ^^^^^^^^^^^^^^^^^^^^^^^
 
 .. code-block:: shell
@@ -31,7 +36,7 @@ Install for Development
 GitHub
 ------
 
-The source code can be found on `GitHub <https://github.com/pjaselin/Cubist>`_ and can be installed from source using the following command:
+The source code can be found on `GitHub <https://github.com/pjaselin/Cubist>`_ and the package can be installed from source using the following command:
 
 .. code-block:: shell
 
