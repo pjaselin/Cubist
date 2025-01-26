@@ -25,6 +25,7 @@ extensions = [
     "sphinx.ext.intersphinx",
     "sphinx.ext.coverage",
     "sphinx.ext.linkcode",
+    "sphinx.ext.autosectionlabel",
     "sphinx_copybutton",
     "matplotlib.sphinxext.plot_directive",
     "sphinx_design",
@@ -54,6 +55,8 @@ def linkcode_resolve(domain, info):
     filename = info["module"].replace(".", "/")
     return f"https://github.com/pjaselin/Cubist/blob/{git_revision_short_hash}/{filename}.py"
 
+
+autosectionlabel_prefix_document = True
 
 # -- Options for HTML output -------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
