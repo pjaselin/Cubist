@@ -51,7 +51,6 @@ class CubistCoefficientDisplay(_CubistDisplayMixin):
     >>> X, y = load_iris(return_X_y=True, as_frame=True)
     >>> model = Cubist(n_rules=2).fit(X, y)
     >>> display = CubistCoefficientDisplay.from_estimator(estimator=model)
-    <...>
     >>> plt.show()
     """
 
@@ -199,7 +198,6 @@ class CubistCoefficientDisplay(_CubistDisplayMixin):
         >>> X, y = load_iris(return_X_y=True, as_frame=True)
         >>> model = Cubist(n_rules=2).fit(X, y)
         >>> display = CubistCoefficientDisplay.from_estimator(estimator=model)
-        <...>
         >>> plt.show()
         """
         check_is_fitted(estimator)

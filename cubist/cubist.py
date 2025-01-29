@@ -151,12 +151,16 @@ class Cubist(RegressorMixin, BaseEstimator):  # pylint: disable=R0902
     >>> from sklearn.model_selection import train_test_split
     >>> X, y = fetch_california_housing(return_X_y=True, as_frame=True)
     >>> X_train, X_test, y_train, y_test = train_test_split(X, y,
-                                                            test_size=0.2,
-                                                            random_state=42)
+    ...                                                     test_size=0.2,
+    ...                                                     random_state=42)
     >>> model = Cubist()
     >>> model.fit(X_train, y_train)
+    Cubist()
     >>> model.predict(X_test)
+    array([0.50073832, 0.86456549, 5.14631033, ..., 4.76159859, 0.76238906,
+    ...    1.9493351 ])
     >>> model.score(X_test, y_test)
+    0.8178354789216098
     """
 
     _parameter_constraints: dict = {

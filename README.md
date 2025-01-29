@@ -84,7 +84,9 @@ missing values, categorical values can be used
 >>> X_train, X_test, y_train, y_test = train_test_split(
         X, y, test_size=0.05, random_state=42
     )
->>> model = Cubist(n_rules=2, verbose=True)
+>>> X_train, X_test, y_train, y_test = train_test_split(
+        X, y, test_size=0.05, random_state=42
+    )
 >>> model.fit(X_train, y_train)
 
 Cubist [Release 2.07 GPL Edition]  Sat Dec 28 19:52:49 2024

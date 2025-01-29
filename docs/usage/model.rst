@@ -1,4 +1,4 @@
-Cubist Model
+Model
 #####
 
 The Cubist model class (``cubist.Cubist``) has eleven parameters and eleven attributes available. Their example usage is demonstrated below and the class is documented in the API Docs section at :ref:`api/model:Cubist`.
@@ -25,7 +25,60 @@ The ``verbose`` flag indicates whether Cubist should pretty-print the generate m
 
 .. dropdown:: Sample Output with Custom Target Label
 
-    Dropdown content
+    .. doctest::
+
+        >>> from sklearn.datasets import load_iris
+        >>> from sklearn.model_selection import train_test_split
+        >>> from cubist import Cubist
+        >>> X, y = load_iris(return_X_y=True, as_frame=True)
+        >>> X_train, X_test, y_train, y_test = train_test_split(X, y,
+        ...                                                     test_size=0.05,
+        ...                                                     random_state=42)
+        >>> model = Cubist(n_rules=2, verbose=True)
+        >>> model.fit(X_train, y_train)
+        Cubist [Release 2.07 GPL Edition]  Sat Dec 28 19:52:49 2024
+        ---------------------------------
+
+            Target attribute `outcome'
+
+        Read 142 cases (5 attributes)
+
+        Model:
+
+          Rule 1: [48 cases, mean 0.0, range 0 to 0, est err 0.0]
+
+            if
+                petal width (cm) <= 0.6
+            then
+                outcome = 0
+
+            Rule 2: [94 cases, mean 1.5, range 1 to 2, est err 0.2]
+
+            if
+                petal width (cm) > 0.6
+            then
+                outcome = 0.2 + 0.76 petal width (cm) + 0.271 petal length (cm)
+                          - 0.45 sepal width (cm)
+
+
+        Evaluation on training data (142 cases):
+
+            Average  |error|                0.1
+            Relative |error|               0.16
+            Correlation coefficient        0.98
+
+
+                Attribute usage:
+                  Conds  Model
+
+                  100%    66%    petal width (cm)
+                          66%    sepal width (cm)
+                          66%    petal length (cm)
+
+
+        Time: 0.0 secs
+
+        Cubist(n_rules=2, verbose=True)
 
 Model Tuning
 ============
@@ -91,11 +144,14 @@ auto mode
 
 Cross-validation
 
-verbose
-
-sampling
-
-extrapolation
-
 Attributes
 **********
+
+Features
+========
+
+model\_
+-------
+
+output\_
+--------

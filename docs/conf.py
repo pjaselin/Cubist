@@ -26,6 +26,7 @@ extensions = [
     "sphinx.ext.coverage",
     "sphinx.ext.linkcode",
     "sphinx.ext.autosectionlabel",
+    "sphinx.ext.doctest",
     "sphinx_copybutton",
     "matplotlib.sphinxext.plot_directive",
     "sphinx_design",
@@ -57,6 +58,8 @@ def linkcode_resolve(domain, info):
 
 
 autosectionlabel_prefix_document = True
+
+trim_doctests_flags = True
 
 # -- Options for HTML output -------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
