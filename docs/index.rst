@@ -11,7 +11,7 @@ cubist Documentation
 Background
 ----------
 
-Cubist is a regression algorithm developed by Ross Quinlan for generating rule-based predictive models. Unlike other ensemble models such as `RandomForest <https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.RandomForestRegressor.html>`_ and `XGBoost <https://xgboost.readthedocs.io/en/stable/>`_, Cubist generates rules as a set of linear regression models with conditions (formulated as if [set of conditions met] then [linear model for given conditions]) for each model, making it easy to understand precisely how the model makes it's predictive decisions. Tools such as `SHAP <https://shap.readthedocs.io/en/latest/>`_ and `lime <https://github.com/marcotcr/lime>`_ are therefore unnecessary as Cubist doesn't exhibit black box behavior. An example pretty-printed model:
+Cubist is a regression algorithm developed by Ross Quinlan for generating rule-based predictive models. Unlike other ensemble models such as `RandomForest <https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.RandomForestRegressor.html>`_ and `XGBoost <https://xgboost.readthedocs.io/en/stable/>`_, Cubist generates rules as a set of linear regression models with conditions (formulated as if [set of conditions met] then [linear model for given conditions]) for each model, making it easy to understand precisely how the model makes it's predictive decisions. Tools such as `SHAP <https://shap.readthedocs.io/en/latest/>`_ and `lime <https://github.com/marcotcr/lime>`_ are therefore unnecessary as Cubist doesn't exhibit black box behavior. An example printed model:
 
 .. dropdown:: Sample Cubist Output
 

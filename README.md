@@ -66,7 +66,7 @@ Cubist is a regression algorithm developed by Ross Quinlan for generating rule-b
 
 ## Advantages
 
-Unlike other ensemble models such as [RandomForest](https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.RandomForestRegressor.html) and [XGBoost](https://xgboost.readthedocs.io/en/stable/), Cubist generates rules as a set of linear regression models with conditions (formulated as if [set of conditions met] then [linear model for given conditions]), making it easy to understand precisely how the model makes it's predictive decisions. Tools such as [SHAP](https://shap.readthedocs.io/en/latest/) and [lime](https://github.com/marcotcr/lime) are therefore unnecessary as Cubist doesn't exhibit black box behavior. See [Sample Usage](#sample-usage) for the pretty-printed model.
+Unlike other ensemble models such as [RandomForest](https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.RandomForestRegressor.html) and [XGBoost](https://xgboost.readthedocs.io/en/stable/), Cubist generates rules as a set of linear regression models with conditions (formulated as if [set of conditions met] then [linear model for given conditions]), making it easy to understand precisely how the model makes it's predictive decisions. Tools such as [SHAP](https://shap.readthedocs.io/en/latest/) and [lime](https://github.com/marcotcr/lime) are therefore unnecessary as Cubist doesn't exhibit black box behavior. See [Sample Usage](#sample-usage) for the printed model.
 
 Like XGBoost, Cubist can perform boosting by the addition of more models (called committees) that correct for the error of prior models (i.e. the second model created corrects for the prediction error of the first, the third for the error of the second, etc.).
 
@@ -162,7 +162,7 @@ The following parameters can be passed as arguments to the ```Cubist()``` class 
 The following attributes are exposed to understand the Cubist model results:
 
 - model_: The trained Cubist model.
-- output_: The pretty print summary of the Cubist model.
+- output_: The print summary of the Cubist model.
 - feature_importances_: DataFrame of how input variables are used in model conditions and regression equations.
 - n_features_in_: The number of features seen during model fitting.
 - feature_names_in_: List of features used to train Cubist.

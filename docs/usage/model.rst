@@ -1,9 +1,9 @@
 Model
 #####
 
-The Cubist model class (``cubist.Cubist``) has eleven parameters and eleven attributes available. Their use is demonstrated below and the class is documented in the API Docs section at :ref:`api/model:Cubist`.
+The Cubist model class (``cubist.Cubist`` or ``cubist.cubist.Cubist``) has eleven parameters and eleven attributes available. Their use is demonstrated below and the class is documented in the :ref:`API Docs<api/model:Cubist>`.
 
-A simple use of Cubist with no configuration is as follows:
+A simple use of Cubist with no added configuration is as follows:
 
 .. doctest::
 
@@ -25,24 +25,24 @@ A simple use of Cubist with no configuration is as follows:
 Parameters
 **********
 
-These are the values passed to the model at class initialization.
+These are the values passed to the model at initialization.
 
 Display Options
 ===============
 
-These parameters change or allow for viewing Cubist's model report.
+These parameters configure and enable printing Cubist's model report.
 
 target_label
 ------------
 
-As the pretty-printed result includes a name for the target (y) value, the ``target_label`` parameter can be set to change the target label to something other than the default of `outcome`.
+The printed result includes a name for the target/output (y) value. The ``target_label`` parameter can be changed to something other than the default of `outcome`.
 
 verbose
 -------
 
-The ``verbose`` flag indicates whether Cubist should pretty-print the generate model, summary, and training performance to the console. Either an integer or Python boolean is accepted.
+The ``verbose`` parameter indicates whether Cubist should print the generated model, summary, and training performance to the console. Either an integer or Python boolean is accepted.
 
-.. dropdown:: Sample Output with Custom Target Label
+.. dropdown:: Sample Verbose Output with Custom Target Label
 
     .. doctest::
 
