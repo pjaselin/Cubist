@@ -59,8 +59,8 @@ class Cubist(RegressorMixin, BaseEstimator):  # pylint: disable=R0902
         Should unbiased rules be used? Since Cubist minimizes the MAE of the
         predicted values, the rules may be biased and the mean predicted value
         may differ from the actual mean. This is recommended when there are
-        frequent occurrences of the same value in a training dataset. Note that
-        MAE may be slightly higher.
+        frequent occurrences of the same target value. Note that MAE may be
+        slightly higher.
 
     auto : bool, default=False
         A value of True allows the algorithm to choose whether to use
@@ -84,7 +84,8 @@ class Cubist(RegressorMixin, BaseEstimator):  # pylint: disable=R0902
         (recommended value is 10 per Quinlan)
 
     random_state : int, default=None
-        An integer to set the random seed for the C Cubist code.
+        An integer to set the random seed for the C Cubist code when performing
+        cross-validation or sampling.
 
     target_label : str, default="outcome"
         A label for the outcome variable. This is only used for printing rules.
@@ -151,8 +152,7 @@ class Cubist(RegressorMixin, BaseEstimator):  # pylint: disable=R0902
     >>> from sklearn.model_selection import train_test_split
     >>> X, y = fetch_california_housing(return_X_y=True, as_frame=True)
     >>> X_train, X_test, y_train, y_test = train_test_split(X, y,
-    ...                                                     test_size=0.2,
-    ...                                                     random_state=42)
+    ...                                                     test_size=0.2)
     >>> model = Cubist()
     >>> model.fit(X_train, y_train)
     Cubist()

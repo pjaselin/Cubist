@@ -12,8 +12,7 @@ A simple use of Cubist with no added configuration is as follows:
     >>> from cubist import Cubist
     >>> X, y = load_iris(return_X_y=True, as_frame=True)
     >>> X_train, X_test, y_train, y_test = train_test_split(X, y,
-    ...                                                     test_size=0.05,
-    ...                                                     random_state=42)
+    ...                                                     test_size=0.05)
     >>> model = Cubist()
     >>> model.fit(X_train, y_train)
     Cubist()
@@ -51,8 +50,7 @@ The ``verbose`` parameter indicates whether Cubist should print the generated mo
         >>> from cubist import Cubist
         >>> X, y = load_iris(return_X_y=True, as_frame=True)
         >>> X_train, X_test, y_train, y_test = train_test_split(X, y,
-        ...                                                     test_size=0.05,
-        ...                                                     random_state=42)
+        ...                                                     test_size=0.05)
         >>> model = Cubist(n_rules=2, verbose=True,
         ...                target_label="custom_output")
         >>> model.fit(X_train, y_train)  # doctest: +NORMALIZE_WHITESPACE
@@ -101,28 +99,36 @@ The ``verbose`` parameter indicates whether Cubist should print the generated mo
         <BLANKLINE>
         Cubist(n_rules=2, target_label='custom_output', verbose=True)
 
-Model Tuning
-============
+Model Construction
+==================
 
-These parameters control the type and complexity of the model.
+These parameters control the model structure.
 
 n_rules
 -------
 
+Varying the ``n_rules`` parameter changes the maximum number of rules Cubist will generate for a model. Recall the definition of a rule from the :ref:`Introduction<index:Background>`.
+
 n_committees
 ------------
+
+Varying the ``n_committees`` parameter changes the number of models (called committees) Cubist will generate. Recall the definition of a committee from the :ref:`Introduction<index:Background>`.
 
 neighbors
 ---------
 
+Varying the ``neighbors`` parameter changes the number of nearest neighbors Cubist will use to correct the rule-based prediction. Using this feature may improve accuracy at the cost of interpretability as the multivariate linear models won't be completely followed. Additionally the training dataset will be cached in the model to support future predictions.
+
 unbiased
 --------
+
+Toggling ``unbiased`` determines whether to allow the mean predicted value for the training cases covered by a rule to differ from their mean value. The default is to minimize the average absolute error.
 
 extrapolation
 -------------
 
-random_state
-------------
+Varying the ``extrapolation`` parameter changes the percentage outside of the output values seen in the training dataset to which Cubist can extrapolate.
+
 
 Alternative Modes
 =================
@@ -132,47 +138,18 @@ These parameters control the mode in which the model is being used. The standard
 auto
 ----
 
+Cubist can be allowed to determine whether to introduce instance-based corrections with a composite model by leaving ``neighbors`` unset and setting ``auto=True``. This feature may increase training time and may produce a warning with regards to Cubist's recommendation. This can be effective as an initial experiment to consider the benefits of a composite model.
+
 sample
 ------
+
+When training on a large dataset, Cubist can subsample from the training dataset with the training percentage set by the ``sample`` parameter.
 
 cv
 --
 
-Whether
 
-Simple n_rules
+random_state
+------------
 
-.. code-block:: python
-
-    >>> from cubist import Cubist
-
-    >>> model = Cubist()
-
-    >>> msg = msgspec.json.encode(alice)
-
-    >>> msg
-    b'{"name":"alice","groups":["admin","engineering"],"email":null}'
-
-.. dropdown::
-
-    Dropdown content
-
-With committees
-
-with instance-based correction
-
-auto mode
-
-Cross-validation
-
-Attributes
-**********
-
-Features
-========
-
-model\_
--------
-
-output\_
---------
+Setting a value for ``random_state`` sets the random seed for Cubist to enable repeatable cross-validation and sampling.

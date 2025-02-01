@@ -25,11 +25,7 @@ A Python package and wrapper for Ross Quinlan's [Cubist](https://www.rulequest.c
   - [Model Attributes](#model-attributes)
 - [Visualization Utilities](#visualization-utilities)
   - [Coefficient Display](#coefficient-display)
-    - [CubistCoefficientDisplay.from_estimator Parameters](#cubistcoefficientdisplayfrom_estimator-parameters)
-    - [CubistCoefficientDisplay Sample Usage](#cubistcoefficientdisplay-sample-usage)
   - [Coverage Display](#coverage-display)
-    - [CubistCoverageDisplay.from_estimator Parameters](#cubistcoveragedisplayfrom_estimator-parameters)
-    - [CubistCoverageDisplay Sample Usage](#cubistcoveragedisplay-sample-usage)
 - [Considerations](#considerations)
 - [Benchmarks](#benchmarks)
 - [Literature for Cubist](#literature-for-cubist)
@@ -82,10 +78,10 @@ missing values, categorical values can be used
 >>> from cubist import Cubist
 >>> X, y = load_iris(return_X_y=True, as_frame=True)
 >>> X_train, X_test, y_train, y_test = train_test_split(
-        X, y, test_size=0.05, random_state=42
+        X, y, test_size=0.05
     )
 >>> X_train, X_test, y_train, y_test = train_test_split(
-        X, y, test_size=0.05, random_state=42
+        X, y, test_size=0.05
     )
 >>> model.fit(X_train, y_train)
 
@@ -145,33 +141,9 @@ array([1.1257    , 0.        , 2.04999995, 1.25449991, 1.30480003,
 
 The following parameters can be passed as arguments to the ```Cubist()``` class instantiation:
 
-- n_rules: Limit of the number of rules Cubist will build. Recommended value is 500.
-- n_committees: Number of committees to construct. Each committee is a rule based model and beyond the first tries to correct the prediction errors of the prior constructed model. Recommended value is 5.
-- neighbors: Integer between 1 and 9 for how many instances should be used to correct the rule-based prediction. If no value is given, Cubist will build a rule-based model only. If this value is set, Cubist will create a composite model with the given number of neighbors. Regardless of the value set, if auto=True, Cubist may override this input and choose a different number of neighbors. Please assess the model for the selected value for the number of neighbors used.
-- unbiased: Should unbiased rules be used? Since Cubist minimizes the MAE of the predicted values, the rules may be biased and the mean predicted value may differ from the actual mean. This is recommended when there are frequent occurrences of the same value in a training dataset. Note that MAE may be slightly higher.
-- auto: A value of True allows the algorithm to choose whether to use nearest-neighbor corrections and how many neighbors to use. False will leave the choice of whether to use a composite model to the value passed `neighbors`.
-- extrapolation: Adjusts how much rule predictions are adjusted to be consistent with the training dataset. Recommended value is 5% as a decimal (0.05)
-- sample: Percentage of the data set to be randomly selected for model building (0.0 or greater but less than 1.0) and held out for model testing. When using this parameter, Cubist will report evaluation results on the testing set in addition to the training set results.
-- cv: Whether to carry out cross-validation (recommended value is 10)
-- random_state: An integer to set the random seed for the C Cubist code.
-- target_label: A label for the outcome variable. This is only used for printing rules.
-- verbose: Should the Cubist output be printed? 1 if yes, 0 if no.
-
 ### Model Attributes
 
 The following attributes are exposed to understand the Cubist model results:
-
-- model_: The trained Cubist model.
-- output_: The print summary of the Cubist model.
-- feature_importances_: DataFrame of how input variables are used in model conditions and regression equations.
-- n_features_in_: The number of features seen during model fitting.
-- feature_names_in_: List of features used to train Cubist.
-- splits_: Table of the splits created by the Cubist model.
-- coeffs_: Table of the regression coefficients found by the Cubist model.
-- version_: The Cubist model version.
-- feature_statistics_: Model statistics (e.g. global mean, extrapolation %, ceiling value, floor value)
-- committee_error_reduction_: Error reduction by using committees.
-- n_committees_used_: Number of committees used by Cubist.
 
 ## Visualization Utilities
 
@@ -181,56 +153,11 @@ Based on the R Cubist package, a few visualization utilities are provided to all
 
 The `CubistCoefficientDisplay` plots the multivariate linear regression coefficients and intercepts selected by the Cubist model. One subplot is created for each variable/attribute with the rule number or committee/rule pair on the y-axis and the coefficient value plotted along the x-axis.
 
-#### CubistCoefficientDisplay.from_estimator Parameters
-
-- estimator: The trained Cubist model.
-- committee: Optional parameter to filter to only committees at or below this committee number.
-- rule: Optional parameter to filter to only rules at or below this rule number.
-- feature_names: List of feature names to filter to in the plot. Leaving unselected plots all features.
-- ax: An optional Matplotlib axes object.
-- scatter_kwargs: Optional keywords to pass to `matplotlib.pyplot.scatter`.
-- gridspec_kwargs: Optional keywords to pass to `matplotlib.pyplot.subplots`.
-
-#### CubistCoefficientDisplay Sample Usage
-
-```python
->>> import matplotlib.pyplot as plt
->>> from sklearn.datasets import load_iris
->>> from cubist import Cubist, CubistCoverageDisplay
->>> X, y = load_iris(return_X_y=True, as_frame=True)
->>> model = Cubist().fit(X, y)
->>> display = CubistCoverageDisplay.from_estimator(estimator=model)
->>> plt.show()
-```
-
 ![Sample Cubist Coefficient Display for Iris dataset](./static/iris_coefficient_display.png)
 
 ### Coverage Display
 
 The `CubistCoverageDisplay` is used to visualize the coverage of rule splits for a given dataset. One subplot is created per input variable/attribute/column with the rule number or comittee/rule pair plotted on the y-axis and the coverage ranges plotted along the x-axis, scaled to the percentage of the variable values.
-
-#### CubistCoverageDisplay.from_estimator Parameters
-
-- estimator: The trained Cubist model.
-- X: An input dataset comparable to the dataset used to train the Cubist model.
-- committee: Optional parameter to filter to only committees at or below this committee number.
-- rule: Optional parameter to filter to only rules at or below this rule number.
-- feature_names: List of feature names to filter to in the plot. Leaving unselected plots all features.
-- ax: An optional Matplotlib axes object.
-- line_kwargs: Optional keywords to pass to `matplotlib.pyplot.plot`.
-- gridspec_kwargs: Optional keywords to pass to `matplotlib.pyplot.subplots`.
-
-#### CubistCoverageDisplay Sample Usage
-
-```python
->>> import matplotlib.pyplot as plt
->>> from sklearn.datasets import load_iris
->>> from cubist import Cubist, CubistCoverageDisplay
->>> X, y = load_iris(return_X_y=True, as_frame=True)
->>> model = Cubist().fit(X, y)
->>> display = CubistCoverageDisplay.from_estimator(estimator=model, X=X)
->>> plt.show()
-```
 
 ![Sample Cubist Coverage Display for Iris dataset](./static/iris_coverage_display.png)
 

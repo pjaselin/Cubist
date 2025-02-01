@@ -11,7 +11,16 @@ cubist Documentation
 Background
 ----------
 
-Cubist is a regression algorithm developed by Ross Quinlan for generating rule-based predictive models. Unlike other ensemble models such as `RandomForest <https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.RandomForestRegressor.html>`_ and `XGBoost <https://xgboost.readthedocs.io/en/stable/>`_, Cubist generates rules as a set of multivariate linear regression models with conditions (formulated as if [set of conditions met] then [multivariate linear model for given conditions]) for each model, making it easy to understand precisely how the model makes it's predictive decisions. Tools such as `SHAP <https://shap.readthedocs.io/en/latest/>`_ and `lime <https://github.com/marcotcr/lime>`_ are therefore unnecessary as Cubist doesn't exhibit black box behavior. An example printed model:
+Cubist is a regression algorithm developed by Ross Quinlan for generating rule-based predictive models. Unlike other ensemble models such as `RandomForest <https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.RandomForestRegressor.html>`_ and `XGBoost <https://xgboost.readthedocs.io/en/stable/>`_, a Cubist model is comprised of a set of rules containing pairs of conditions and corresponding multivariate linear regression models, covering the full domain of the training dataset. Each rule is formulated as:
+
+::
+
+    if
+        [conditions]
+    then
+        [linear model]
+
+This makes it straightforward to understand how the model makes it's predictive decisions. Tools such as `SHAP <https://shap.readthedocs.io/en/latest/>`_ and `lime <https://github.com/marcotcr/lime>`_ are therefore unnecessary as Cubist doesn't exhibit black box behavior. A full example model:
 
 .. dropdown:: Sample Cubist Output
 
@@ -58,6 +67,8 @@ Cubist is a regression algorithm developed by Ross Quinlan for generating rule-b
 
 
       Time: 0.0 secs
+
+In the above sample using the `Iris dataset <https://scikit-learn.org/stable/modules/generated/sklearn.datasets.load_iris.html>`_, the Cubist model contains two rules where the outcome (y-value) is 0 when `petal width (cm)` <= 0.6 and otherwise the outcome is given by 0.2 + 0.76 `petal width (cm)` + 0.271 `petal length (cm)` - 0.45 `sepal width (cm)`.
 
 Like XGBoost, Cubist can perform boosting by the addition of more models (called committees) that correct for the error of prior models (i.e. the second model created corrects for the prediction error of the first, the third for the error of the second, etc.).
 
