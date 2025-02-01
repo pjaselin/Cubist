@@ -1,4 +1,4 @@
-"""Common utility functions used across the library"""
+"""Common utility functions used across the package"""
 
 import pandas as pd
 import numpy as np

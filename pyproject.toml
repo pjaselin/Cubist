@@ -12,14 +12,14 @@ build-backend = "setuptools.build_meta"
 name = "cubist"
 version = "1.0.0"
 authors = [
-  {name = "John Ross Quinlan"},
+  {name = "Ross Quinlan"},
   {name = "Max Kuhn"},
   {name = "Patrick Aselin"},
 ]
 maintainers = [
   {name = "Patrick Aselin"}
 ]
-description="A Python package for fitting Quinlan's Cubist regression model."
+description="A Python package for fitting Ross Quinlan's Cubist regression model."
 readme = {file = "README.md", content-type = "text/markdown"}
 classifiers = [
   "Development Status :: 5 - Production/Stable",
@@ -46,11 +46,19 @@ dev = [
   "pytest",
   "ruff",
   "coverage",
-  "pylint",
-  "sphinx"
+  "pylint"
 ]
 viz = [
   "matplotlib"
+]
+docs = [
+  "Sphinx>=8.1.3",
+  "furo>=2024.8.6",
+  "sphinx-copybutton>=0.5.2",
+  "matplotlib>=3.10.0",
+  "sphinx-design>=0.6.1",
+  "numpydoc>=1.8.0",
+  "sphinx-autobuild>=2024.10.3"
 ]
 
 [project.urls]
@@ -78,6 +86,7 @@ omit = [
 skip_covered = true
 
 [tool.pylint.'MESSAGES CONTROL']
+ignore-paths = '^docs/.*$'
 good-names = [
   "X",
   "X_train",

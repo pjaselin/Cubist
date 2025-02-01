@@ -12,14 +12,15 @@ from ._cubist_display_mixin import _CubistDisplayMixin
 class CubistCoefficientDisplay(_CubistDisplayMixin):
     """Visualization of the regression coefficients used in the Cubist model.
 
-    This tool plots the linear coefficients and intercepts created for a Cubist
-    model and stored in the `coeffs_` attribute. One subplot is created for
-    each variable or intercept with the rule number or committee/rule pair on
-    the y-axis. The coefficient values for the given variable and rule pair or
-    variable and committee/rule pair are plotted along the x-axis.
+    This tool plots the multivariate linear coefficients and intercepts created
+    for a Cubist model and stored in the `coeffs_` attribute. One subplot is
+    created for each variable or intercept with the rule number or
+    committee/rule pair on the y-axis. The coefficient values for the given
+    variable and rule pair or variable and committee/rule pair are plotted along
+    the x-axis.
 
     See the details in the docstrings of
-    :func:`~cubist.CubistCoefficientDisplay.from_estimator`to
+    :func:`~cubist.CubistCoefficientDisplay.from_estimator` to
     create a visualizer. All parameters are stored as attributes.
 
     .. versionadded:: 1.0.0
@@ -27,8 +28,8 @@ class CubistCoefficientDisplay(_CubistDisplayMixin):
     Parameters
     ----------
     coeffs : pd.DataFrame
-        DataFrame containing the linear model coefficients by variable,
-        committee, and rule.
+        DataFrame containing the multivariate linear model coefficients by
+        variable, committee, and rule.
 
     Attributes
     ----------
@@ -51,7 +52,6 @@ class CubistCoefficientDisplay(_CubistDisplayMixin):
     >>> X, y = load_iris(return_X_y=True, as_frame=True)
     >>> model = Cubist(n_rules=2).fit(X, y)
     >>> display = CubistCoefficientDisplay.from_estimator(estimator=model)
-    <...>
     >>> plt.show()
     """
 
@@ -199,7 +199,6 @@ class CubistCoefficientDisplay(_CubistDisplayMixin):
         >>> X, y = load_iris(return_X_y=True, as_frame=True)
         >>> model = Cubist(n_rules=2).fit(X, y)
         >>> display = CubistCoefficientDisplay.from_estimator(estimator=model)
-        <...>
         >>> plt.show()
         """
         check_is_fitted(estimator)

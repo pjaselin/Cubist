@@ -228,7 +228,7 @@ def _type3(x):
 
 
 def _eqn(x, var_names: list):
-    """Parse out the linear equation"""
+    """Parse out the multivariate linear equation"""
     x = x.replace('"', "")
     starts = [m.start(0) for m in re.finditer("(coeff=)|(att=)", x)]
     tmp = [""] * len(starts)

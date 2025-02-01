@@ -19,7 +19,7 @@ def test_coverage_display(ames_housing):
 
 
 def test_coverage_display_for_r_parity(boston):
-    """Test creating plot from the R library"""
+    """Test creating plot from the R package"""
     X, y = boston
     model = Cubist(n_rules=100, extrapolation=1.0)
     model.fit(X, y)

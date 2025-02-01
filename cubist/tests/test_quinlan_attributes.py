@@ -1,4 +1,4 @@
-"""Tests for obtaining Quinlan attributes from input datasets"""
+"""Tests for obtaining Quinlan's attributes from input datasets"""
 
 import random
 
