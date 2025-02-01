@@ -107,8 +107,8 @@ class Cubist(RegressorMixin, BaseEstimator):  # pylint: disable=R0902
         first column for "Conditions" shows the approximate percentage of cases
         for which the named attribute appears in a condition of an applicable
         rule, while the second column "Attributes" gives the percentage of cases
-        for which the attribute appears in the linear formula of an applicable
-        rule.
+        for which the attribute appears in the multivariate linear formula of an
+        applicable rule.
 
     n_features_in_ : int
         Number of features seen during :term:`fit`.

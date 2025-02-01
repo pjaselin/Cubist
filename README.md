@@ -66,11 +66,11 @@ Cubist is a regression algorithm developed by Ross Quinlan for generating rule-b
 
 ## Advantages
 
-Unlike other ensemble models such as [RandomForest](https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.RandomForestRegressor.html) and [XGBoost](https://xgboost.readthedocs.io/en/stable/), Cubist generates rules as a set of linear regression models with conditions (formulated as if [set of conditions met] then [linear model for given conditions]), making it easy to understand precisely how the model makes it's predictive decisions. Tools such as [SHAP](https://shap.readthedocs.io/en/latest/) and [lime](https://github.com/marcotcr/lime) are therefore unnecessary as Cubist doesn't exhibit black box behavior. See [Sample Usage](#sample-usage) for the printed model.
+Unlike other ensemble models such as [RandomForest](https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.RandomForestRegressor.html) and [XGBoost](https://xgboost.readthedocs.io/en/stable/), Cubist generates rules as a set of multivariate linear models with conditions (formulated as if [set of conditions met] then [multivariate linear model for given conditions]), making it easy to understand precisely how the model makes it's predictive decisions. Tools such as [SHAP](https://shap.readthedocs.io/en/latest/) and [lime](https://github.com/marcotcr/lime) are therefore unnecessary as Cubist doesn't exhibit black box behavior. See [Sample Usage](#sample-usage) for the printed model.
 
 Like XGBoost, Cubist can perform boosting by the addition of more models (called committees) that correct for the error of prior models (i.e. the second model created corrects for the prediction error of the first, the third for the error of the second, etc.).
 
-In addition to boosting, the model can perform instance-based (nearest-neighbor) corrections to create composite models, combining the advantages of these two methods. Note that with instance-based correction, model accuracy may be improved at the expense of compute time (this extra step takes longer) and some interpretability as the linear regression rules are no longer completely followed. It should also be noted that a composite model might be quite large as the full training dataset must be stored in order to perform instance-based corrections for inferencing. A composite model will be used when `auto=False` with `neighbors` set to an integer between 1 and 9. Cubist can be allowed to decide whether to take advantage of composite models with `auto=True` and `neighbors` left unset.
+In addition to boosting, the model can perform instance-based (nearest-neighbor) corrections to create composite models, combining the advantages of these two methods. Note that with instance-based correction, model accuracy may be improved at the expense of compute time (this extra step takes longer) and some interpretability as the multivariate linear models are no longer completely followed. It should also be noted that a composite model might be quite large as the full training dataset must be stored in order to perform instance-based corrections for inferencing. A composite model will be used when `auto=False` with `neighbors` set to an integer between 1 and 9. Cubist can be allowed to decide whether to take advantage of composite models with `auto=True` and `neighbors` left unset.
 
 missing values, categorical values can be used
 
@@ -179,7 +179,7 @@ Based on the R Cubist package, a few visualization utilities are provided to all
 
 ### Coefficient Display
 
-The `CubistCoefficientDisplay` plots the linear regression coefficients and intercepts selected by the Cubist model. One subplot is created for each variable/attribute with the rule number or committee/rule pair on the y-axis and the coefficient value plotted along the x-axis.
+The `CubistCoefficientDisplay` plots the multivariate linear regression coefficients and intercepts selected by the Cubist model. One subplot is created for each variable/attribute with the rule number or committee/rule pair on the y-axis and the coefficient value plotted along the x-axis.
 
 #### CubistCoefficientDisplay.from_estimator Parameters
 
@@ -238,7 +238,7 @@ The `CubistCoverageDisplay` is used to visualize the coverage of rule splits for
 
 - For small datasets, using the `sample` parameter is probably inadvisable as Cubist won't have enough samples to produce a representative model.
 - If you are looking for fast inferencing and can spare accuracy, consider skipping using a composite model by leaving `neighbors` unset.
-- Models that produce one or more rules without splits (i.e. a single linear model which holds true for the entire dataset), will return an empty `splits_`attribute while the coefficients will be available in the `coeffs_` attribute.
+- Models that produce one or more rules without splits (i.e. a single multivariate linear model which holds true for the entire dataset), will return an empty `splits_`attribute while the coefficients will be available in the `coeffs_` attribute.
 
 ## Benchmarks
 
