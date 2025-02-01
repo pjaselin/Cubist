@@ -59,8 +59,6 @@ def linkcode_resolve(domain, info):
 
 autosectionlabel_prefix_document = True
 
-trim_doctests_flags = True
-
 # -- Options for HTML output -------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
 

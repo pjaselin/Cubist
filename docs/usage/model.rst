@@ -1,7 +1,26 @@
 Model
 #####
 
-The Cubist model class (``cubist.Cubist``) has eleven parameters and eleven attributes available. Their example usage is demonstrated below and the class is documented in the API Docs section at :ref:`api/model:Cubist`.
+The Cubist model class (``cubist.Cubist``) has eleven parameters and eleven attributes available. Their use is demonstrated below and the class is documented in the API Docs section at :ref:`api/model:Cubist`.
+
+A simple use of Cubist with no configuration is as follows:
+
+.. doctest::
+
+    >>> from sklearn.datasets import load_iris
+    >>> from sklearn.model_selection import train_test_split
+    >>> from cubist import Cubist
+    >>> X, y = load_iris(return_X_y=True, as_frame=True)
+    >>> X_train, X_test, y_train, y_test = train_test_split(X, y,
+    ...                                                     test_size=0.05,
+    ...                                                     random_state=42)
+    >>> model = Cubist()
+    >>> model.fit(X_train, y_train)
+    Cubist()
+    >>> model.score(X_train, y_train)
+    0.9656775005204449
+    >>> model.score(X_test, y_test)
+    0.9955073453292975
 
 Parameters
 **********
@@ -34,51 +53,53 @@ The ``verbose`` flag indicates whether Cubist should pretty-print the generate m
         >>> X_train, X_test, y_train, y_test = train_test_split(X, y,
         ...                                                     test_size=0.05,
         ...                                                     random_state=42)
-        >>> model = Cubist(n_rules=2, verbose=True)
-        >>> model.fit(X_train, y_train)
-        Cubist [Release 2.07 GPL Edition]  Sat Dec 28 19:52:49 2024
+        >>> model = Cubist(n_rules=2, verbose=True,
+        ...                target_label="custom_output")
+        >>> model.fit(X_train, y_train)  # doctest: +NORMALIZE_WHITESPACE
+        <BLANKLINE>
+        Cubist [Release 2.07 GPL Edition]  ...
         ---------------------------------
-
-            Target attribute `outcome'
-
+        <BLANKLINE>
+            Target attribute `custom_output'
+        <BLANKLINE>
         Read 142 cases (5 attributes)
-
+        <BLANKLINE>
         Model:
-
+        <BLANKLINE>
           Rule 1: [48 cases, mean 0.0, range 0 to 0, est err 0.0]
-
+        <BLANKLINE>
             if
                 petal width (cm) <= 0.6
             then
-                outcome = 0
-
-            Rule 2: [94 cases, mean 1.5, range 1 to 2, est err 0.2]
-
+                custom_output = 0
+        <BLANKLINE>
+          Rule 2: [94 cases, mean 1.5, range 1 to 2, est err 0.2]
+        <BLANKLINE>
             if
                 petal width (cm) > 0.6
             then
-                outcome = 0.2 + 0.76 petal width (cm) + 0.271 petal length (cm)
-                          - 0.45 sepal width (cm)
-
-
+                custom_output = 0.2 + 0.76 petal width (cm) + 0.271 petal length (cm)
+                              - 0.45 sepal width (cm)
+        <BLANKLINE>
+        <BLANKLINE>
         Evaluation on training data (142 cases):
-
+        <BLANKLINE>
             Average  |error|                0.1
             Relative |error|               0.16
             Correlation coefficient        0.98
-
-
+        <BLANKLINE>
+        <BLANKLINE>
                 Attribute usage:
                   Conds  Model
-
+        <BLANKLINE>
                   100%    66%    petal width (cm)
                           66%    sepal width (cm)
                           66%    petal length (cm)
-
-
+        <BLANKLINE>
+        <BLANKLINE>
         Time: 0.0 secs
-
-        Cubist(n_rules=2, verbose=True)
+        <BLANKLINE>
+        Cubist(n_rules=2, target_label='custom_output', verbose=True)
 
 Model Tuning
 ============
