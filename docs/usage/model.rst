@@ -12,6 +12,7 @@ A simple use of Cubist with no added configuration is as follows:
     >>> from cubist import Cubist
     >>> X, y = load_iris(return_X_y=True, as_frame=True)
     >>> X_train, X_test, y_train, y_test = train_test_split(X, y,
+    ...                                                     random_state=42,
     ...                                                     test_size=0.05)
     >>> model = Cubist()
     >>> model.fit(X_train, y_train)
@@ -50,6 +51,7 @@ The ``verbose`` parameter indicates whether Cubist should print the generated mo
         >>> from cubist import Cubist
         >>> X, y = load_iris(return_X_y=True, as_frame=True)
         >>> X_train, X_test, y_train, y_test = train_test_split(X, y,
+        ...                                                     random_state=42,
         ...                                                     test_size=0.05)
         >>> model = Cubist(n_rules=2, verbose=True,
         ...                target_label="custom_output")
