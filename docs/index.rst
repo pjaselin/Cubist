@@ -100,6 +100,18 @@ Contents
    api/visualizations
    api/exceptions
 
+Considerations
+--------------
+
+- For small datasets, using the `sample` parameter is probably inadvisable as Cubist won't have enough samples to produce a representative model.
+- If you are looking for fast inferencing and can spare accuracy, consider skipping using a composite model by leaving `neighbors` unset.
+- Models that produce one or more rules without splits (i.e. a single multivariate linear model which holds true for the entire dataset), will return an empty `splits_`attribute while the coefficients will be available in the `coeffs_` attribute.
+
+Benchmarks
+----------
+
+There are many literature examples demonstrating the power of Cubist and comparing it to Random Forest as well as other bootstrapped/boosted models. Some of these are compiled here: [Cubist in Use](https://www.rulequest.com/cubist-pubs.html). To demonstrate this, some benchmark scripts are provided in the respectively named folder.
+
 Acknowledgements
 ----------------
 

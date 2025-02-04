@@ -14,26 +14,27 @@
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 **Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
 
-- [Features](#features)
+- [Model Features](#model-features)
 - [Installation](#installation)
   - [Model-Only](#model-only)
   - [Optional Dependencies](#optional-dependencies)
-- [Advantages](#advantages)
 - [Sample Usage](#sample-usage)
-- [Visualization Utilities](#visualization-utilities)
-  - [Coefficient Display](#coefficient-display)
-  - [Coverage Display](#coverage-display)
-- [Considerations](#considerations)
-- [Benchmarks](#benchmarks)
 - [Literature for Cubist](#literature-for-cubist)
   - [Original Paper](#original-paper)
   - [Publications Using Cubist](#publications-using-cubist)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
-## Features
+## Model Features
 
-Cubist offers some interesting features unlike
+Cubist offers some interesting features:
+
+- Handles missing and categorical values
+- Cross-validation and sampling
+- Easily interpretable rules
+- Error reduction by using multiple models (committees)
+- Error reduction by instance-based correction (nearest neighbors)
+- Extrapolation
 
 ## Installation
 
@@ -56,16 +57,6 @@ For development:
 ```bash
 pip install cubist[dev,viz]
 ```
-
-## Advantages
-
-Unlike other ensemble models such as [RandomForest](https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.RandomForestRegressor.html) and [XGBoost](https://xgboost.readthedocs.io/en/stable/), Cubist generates rules as a set of multivariate linear models with conditions (formulated as if [set of conditions met] then [multivariate linear model for given conditions]), making it easy to understand precisely how the model makes it's predictive decisions. Tools such as [SHAP](https://shap.readthedocs.io/en/latest/) and [lime](https://github.com/marcotcr/lime) are therefore unnecessary as Cubist doesn't exhibit black box behavior. See [Sample Usage](#sample-usage) for the printed model.
-
-Like XGBoost, Cubist can perform boosting by the addition of more models (called committees) that correct for the error of prior models (i.e. the second model created corrects for the prediction error of the first, the third for the error of the second, etc.).
-
-In addition to boosting, the model can perform instance-based (nearest-neighbor) corrections to create composite models, combining the advantages of these two methods. Note that with instance-based correction, model accuracy may be improved at the expense of compute time (this extra step takes longer) and some interpretability as the multivariate linear models are no longer completely followed. It should also be noted that a composite model might be quite large as the full training dataset must be stored in order to perform instance-based corrections for inferencing. A composite model will be used when `auto=False` with `neighbors` set to an integer between 1 and 9. Cubist can be allowed to decide whether to take advantage of composite models with `auto=True` and `neighbors` left unset.
-
-missing values, categorical values can be used
 
 ## Sample Usage
 
@@ -131,32 +122,6 @@ array([1.1257    , 0.        , 2.04999995, 1.25449991, 1.30480003,
 >>> model.score(X_test, y_test)
 0.9543285583162371
 ```
-
-## Visualization Utilities
-
-Based on the R Cubist package, a few visualization utilities are provided to allow some exploration of trained Cubist models. Differing from the original package, these are extended somewhat to allow configuration of the subplots as well as for selecting a subset of variables/attributes to plot.
-
-### Coefficient Display
-
-The `CubistCoefficientDisplay` plots the multivariate linear regression coefficients and intercepts selected by the Cubist model. One subplot is created for each variable/attribute with the rule number or committee/rule pair on the y-axis and the coefficient value plotted along the x-axis.
-
-![Sample Cubist Coefficient Display for Iris dataset](./static/iris_coefficient_display.png)
-
-### Coverage Display
-
-The `CubistCoverageDisplay` is used to visualize the coverage of rule splits for a given dataset. One subplot is created per input variable/attribute/column with the rule number or comittee/rule pair plotted on the y-axis and the coverage ranges plotted along the x-axis, scaled to the percentage of the variable values.
-
-![Sample Cubist Coverage Display for Iris dataset](./static/iris_coverage_display.png)
-
-## Considerations
-
-- For small datasets, using the `sample` parameter is probably inadvisable as Cubist won't have enough samples to produce a representative model.
-- If you are looking for fast inferencing and can spare accuracy, consider skipping using a composite model by leaving `neighbors` unset.
-- Models that produce one or more rules without splits (i.e. a single multivariate linear model which holds true for the entire dataset), will return an empty `splits_`attribute while the coefficients will be available in the `coeffs_` attribute.
-
-## Benchmarks
-
-There are many literature examples demonstrating the power of Cubist and comparing it to Random Forest as well as other bootstrapped/boosted models. Some of these are compiled here: [Cubist in Use](https://www.rulequest.com/cubist-pubs.html). To demonstrate this, some benchmark scripts are provided in the respectively named folder.
 
 ## Literature for Cubist
 
