@@ -11,7 +11,7 @@ cubist Documentation
 Background
 ----------
 
-Cubist is a regression algorithm developed by Ross Quinlan for generating rule-based predictive models. Unlike other ensemble models such as `RandomForest <https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.RandomForestRegressor.html>`_ and `XGBoost <https://xgboost.readthedocs.io/en/stable/>`_, a Cubist model is comprised of a set of rules containing pairs of conditions and corresponding multivariate linear regression models, covering the full domain of the training dataset. Each rule is formulated as:
+Cubist is a regression algorithm developed by Ross Quinlan for generating rule-based predictive models. This has been available in the R world thanks to the work of Max Kuhn and his colleagues. With this package, Cubist is introduced to Python and made scikit-learn compatible. Cross-validation and control over whether Cubist creates a composite model is also enabled here. Unlike other ensemble models such as `RandomForest <https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.RandomForestRegressor.html>`_ and `XGBoost <https://xgboost.readthedocs.io/en/stable/>`_, a Cubist model is comprised of a set of rules containing pairs of conditions and corresponding multivariate linear regression models, covering the full domain of the training dataset. Each rule is formulated as:
 
 ::
 

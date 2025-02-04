@@ -14,15 +14,12 @@
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 **Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
 
+- [Features](#features)
 - [Installation](#installation)
   - [Model-Only](#model-only)
   - [Optional Dependencies](#optional-dependencies)
-- [Background](#background)
 - [Advantages](#advantages)
 - [Sample Usage](#sample-usage)
-- [Cubist Model Class](#cubist-model-class)
-  - [Model Parameters](#model-parameters)
-  - [Model Attributes](#model-attributes)
 - [Visualization Utilities](#visualization-utilities)
   - [Coefficient Display](#coefficient-display)
   - [Coverage Display](#coverage-display)
@@ -33,6 +30,10 @@
   - [Publications Using Cubist](#publications-using-cubist)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
+## Features
+
+Cubist offers some interesting features unlike
 
 ## Installation
 
@@ -55,10 +56,6 @@ For development:
 ```bash
 pip install cubist[dev,viz]
 ```
-
-## Background
-
-Cubist is a regression algorithm developed by Ross Quinlan for generating rule-based predictive models. This has been available in the R world thanks to the work of Max Kuhn and his colleagues and with this package is introduced to Python and made scikit-learn compatible. Cross-validation and control over whether Cubist creates a composite model is also enabled here.
 
 ## Advantages
 
@@ -134,16 +131,6 @@ array([1.1257    , 0.        , 2.04999995, 1.25449991, 1.30480003,
 >>> model.score(X_test, y_test)
 0.9543285583162371
 ```
-
-## Cubist Model Class
-
-### Model Parameters
-
-The following parameters can be passed as arguments to the ```Cubist()``` class instantiation:
-
-### Model Attributes
-
-The following attributes are exposed to understand the Cubist model results:
 
 ## Visualization Utilities
 
