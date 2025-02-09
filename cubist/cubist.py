@@ -6,7 +6,6 @@ from warnings import warn
 
 import numpy as np
 import pandas as pd
-from _cubist import _cubist, _predictions  # noqa E0611 # pylint: disable=E0611
 from sklearn.base import BaseEstimator, RegressorMixin, _fit_context
 from sklearn.utils import RegressorTags
 from sklearn.utils._param_validation import Interval, RealNotInt
@@ -16,6 +15,8 @@ from sklearn.utils.validation import (
     check_random_state,
     validate_data,
 )
+
+from _cubist import _cubist, _predictions  # noqa E0611 # pylint: disable=E0611
 
 from ._attribute_usage import _attribute_usage
 from ._make_data_string import _make_data_string
