@@ -112,8 +112,25 @@ Benchmarks
 
 There are many literature examples demonstrating the power of Cubist and comparing it to Random Forest as well as other bootstrapped/boosted models. Some of these are compiled here: [Cubist in Use](https://www.rulequest.com/cubist-pubs.html). To demonstrate this, some benchmark scripts are provided in the respectively named folder.
 
+## Literature
+
+### Original Paper
+
+- [Learning with Continuous Classes](https://sci2s.ugr.es/keel/pdf/algorithm/congreso/1992-Quinlan-AI.pdf)
+
+### Publications Using Cubist
+
+- [Cubist in Use](https://www.rulequest.com/cubist-pubs.html)
+- [A Machine Learning Example in R using Cubist](https://www.linkedin.com/pulse/machine-learning-example-r-using-cubist-kirk-mettler)
+
 Acknowledgements
 ----------------
+
+The Cubist model is developed, maintained, and distributed by [Ross Quinlan](https://www.rulequest.com/Personal/). For those looking to leverage Cubist more fully, he also provides a paid edition. As such, all credit for this truly impressive model goes to him.
+
+After Ross Quinlan, a special thanks goes to [Max Kuhn](https://github.com/topepo) and his colleagues for developing the R wrapper for Cubist. Without that work, there would have been no inspiration or blueprint for this effort.
+
+Finally, due gratitude to Kirk Mettler for introducing this model and inspiration to pursue this effort.
 
 While I appreciate the positive responses from this effort, I'm truly only a messenger. All credit is due to Ross Quinlan for his work in developing Cubist and it's related classification algorithms such as C5.0. If not for Max Kuhn and his colleagues, I wouldn't have known where to start. This project is more or less a Python translation of Max's R package so the heavylifting in understanding how to control the Cubist C library came from them.
 
@@ -125,6 +142,12 @@ Quinlan for his work on the model
 Max Kuhn for developing the R package on which this is based
 
 Besides the value of this work, this project has also served as a practical means of learning over the past few years:
+
+Beyond the value to end users in this effort, this project has been useful in:
+
+- Learning Python packaging
+- Shoring up understanding of pytest/coverage, CI/CD with GitHub Actions
+- Learning Sphinx, restructured Markdown, pre-commit, mypy
 
 - Python packaging (cibuildwheel)
 - CI/CD via GitHub Actions

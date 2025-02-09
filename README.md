@@ -8,7 +8,7 @@
 [![PyPI - Downloads](https://img.shields.io/pypi/dm/cubist)](https://pypi.org/project/cubist)
 [![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit)](https://github.com/pre-commit/pre-commit)
 
-`cubist` is a Python package and wrapper for [Ross Quinlan](https://www.rulequest.com/Personal/)'s [Cubist](https://www.rulequest.com/cubist-unix.html) v2.07 regression model. The package is both inspired by and a translation of the [R wrapper for Cubist](https://github.com/topepo/Cubist). This implementation of the model is compatible with and the visualization utilities are designed after [scikit-learn](https://scikit-learn.org/stable/).
+`cubist` is a Python package and wrapper for [Ross Quinlan](https://www.rulequest.com/Personal/)'s [Cubist](https://www.rulequest.com/cubist-unix.html) v2.07 regression model. The package is both inspired by and a translation of the [R wrapper for Cubist](https://github.com/topepo/Cubist). This implementation of the model is compatible with and the visualization utilities are designed after those in [scikit-learn](https://scikit-learn.org/stable/).
 
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
@@ -17,12 +17,8 @@
 - [Model Features](#model-features)
 - [Installation](#installation)
   - [Model-Only](#model-only)
-  - [Optional Dependencies](#optional-dependencies)
+  - [Enable Visualization Utilities](#enable-visualization-utilities)
 - [Sample Usage](#sample-usage)
-- [Literature](#literature)
-  - [Original Paper](#original-paper)
-  - [Publications Using Cubist](#publications-using-cubist)
-- [Acknowledgements](#acknowledgements)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
@@ -43,18 +39,10 @@
 pip install --upgrade cubist
 ```
 
-### Optional Dependencies
-
-To enable visualization utilities:
+### Enable Visualization Utilities
 
 ```bash
 pip install cubist[viz]
-```
-
-For development:
-
-```bash
-pip install cubist[dev,viz]
 ```
 
 ## Sample Usage
@@ -121,28 +109,3 @@ array([1.1257    , 0.        , 2.04999995, 1.25449991, 1.30480003,
 >>> model.score(X_test, y_test)
 0.9543285583162371
 ```
-
-## Literature
-
-### Original Paper
-
-- [Learning with Continuous Classes](https://sci2s.ugr.es/keel/pdf/algorithm/congreso/1992-Quinlan-AI.pdf)
-
-### Publications Using Cubist
-
-- [Cubist in Use](https://www.rulequest.com/cubist-pubs.html)
-- [A Machine Learning Example in R using Cubist](https://www.linkedin.com/pulse/machine-learning-example-r-using-cubist-kirk-mettler)
-
-## Acknowledgements
-
-The Cubist model is developed, maintained, and distributed by [Ross Quinlan](https://www.rulequest.com/Personal/). For those looking to leverage Cubist more fully, he also provides a paid edition. As such, all credit for this truly impressive model goes to him.
-
-After Ross Quinlan, a special thanks goes to [Max Kuhn](https://github.com/topepo) and his colleagues for developing the R wrapper for Cubist. Without that work, there would have been no inspiration or blueprint for this effort.
-
-Finally, due gratitude to Kirk Mettler for introducing this model and inspiration to pursue this effort.
-
-Beyond the value to end users in this effort, this project has been useful in:
-
-- Learning Python packaging
-- Shoring up understanding of pytest/coverage, CI/CD with GitHub Actions
-- Learning Sphinx, restructured Markdown, pre-commit, mypy
