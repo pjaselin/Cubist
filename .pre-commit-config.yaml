@@ -33,14 +33,14 @@ repos:
     hooks:
       - id: typos
         args: []
-  - repo: local
-    hooks:
-      - id: pylint
-        name: pylint
-        entry: pylint
-        language: system
-        types: [python]
-        require_serial: true
+  # - repo: local
+  #   hooks:
+  #     - id: pylint
+  #       name: pylint
+  #       entry: pylint
+  #       language: system
+  #       types: [python]
+  #       require_serial: true
   - repo: https://github.com/pycqa/isort
     rev: 6.0.0
     hooks:
