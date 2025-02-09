@@ -19,22 +19,21 @@
   - [Model-Only](#model-only)
   - [Optional Dependencies](#optional-dependencies)
 - [Sample Usage](#sample-usage)
-- [Literature for Cubist](#literature-for-cubist)
+- [Literature](#literature)
   - [Original Paper](#original-paper)
   - [Publications Using Cubist](#publications-using-cubist)
+- [Acknowledgements](#acknowledgements)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 ## Model Features
 
-Cubist offers some interesting features:
-
-- Handles missing and categorical values
-- Cross-validation and sampling
-- Easily interpretable rules
+- Generates a piecewise model formulated collection of rules with corresponding linear regressors (optionally allowing for nearest-neighbor correction)
+- High interpretability due to piecewise rules and linear regressors
+- Handles continuous, date, time, timestamp, and discrete values. Additionally can ignore columns, add labels to training rows, and allows for missing values. Columns can also be defined by formulas. N.B. these are not all supported in this package.
+- Supports cross-validation and sampling
 - Error reduction by using multiple models (committees)
-- Error reduction by instance-based correction (nearest neighbors)
-- Extrapolation
+- Supports extrapolation beyond the training dataset
 
 ## Installation
 
@@ -123,7 +122,7 @@ array([1.1257    , 0.        , 2.04999995, 1.25449991, 1.30480003,
 0.9543285583162371
 ```
 
-## Literature for Cubist
+## Literature
 
 ### Original Paper
 
@@ -133,3 +132,17 @@ array([1.1257    , 0.        , 2.04999995, 1.25449991, 1.30480003,
 
 - [Cubist in Use](https://www.rulequest.com/cubist-pubs.html)
 - [A Machine Learning Example in R using Cubist](https://www.linkedin.com/pulse/machine-learning-example-r-using-cubist-kirk-mettler)
+
+## Acknowledgements
+
+The Cubist model is developed, maintained, and distributed by [Ross Quinlan](https://www.rulequest.com/Personal/). For those looking to leverage Cubist more fully, he also provides a paid edition. As such, all credit for this truly impressive model goes to him.
+
+After Ross Quinlan, a special thanks goes to [Max Kuhn](https://github.com/topepo) and his colleagues for developing the R wrapper for Cubist. Without that work, there would have been no inspiration or blueprint for this effort.
+
+Finally, due gratitude to Kirk Mettler for introducing this model and inspiration to pursue this effort.
+
+Beyond the value to end users in this effort, this project has been useful in:
+
+- Learning Python packaging
+- Shoring up understanding of pytest/coverage, CI/CD with GitHub Actions
+- Learning Sphinx, restructured Markdown, pre-commit, mypy

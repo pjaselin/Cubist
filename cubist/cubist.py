@@ -1,27 +1,26 @@
 """Main Cubist estimator class"""
 
 import zlib
-from warnings import warn
 from numbers import Integral
+from warnings import warn
 
 import numpy as np
 import pandas as pd
-from sklearn.utils.validation import (
-    check_is_fitted,
-    check_random_state,
-    _check_sample_weight,
-    validate_data,
-)
+from _cubist import _cubist, _predictions  # noqa E0611 # pylint: disable=E0611
+from sklearn.base import BaseEstimator, RegressorMixin, _fit_context
 from sklearn.utils import RegressorTags
 from sklearn.utils._param_validation import Interval, RealNotInt
-from sklearn.base import RegressorMixin, BaseEstimator, _fit_context
+from sklearn.utils.validation import (
+    _check_sample_weight,
+    check_is_fitted,
+    check_random_state,
+    validate_data,
+)
 
-from _cubist import _cubist, _predictions  # noqa E0611 # pylint: disable=E0611
-
-from ._make_names_string import _make_names_string
-from ._make_data_string import _make_data_string
-from ._parse_model import _parse_model
 from ._attribute_usage import _attribute_usage
+from ._make_data_string import _make_data_string
+from ._make_names_string import _make_names_string
+from ._parse_model import _parse_model
 from .exceptions import CubistError
 
 
@@ -108,8 +107,8 @@ class Cubist(RegressorMixin, BaseEstimator):  # pylint: disable=R0902
         first column for "Conditions" shows the approximate percentage of cases
         for which the named attribute appears in a condition of an applicable
         rule, while the second column "Attributes" gives the percentage of cases
-        for which the attribute appears in the multivariate linear formula of an
-        applicable rule.
+        for which the attribute appears in the linear formula of an applicable
+        rule.
 
     n_features_in_ : int
         Number of features seen during :term:`fit`.

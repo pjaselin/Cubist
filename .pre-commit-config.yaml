@@ -41,3 +41,19 @@ repos:
         language: system
         types: [python]
         require_serial: true
+  - repo: https://github.com/pycqa/isort
+    rev: 6.0.0
+    hooks:
+      - id: isort
+  # - repo: https://github.com/pre-commit/mirrors-mypy
+  #   rev: 'v1.15.0'
+  #   hooks:
+  #     - id: mypy
+  # - repo: https://github.com/commitizen-tools/commitizen
+  #   rev: v4.2.1
+  #   hooks:
+  #     - id: commitizen
+  # - repo: https://github.com/PyCQA/doc8
+  #   rev: v1.1.2
+  #   hooks:
+  #     - id: doc8

@@ -1,23 +1,21 @@
 """Visualization class for the Cubist Coefficient Display"""
 
 import pandas as pd
-
 from sklearn.utils._optional_dependencies import check_matplotlib_support
 from sklearn.utils.validation import check_is_fitted
 
-from .cubist import Cubist
 from ._cubist_display_mixin import _CubistDisplayMixin
+from .cubist import Cubist
 
 
 class CubistCoefficientDisplay(_CubistDisplayMixin):
     """Visualization of the regression coefficients used in the Cubist model.
 
-    This tool plots the multivariate linear coefficients and intercepts created
-    for a Cubist model and stored in the `coeffs_` attribute. One subplot is
-    created for each variable or intercept with the rule number or
-    committee/rule pair on the y-axis. The coefficient values for the given
-    variable and rule pair or variable and committee/rule pair are plotted along
-    the x-axis.
+    This tool plots the linear coefficients and intercepts created for a Cubist
+    model and stored in the `coeffs_` attribute. One subplot is created for each
+    variable or intercept with the rule number or committee/rule pair on the
+    y-axis. The coefficient values for the given variable and rule pair or
+    variable and committee/rule pair are plotted along the x-axis.
 
     See the details in the docstrings of
     :func:`~cubist.CubistCoefficientDisplay.from_estimator` to
@@ -28,8 +26,8 @@ class CubistCoefficientDisplay(_CubistDisplayMixin):
     Parameters
     ----------
     coeffs : pd.DataFrame
-        DataFrame containing the multivariate linear model coefficients by
-        variable, committee, and rule.
+        DataFrame containing the linear model coefficients by variable,
+        committee, and rule.
 
     Attributes
     ----------

@@ -5,8 +5,8 @@ import re
 from collections import deque
 from typing import Union
 
-import pandas as pd
 import numpy as np
+import pandas as pd
 
 from ._utils import _format
 
@@ -228,7 +228,7 @@ def _type3(x):
 
 
 def _eqn(x, var_names: list):
-    """Parse out the multivariate linear equation"""
+    """Parse out the linear equation"""
     x = x.replace('"', "")
     starts = [m.start(0) for m in re.finditer("(coeff=)|(att=)", x)]
     tmp = [""] * len(starts)

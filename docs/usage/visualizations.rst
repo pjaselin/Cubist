@@ -6,7 +6,7 @@ Based on the R Cubist package, a few visualization utilities are provided to all
 Coefficient Display
 *******************
 
-The `CubistCoefficientDisplay` plots the multivariate linear regression coefficients and intercepts selected by the Cubist model. One subplot is created for each variable/attribute with the rule number or committee/rule pair on the y-axis and the coefficient value plotted along the x-axis.
+The `CubistCoefficientDisplay` plots the linear regression coefficients and intercepts selected by the Cubist model. One subplot is created for each variable/attribute with the rule number or committee/rule pair on the y-axis and the coefficient value plotted along the x-axis.
 
 ![Sample Cubist Coefficient Display for Iris dataset](./static/iris_coefficient_display.png)
 

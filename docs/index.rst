@@ -11,7 +11,7 @@ cubist Documentation
 Background
 ----------
 
-Cubist is a regression algorithm developed by Ross Quinlan for generating rule-based predictive models. This has been available in the R world thanks to the work of Max Kuhn and his colleagues. With this package, Cubist is introduced to Python and made scikit-learn compatible. Cross-validation and control over whether Cubist creates a composite model is also enabled here. Unlike other ensemble models such as `RandomForest <https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.RandomForestRegressor.html>`_ and `XGBoost <https://xgboost.readthedocs.io/en/stable/>`_, a Cubist model is comprised of a set of rules containing pairs of conditions and corresponding multivariate linear regression models, covering the full domain of the training dataset. Each rule is formulated as:
+Cubist is a regression algorithm developed by Ross Quinlan for generating rule-based predictive models. This has been available in the R world thanks to the work of Max Kuhn and his colleagues. With this package, Cubist is introduced to Python and made scikit-learn compatible. Cross-validation and control over whether Cubist creates a composite model is also enabled here. Unlike other ensemble models such as `RandomForest <https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.RandomForestRegressor.html>`_ and `XGBoost <https://xgboost.readthedocs.io/en/stable/>`_, a Cubist model is comprised of a set of rules containing pairs of conditions and corresponding linear regression models, covering the full domain of the training dataset. Each rule is formulated as:
 
 ::
 
@@ -72,7 +72,7 @@ In the above sample using the `Iris dataset <https://scikit-learn.org/stable/mod
 
 Like XGBoost, Cubist can perform boosting by the addition of more models (called committees) that correct for the error of prior models (i.e. the second model created corrects for the prediction error of the first, the third for the error of the second, etc.).
 
-In addition to boosting, the model supports instance-based (nearest-neighbor) corrections to create composite models, combining the advantages of these two methods. Note that with instance-based correction, model accuracy may be improved at the expense of compute time as this extra step takes longer and somewhat reduced interpretability as the multivariate linear models are no longer completely followed. It should also be noted that the disk size of a saved composite model will be proportional to the training dataset size as the latter will be stored with the model to enable future inferencing with instance-based corrections. Interestingly, Cubist can be allowed to decide whether to take advantage of composite models with the appropriate settings and will report it's choice to the user.
+In addition to boosting, the model supports instance-based (nearest-neighbor) corrections to create composite models, combining the advantages of these two methods. Note that with instance-based correction, model accuracy may be improved at the expense of compute time as this extra step takes longer and somewhat reduced interpretability as the linear models are no longer completely followed. It should also be noted that the disk size of a saved composite model will be proportional to the training dataset size as the latter will be stored with the model to enable future inferencing with instance-based corrections. Interestingly, Cubist can be allowed to decide whether to take advantage of composite models with the appropriate settings and will report it's choice to the user.
 
 A final difference with other models is that Cubist natively supports missing and categorical values. This means user are not required to introduce encodings if not desired and may exlore more patterns (e.g. missingness) in the dataset.
 
@@ -105,7 +105,7 @@ Considerations
 
 - For small datasets, using the `sample` parameter is probably inadvisable as Cubist won't have enough samples to produce a representative model.
 - If you are looking for fast inferencing and can spare accuracy, consider skipping using a composite model by leaving `neighbors` unset.
-- Models that produce one or more rules without splits (i.e. a single multivariate linear model which holds true for the entire dataset), will return an empty `splits_`attribute while the coefficients will be available in the `coeffs_` attribute.
+- Models that produce one or more rules without splits (i.e. a single linear model which holds true for the entire dataset), will return an empty `splits_`attribute while the coefficients will be available in the `coeffs_` attribute.
 
 Benchmarks
 ----------

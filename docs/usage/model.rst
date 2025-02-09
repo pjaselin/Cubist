@@ -119,7 +119,7 @@ Varying the ``n_committees`` parameter changes the number of models (called comm
 neighbors
 ---------
 
-Varying the ``neighbors`` parameter changes the number of nearest neighbors Cubist will use to correct the rule-based prediction. Using this feature may improve accuracy at the cost of interpretability as the multivariate linear models won't be completely followed. Additionally the training dataset will be cached in the model to support future predictions.
+Varying the ``neighbors`` parameter changes the number of nearest neighbors Cubist will use to correct the rule-based prediction. Using this feature may improve accuracy at the cost of interpretability as the linear models won't be completely followed. Additionally the training dataset will be cached in the model to support future predictions.
 
 unbiased
 --------

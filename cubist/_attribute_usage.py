@@ -22,7 +22,7 @@ def _attribute_usage(output: str, feature_names: Union[list, set]):
     -------
     output : pd.DataFrame
         DataFrame of the variable/attribute usage in the conditions and
-        multivariate linear models created by Cubist.
+        linear models created by Cubist.
     """
     # get the attribute usage section of the model output
     start_i = output.find("Attribute usage:")

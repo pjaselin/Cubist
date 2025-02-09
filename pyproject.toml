@@ -92,3 +92,6 @@ good-names = [
   "X_train",
   "X_test"
 ]
+
+[tool.isort]
+profile = "black"
