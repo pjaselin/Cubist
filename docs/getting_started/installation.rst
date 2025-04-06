@@ -11,11 +11,6 @@ Model-Only
 
 .. code-block:: shell
 
-   python3 -m pip install --upgrade sphinx-prompt
-
-
-.. code-block:: shell
-
    pip install cubist
 
 Enable Visualization Utilities
