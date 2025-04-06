@@ -20,7 +20,7 @@ on:
 
 jobs:
   test:
-    name: Test and lint on Python 3.11 and ${{ matrix.os }}
+    name: Test and lint on ${{ matrix.os }} with Python 3.11
     strategy:
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
@@ -73,7 +73,7 @@ jobs:
         CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
   build:
-    name: Build on Python 3.11 and ubuntu-latest
+    name: Build docs on ubuntu-latest with with Python 3.11
     runs-on: ubuntu-latest
     needs: test
 
@@ -107,7 +107,7 @@ jobs:
         path: docs/_build/html
 
   deployment:
-    name: Build on Python 3.11 and ubuntu-latest
+    name: Deploy docs to GitHub Pages
     runs-on: ubuntu-latest
     needs: build
 
@@ -123,5 +123,5 @@ jobs:
 
     steps:
     - name: Deploy to GitHub Pages
-      # id: deployment
+      id: deployment
       uses: actions/deploy-pages@v4
