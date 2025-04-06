@@ -7,8 +7,9 @@
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
 import os
-import sys
 import subprocess
+import sys
+import warnings
 
 sys.path.insert(0, os.path.abspath(".."))
 
@@ -56,6 +57,15 @@ def linkcode_resolve(domain, info):
     filename = info["module"].replace(".", "/")
     return f"https://github.com/pjaselin/Cubist/blob/{git_revision_short_hash}/{filename}.py"
 
+
+warnings.filterwarnings(
+    "ignore",
+    category=UserWarning,
+    message=(
+        "Matplotlib is currently using agg, which is a"
+        " non-GUI backend, so cannot show the figure."
+    ),
+)
 
 autosectionlabel_prefix_document = True
 
