@@ -2,6 +2,11 @@
 default_language_version:
   node: 22.9.0
 
+default_install_hook_types:
+  - pre-commit
+  - commit-msg
+  - pre-push
+
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v5.0.0
@@ -14,14 +19,14 @@ repos:
         args: [--pytest-test-first]
   - repo: https://github.com/astral-sh/ruff-pre-commit
     # Ruff version.
-    rev: v0.8.6
+    rev: v0.11.4
     hooks:
       # Run the linter.
       - id: ruff
       # Run the formatter.
       - id: ruff-format
   - repo: https://github.com/DavidAnson/markdownlint-cli2
-    rev: v0.17.1
+    rev: v0.17.2
     hooks:
       - id: markdownlint-cli2
   - repo: https://github.com/thlorenz/doctoc
@@ -29,22 +34,22 @@ repos:
     hooks:
       - id: doctoc
   - repo: https://github.com/crate-ci/typos
-    rev: v1.29.4
+    rev: v1.31.1
     hooks:
       - id: typos
         args: []
   - repo: https://github.com/pycqa/isort
-    rev: 6.0.0
+    rev: 6.0.1
     hooks:
       - id: isort
   # - repo: https://github.com/pre-commit/mirrors-mypy
   #   rev: 'v1.15.0'
   #   hooks:
   #     - id: mypy
-  # - repo: https://github.com/commitizen-tools/commitizen
-  #   rev: v4.2.1
-  #   hooks:
-  #     - id: commitizen
+  - repo: https://github.com/commitizen-tools/commitizen
+    rev: v4.5.0
+    hooks:
+      - id: commitizen
   # - repo: https://github.com/PyCQA/doc8
   #   rev: v1.1.2
   #   hooks:

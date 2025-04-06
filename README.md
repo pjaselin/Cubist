@@ -14,22 +14,33 @@
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 **Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
 
-- [Model Features](#model-features)
+- [Cubist Model Features](#cubist-model-features)
+- [Package Features](#package-features)
 - [Installation](#installation)
   - [Model-Only](#model-only)
   - [Enable Visualization Utilities](#enable-visualization-utilities)
-- [Sample Usage](#sample-usage)
+- [Usage](#usage)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
-## Model Features
+## Cubist Model Features
 
-- Generates a piecewise model formulated collection of rules with corresponding linear regressors (optionally allowing for nearest-neighbor correction)
-- High interpretability due to piecewise rules and linear regressors
-- Handles continuous, date, time, timestamp, and discrete values. Additionally can ignore columns, add labels to training rows, and allows for missing values. Columns can also be defined by formulas. N.B. these are not all supported in this package.
-- Supports cross-validation and sampling
-- Error reduction by using multiple models (committees)
-- Supports extrapolation beyond the training dataset
+The Cubist model has the following distinguishing features, although not all are fully enabled in this package:
+
+- Generates a piecewise model formulated as a collection of conditional rules with corresponding linear regressors (optionally allowing for nearest-neighbor correction).
+- High interpretability due to piecewise rules and linear regressors.
+- Handles missing values.
+- Handles continuous, date, time, timestamp, and discrete values. Additionally can ignore columns and add labels to training rows. Columns can also be defined by formulas. N.B. Not all of these are supported in this package.
+- Natively performs cross-validation and sampling.
+- Error can be further reduced by using multiple models (committees).
+- Allows for extrapolation beyond the original training target values (sets a minimum of zero for predicted output if all training target values are greater than zero).
+
+## Package Features
+
+- Cubist model exposed as a scikit-learn estimator.
+- Visualization utilities for:
+  - Exploring the coefficients of the linear regressors.
+  - Assessing the coverage of rules over an input dataset.
 
 ## Installation
 
@@ -45,7 +56,7 @@ pip install --upgrade cubist
 pip install cubist[viz]
 ```
 
-## Sample Usage
+## Usage
 
 ```python
 >>> from sklearn.datasets import load_iris

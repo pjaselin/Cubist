@@ -112,34 +112,28 @@ Benchmarks
 
 There are many literature examples demonstrating the power of Cubist and comparing it to Random Forest as well as other bootstrapped/boosted models. Some of these are compiled here: [Cubist in Use](https://www.rulequest.com/cubist-pubs.html). To demonstrate this, some benchmark scripts are provided in the respectively named folder.
 
-## Literature
+Literature
+----------
 
-### Original Paper
+Original Paper
+^^^^^^^^^^^^^^
 
-- [Learning with Continuous Classes](https://sci2s.ugr.es/keel/pdf/algorithm/congreso/1992-Quinlan-AI.pdf)
+- `Learning with Continuous Classes <https://sci2s.ugr.es/keel/pdf/algorithm/congreso/1992-Quinlan-AI.pdf)>`_
 
-### Publications Using Cubist
+Publications Using Cubist
+^^^^^^^^^^^^^^^^^^^^^^^^^
 
-- [Cubist in Use](https://www.rulequest.com/cubist-pubs.html)
-- [A Machine Learning Example in R using Cubist](https://www.linkedin.com/pulse/machine-learning-example-r-using-cubist-kirk-mettler)
+- `Cubist in Use <https://www.rulequest.com/cubist-pubs.html>`_
+- `A Machine Learning Example in R using Cubist <https://www.linkedin.com/pulse/machine-learning-example-r-using-cubist-kirk-mettler>`_
 
 Acknowledgements
 ----------------
 
-The Cubist model is developed, maintained, and distributed by [Ross Quinlan](https://www.rulequest.com/Personal/). For those looking to leverage Cubist more fully, he also provides a paid edition. As such, all credit for this truly impressive model goes to him.
+While the positive feedback for this package is appreciated, all credit rightly belongs to `Ross Quinlan <https://www.rulequest.com/Personal/>`_ for his work in developing the Cubist model and it's related classification algorithms such as C5.0. He also provides a commercial edition for those looking to leverage Cubist more fully.
 
-After Ross Quinlan, a special thanks goes to [Max Kuhn](https://github.com/topepo) and his colleagues for developing the R wrapper for Cubist. Without that work, there would have been no inspiration or blueprint for this effort.
+I also want to give credit to `Max Kuhn <https://github.com/topepo>`_ and his colleagues for developing the R wrapper for Cubist. This package is more or less a Python translation of that effort so the heavylifting in understanding how to control the Cubist C library came from them. Without that project, there would have been no inspiration or blueprint for this one.
 
-Finally, due gratitude to Kirk Mettler for introducing this model and inspiration to pursue this effort.
-
-While I appreciate the positive responses from this effort, I'm truly only a messenger. All credit is due to Ross Quinlan for his work in developing Cubist and it's related classification algorithms such as C5.0. If not for Max Kuhn and his colleagues, I wouldn't have known where to start. This project is more or less a Python translation of Max's R package so the heavylifting in understanding how to control the Cubist C library came from them.
-
-Finally I'm also grateful to my leadership at IBM, Kirk Mettler, for introducing me to Cubist and from whom I first conceived of this effort.
- the R world thanks to the work of Max Kuhn and his colleagues. It is introduced to Python with this package and made scikit-learn compatible for use with at ecosystem. Cross-validation and control over whether Cubist creates a composite model is also enabled here.
-
-Grateful to Kirk Mettler for introducing me to the model
-Quinlan for his work on the model
-Max Kuhn for developing the R package on which this is based
+Finally, I want to express my gratitude to `Kirk Mettler <https://www.linkedin.com/in/kirkmettler/>`_, my former mentor at IBM, for introducing me to this model and encouraging me to embark on this effort.
 
 Besides the value of this work, this project has also served as a practical means of learning over the past few years:
 
