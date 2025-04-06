@@ -58,6 +58,7 @@ def linkcode_resolve(domain, info):
     return f"https://github.com/pjaselin/Cubist/blob/{git_revision_short_hash}/{filename}.py"
 
 
+# silence matplotlib warnings when docs are tested
 warnings.filterwarnings(
     "ignore",
     category=UserWarning,
