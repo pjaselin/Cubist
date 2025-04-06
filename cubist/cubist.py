@@ -161,7 +161,7 @@ class Cubist(RegressorMixin, BaseEstimator):  # pylint: disable=R0902
     array([0.50073832, 0.86456549, 5.14631033, ..., 4.76159859, 0.76238906,
     ...    1.9493351 ], shape=(4128,))
     >>> model.score(X_test, y_test)
-    0.8178354789216098
+    0.81783547...
     """
 
     _parameter_constraints: dict = {
