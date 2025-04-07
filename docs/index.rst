@@ -11,9 +11,13 @@ cubist Documentation
 TL;DR
 -----
 
+Install ``cubist`` with:
+
 .. code-block:: shell
 
    pip install cubist
+
+Example model use integrated with scikit-learn:
 
 .. doctest::
 
@@ -75,7 +79,7 @@ TL;DR
 Background
 ----------
 
-Cubist is a regression algorithm developed by Ross Quinlan for generating rule-based predictive models. This has been available in the R world thanks to the work of Max Kuhn and his colleagues. With this package, Cubist is introduced to Python and made scikit-learn compatible. Cross-validation and control over whether Cubist creates a composite model is also enabled here. Unlike other ensemble models such as `RandomForest <https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.RandomForestRegressor.html>`_ and `XGBoost <https://xgboost.readthedocs.io/en/stable/>`_, a Cubist model is comprised of a set of rules containing pairs of conditions and corresponding linear regression models, covering the full domain of the training dataset. Each rule is formulated as:
+Cubist is a regression algorithm developed by Ross Quinlan for generating rule-based predictive models. This has been available in the R world thanks to the work of Max Kuhn and his colleagues. With this package, Cubist is introduced to Python and made compatible with scikit-learn. Cross-validation and control over whether Cubist creates a composite model is also enabled here. Unlike other ensemble models such as `RandomForest <https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.RandomForestRegressor.html>`_ and `XGBoost <https://xgboost.readthedocs.io/en/stable/>`_, a Cubist model is comprised of a set of rules containing pairs of conditions and corresponding linear regression models, covering the full domain of the training dataset. Each rule is formulated in the following format:
 
 ::
 
@@ -84,7 +88,7 @@ Cubist is a regression algorithm developed by Ross Quinlan for generating rule-b
     then
         [linear model]
 
-This makes it straightforward to understand how the model makes it's predictive decisions. Tools such as `SHAP <https://shap.readthedocs.io/en/latest/>`_ and `lime <https://github.com/marcotcr/lime>`_ are therefore unnecessary as Cubist doesn't exhibit black box behavior. A full example model:
+This makes it straightforward to understand the model's predictive decisions. Tools such as `SHAP <https://shap.readthedocs.io/en/latest/>`_ and `lime <https://github.com/marcotcr/lime>`_ are therefore unnecessary as Cubist doesn't exhibit black box behavior. A full example model:
 
 .. dropdown:: Sample Cubist Output
 
@@ -174,7 +178,7 @@ Considerations
 Benchmarks
 ----------
 
-There are many literature examples demonstrating the power of Cubist and comparing it to Random Forest as well as other bootstrapped/boosted models. Some of these are compiled here: [Cubist in Use](https://www.rulequest.com/cubist-pubs.html). To demonstrate this, some benchmark scripts are provided in the respectively named folder.
+There are many literature examples demonstrating the power of Cubist and comparing it to Random Forest as well as other bootstrapped/boosted models. Some of these are compiled here: `Cubist in Use <https://www.rulequest.com/cubist-pubs.html>`_.
 
 Literature
 ----------
@@ -198,21 +202,3 @@ While the positive feedback for this package is appreciated, all credit rightly 
 I also want to give credit to `Max Kuhn <https://github.com/topepo>`_ and his colleagues for developing the R wrapper for Cubist. This package is more or less a Python translation of that effort so the heavylifting in understanding how to control the Cubist C library came from them. Without that project, there would have been no inspiration or blueprint for this one.
 
 Finally, I want to express my gratitude to `Kirk Mettler <https://www.linkedin.com/in/kirkmettler/>`_, my former mentor at IBM, for introducing me to this model and encouraging me to embark on this effort.
-
-Besides the value of this work, this project has also served as a practical means of learning over the past few years:
-
-Beyond the value to end users in this effort, this project has been useful in:
-
-- Learning Python packaging
-- Shoring up understanding of pytest/coverage, CI/CD with GitHub Actions
-- Learning Sphinx, restructured Markdown, pre-commit, mypy
-
-- Python packaging (cibuildwheel)
-- CI/CD via GitHub Actions
-- pytest
-- coverage/CodeCov
-- pre-commit
-- sphinx
-- cython
-- ruff
-- pylint
