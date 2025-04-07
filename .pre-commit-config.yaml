@@ -50,7 +50,7 @@ repos:
     rev: v4.5.0
     hooks:
       - id: commitizen
-  # - repo: https://github.com/PyCQA/doc8
-  #   rev: v1.1.2
-  #   hooks:
-  #     - id: doc8
+  - repo: https://github.com/PyCQA/doc8
+    rev: v1.1.2
+    hooks:
+      - id: doc8
