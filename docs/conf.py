@@ -14,8 +14,7 @@ import warnings
 sys.path.insert(0, os.path.abspath(".."))
 
 project = "cubist"
-copyright = "Patrick Aselin"
-author = "Patrick Aselin"
+html_show_copyright = False
 release = "v1.0.0"
 
 # -- General configuration ---------------------------------------------------
