@@ -96,3 +96,6 @@ good-names = [
 [tool.isort]
 known_first_party = ["_cubist"]
 profile = "black"
+
+[tool.doc8]
+ignore = ["D001"]

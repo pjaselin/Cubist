@@ -6,7 +6,7 @@
 cubist Documentation
 ====================
 
-``cubist`` is a Python package and wrapper for `Ross Quinlan <https://www.rulequest.com/Personal/>`_'s `Cubist <https://www.rulequest.com/cubist-unix.html>`_ v2.07 regression model with additional utilities for visualizing the model. The package is both inspired by and a translation of the `R wrapper for Cubist <https://github.com/topepo/Cubist>`_. This implementation of the model is compatible with and the visualization utilities are designed after `scikit-learn <https://scikit-learn.org/stable/>`_.
+``cubist`` is a Python package and wrapper for `Ross Quinlan <https://www.rulequest.com/Personal/>`_'s `Cubist <https://www.rulequest.com/cubist-unix.html>`_ v2.07 regression model with additional utilities for visualizing the model. The package is both inspired by and a translation of the `R wrapper for Cubist <https://github.com/topepo/Cubist>`_. This implementation of the model is compatible with and the visualization utilities are designed after those in `scikit-learn <https://scikit-learn.org/stable/>`_.
 
 TL;DR
 -----
