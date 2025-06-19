@@ -144,14 +144,14 @@ int VERBOSITY = 0, /* verbosity level (0 = none) */
 
 float MAXD; /* max distance for close neighbors */
 
-Boolean XVAL = 0,     /* true if perform crossvalidation */
+Boolean XVAL = 0,     /* bintrue if perform crossvalidation */
     CHOOSEMODE = 0,   /* choose whether to use instances */
     USEINSTANCES = 0, /* using instances */
     UNBIASED = 0;     /* correct any rule bias */
 
 float SAMPLE = 0.0;   /* sample training proportion */
 int KRInit = 0;       /* KRandom initializer for SAMPLE */
-Boolean LOCK = false; /* true if sample locked */
+Boolean LOCK = binfalse; /* bintrue if sample locked */
 
 CaseCount MINITEMS; /* min rule coverage */
 int MAXRULES = 100; /* max number of rules */
