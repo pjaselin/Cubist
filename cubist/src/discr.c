@@ -162,7 +162,7 @@ void EvalSubsetSplit(Tree Node, Attribute Att, CaseNo Fp, CaseNo Lp)
     if (sv < 2)
       break;
 
-    GEnv.Left[sv] = false;
+    GEnv.Left[sv] = binfalse;
 
     GEnv.BrFreq[2] -= GEnv.ValFreq[sv];
     GEnv.BrSum[2] -= GEnv.ValSum[sv];
