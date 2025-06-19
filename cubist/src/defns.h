@@ -91,8 +91,8 @@
 #define EVALSAMPLE 10000 /* sampling training data for evaluation */
 
 #define Nil 0 /* null pointer */
-#define false 0
-#define true 1
+#define binfalse 0
+#define bintrue 1
 #define None -1
 #define Epsilon 1E-4
 #define Width 80 /* approx max width of output */
@@ -281,7 +281,7 @@ typedef struct _env_rec {
   Boolean *DoNotUse;   /* atts precxluded from model */
   float *Gain;         /* gain from splitting on att */
   ContValue *Bar;      /* best threshold for contin att */
-  Boolean *Left;       /* true if v is in left subset */
+  Boolean *Left;       /* bintrue if v is in left subset */
   Set **Subset;        /* subset s for att a */
   Attribute *ModelAtt; /* atts used in current model */
   int NModelAtt;       /* number ditto */
@@ -296,7 +296,7 @@ typedef struct _env_rec {
       *Mean,          /* [Att] */
       *Var,           /* [Att] */
       *AvDev;         /* [Att] */
-  Boolean *ZeroCoeff, /* true if coeff to be set to zero */
+  Boolean *ZeroCoeff, /* bintrue if coeff to be set to zero */
       *SaveZero;      /* for SimplifyModel */
   DataRec *Filtered;  /* items minus outliers */
 } EnvRec, *Env;
@@ -574,7 +574,7 @@ void SmoothModels(Tree T, Tree Parent, CaseNo Fp, CaseNo Lp);
 double ErrVariance(double *Model, CaseNo Fp, CaseNo Lp, double *Err);
 double Smooth(double PVal, int PCases, double LVal, int LCases);
 void FindErrors(Tree T, CaseNo Fp, CaseNo Lp);
-void CValToStr(ContValue CV, Attribute Att, String DS);
+void CValToStr(ContValue CV, Attribute Att, String DS, size_t DS_size);
 Boolean FindWeakestSubtree(Tree T);
 float TreeValue(Tree T, DataRec Case);
 float MedianResid(CaseNo Fp, CaseNo Lp, double Want);
@@ -619,9 +619,9 @@ int Denominator(ContValue Val);
 int FracBase(Attribute Att);
 int GetInt(String S, int N);
 int DateToDay(String DS);
-void DayToDate(int DI, String Date);
+void DayToDate(int DI, String Date, size_t DT_size);
 int TimeToSecs(String TS);
-void SecsToTime(int Secs, String Time);
+void SecsToTime(int Secs, String Time, size_t DT_size);
 void SetTSBase(int y);
 int TStampToMins(String TS);
 void Cleanup(void);
