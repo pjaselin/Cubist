@@ -58,7 +58,7 @@ static double my_rand(void) {
 
 #define Inc 2048
 
-Boolean SuppressErrorMessages = false;
+Boolean SuppressErrorMessages = binfalse;
 #define XError(a, b, c)                                                        \
   if (!SuppressErrorMessages)                                                  \
   Error(a, b, c)
@@ -80,10 +80,11 @@ void GetData(FILE *Df, Boolean Train, Boolean AllowUnknownTarget)
 {
   CaseNo CaseSpace, i;
   DataRec DVec;
-  Boolean AnyUnknown = false, FirstIgnore = true, *AttMsg;
+  Boolean AnyUnknown = binfalse, FirstIgnore = bintrue, *AttMsg;
   Attribute Att;
   ContValue Val, Range;
-  char CVS[20];
+  size_t size = 20;
+  char CVS[size];
   CaseCount *Freq; /* discrete value frequencies */
   CaseNo Count, WantTrain, LeftTrain, WantTest, LeftTest;
   Boolean SelectTrain;
@@ -162,7 +163,7 @@ void GetData(FILE *Df, Boolean Train, Boolean AllowUnknownTarget)
       if (FirstIgnore && Of) {
         fprintf(Of,
                 (AllowUnknownTarget ? T_IgnoreNATarget : T_IgnoreBadTarget));
-        FirstIgnore = false;
+        FirstIgnore = binfalse;
       }
 
       FreeLastCase(DVec);
@@ -267,7 +268,7 @@ void GetData(FILE *Df, Boolean Train, Boolean AllowUnknownTarget)
         if (Discrete(Att)) {
           fprintf(Of, "`%s'\n", AttValName[Att][Modal[Att]]);
         } else {
-          CValToStr(AttMean[Att], Att, CVS);
+          CValToStr(AttMean[Att], Att, CVS, size);
           fprintf(Of, "%s\n", CVS);
         }
       }
@@ -305,7 +306,7 @@ Boolean ReplaceUnknowns(DataRec Case, Boolean *AttMsg)
 /*      ---------------  */
 {
   Attribute Att;
-  Boolean Replaced = false;
+  Boolean Replaced = binfalse;
 
   ForEach(Att, 1, MaxAtt) {
     if (Skip(Att) || Att == ClassAtt)
@@ -314,11 +315,11 @@ Boolean ReplaceUnknowns(DataRec Case, Boolean *AttMsg)
     if (Discrete(Att) && !DVal(Case, Att)) {
       DVal(Case, Att) = Modal[Att];
       if (AttMsg)
-        AttMsg[Att] = Replaced = true;
+        AttMsg[Att] = Replaced = bintrue;
     } else if (Continuous(Att) && CVal(Case, Att) == UNKNOWN) {
       CVal(Case, Att) = AttMean[Att];
       if (AttMsg)
-        AttMsg[Att] = Replaced = true;
+        AttMsg[Att] = Replaced = bintrue;
     }
   }
 
@@ -348,7 +349,7 @@ DataRec GetDataRec(FILE *Df, Boolean Train)
   int Dv, Chars;
   ContValue Cv;
   DataRec DVec;
-  Boolean FirstValue = true;
+  Boolean FirstValue = bintrue;
 
   if (ReadName(Df, Name, 1000, '\00')) {
     Case[MaxCase] = DVec = NewCase();
@@ -368,7 +369,7 @@ DataRec GetDataRec(FILE *Df, Boolean Train)
         FreeLastCase(DVec);
         return Nil;
       }
-      FirstValue = false;
+      FirstValue = binfalse;
 
       if (Exclude(Att)) {
         if (Att == LabelAtt) {
@@ -478,7 +479,7 @@ CaseNo CountData(FILE *Df)
   char Last = ',';
   int Count = 0, Next;
 
-  while (true) {
+  while (bintrue) {
     if ((Next = getc(Df)) == EOF) {
       if (Last != ',')
         Count++;
