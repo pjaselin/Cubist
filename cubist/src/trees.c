@@ -208,7 +208,7 @@ void ShowBranch(int Sh, Tree T, DiscrValue v, DiscrValue BrNo)
     }
 
     fprintf(Of, "%s in {", AttName[Att]);
-    FirstValue = true;
+    FirstValue = bintrue;
     Skip = strlen(AttName[Att]) + 5;
     TextWidth = Skip + Sh * TabSize;
 
@@ -221,12 +221,12 @@ void ShowBranch(int Sh, Tree T, DiscrValue v, DiscrValue BrNo)
           ForEach(i, 1, Skip) putc(' ', Of);
 
           TextWidth = Skip + Sh * TabSize;
-          FirstValue = true;
+          FirstValue = bintrue;
         }
 
         fprintf(Of, "%s%c", AttValName[Att][Pv], Pv == Last ? '}' : ',');
         TextWidth += strlen(AttValName[Att][Pv]) + 1;
-        FirstValue = false;
+        FirstValue = binfalse;
       }
     }
     putc(':', Of);
