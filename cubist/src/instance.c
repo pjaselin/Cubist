@@ -41,8 +41,8 @@
 int MinN; /* minimum close neighbors */
 
 int Try;                  /* sample size for estimates */
-Boolean UseAll,           /* true if no sampling */
-    SetNN,                /* true if NN set automatically */
+Boolean UseAll,           /* bintrue if no sampling */
+    SetNN,                /* bintrue if NN set automatically */
         *Tested = Nil;    /* for BuildIndex */
 CaseCount *ValFreq = Nil; /* ditto */
 
@@ -54,7 +54,7 @@ AttValue *KDBlock; /* copy of instances in KDTree order to
 /* Prepare for instance-based prediction     */
 /*                                                                       */
 /* The modified K-D tree algorithm adds to each instance the  */
-/* distances to two "reference" points.  The first is an artifical  */
+/* distances to two "reference" points.  The first is an artificial  */
 /* point intended to play the role of an origin: its value for an  */
 /* attribute should be lower than most of the instances' values.  */
 /* The second reference point is the instance that is furthest  */
@@ -137,7 +137,7 @@ void InitialiseInstances(RRuleSet *Cttee)
   if (MAXD < 0) {
     SetParameters(Cttee);
   } else {
-    SetNN = false;
+    SetNN = binfalse;
   }
 
   MinN = (NN + 1) / 2;
@@ -175,9 +175,9 @@ void SetParameters(RRuleSet *Cttee)
   /*  Set NN if required  */
 
   if (NN) {
-    SetNN = false;
+    SetNN = binfalse;
   } else {
-    SetNN = true;
+    SetNN = bintrue;
 
     NotifyStage(SETNEIGHBORS);
     Progress(-Try);
@@ -270,7 +270,7 @@ void CheckForms(RRuleSet *Cttee)
 
       if (EstimateErr(RSErr, MaxCase + 1, 2 * AvRules) <
           EstimateErr(RSIErr, MaxCase + 1, AvRules)) {
-    USEINSTANCES = false;
+    USEINSTANCES = binfalse;
     fprintf(Of, T_SuggestRules);
     FreeInstances();
   }
@@ -605,7 +605,7 @@ Index BuildIndex(CaseNo Fp, CaseNo Lp)
     Node->Tested = BestAtt;
     Node->SubIndex = Alloc(MaxAttVal[BestAtt] + 1, Index);
 
-    Tested[BestAtt] = true;
+    Tested[BestAtt] = bintrue;
 
     /*  Sort instances by attribute value  */
 
@@ -621,7 +621,7 @@ Index BuildIndex(CaseNo Fp, CaseNo Lp)
       Fp = Kp;
     }
 
-    Tested[BestAtt] = false;
+    Tested[BestAtt] = binfalse;
   } else {
     Node->Tested = BestAtt;
     Node->Cut = BestMean;
