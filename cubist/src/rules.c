@@ -266,7 +266,8 @@ void PrintRule(CRule R)
 {
   Attribute Att;
   int c, d, dd, id, LineLen, EntryLen, Indent, NCoeff = 0;
-  char Entry[1000];
+  size_t size = 1000;
+  char Entry[size];
   double *Model;
   float *Importance;
 
@@ -313,10 +314,10 @@ void PrintRule(CRule R)
     }
   }
 
-  sprintf(Entry, "%s =", AttName[ClassAtt]);
+  snprintf(Entry, size, "%s =", AttName[ClassAtt]);
   Indent = CharWidth(Entry);
 
-  sprintf(Entry + Indent, " %.14g", Model[0]);
+  snprintf(Entry + Indent, size, " %.14g", Model[0]);
   fprintf(Of, "\t%s", Entry);
   LineLen = CharWidth(Entry);
 
@@ -332,7 +333,7 @@ void PrintRule(CRule R)
 
     /*  Print, breaking lines when necessary  */
 
-    sprintf(Entry, " %c %.14g %s", (Model[Att] > 0 ? '+' : '-'),
+    snprintf(Entry, size, " %c %.14g %s", (Model[Att] > 0 ? '+' : '-'),
             fabs(Model[Att]), AttName[Att]);
     EntryLen = CharWidth(Entry);
 
@@ -360,7 +361,8 @@ void PrintCondition(Condition C)
   Boolean First = bintrue;
   Attribute Att;
   int Col, Base, Entry;
-  char CVS[20];
+  size_t size = 20;
+  char CVS[size];
 
   v = C->TestValue;
   Att = C->Tested;
@@ -381,7 +383,7 @@ void PrintCondition(Condition C)
     if (v == 1) {
       fprintf(Of, " = N/A\n");
     } else {
-      CValToStr(C->Cut, Att, CVS);
+      CValToStr(C->Cut, Att, CVS, size);
       fprintf(Of, " %s %s\n", (v == 2 ? "<=" : ">"), CVS);
     }
     break;
