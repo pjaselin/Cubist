@@ -728,7 +728,7 @@ void CValToStr(ContValue CV, Attribute Att, String DS, size_t DS_size)
     DayToDate(floor(CV / 1440) + TSBase, DS, DS_size);
     DS[10] = ' ';
     Mins = rint(CV) - floor(CV / 1440) * 1440;
-    SecsToTime(Mins * 60, DS + 11, DS_size);
+    SecsToTime(Mins * 60, DS + 11, DS_size - 11);
   } else if (DateVal(Att)) {
     DayToDate(CV, DS, DS_size);
   } else if (TimeVal(Att)) {
