@@ -97,11 +97,11 @@ Boolean Matches(CRule R, DataRec Case)
 
   ForEach(d, 1, R->Size) {
     if (!Satisfies(Case, R->Lhs[d])) {
-      return false;
+      return binfalse;
     }
   }
 
-  return true;
+  return bintrue;
 }
 
 /*************************************************************************/
