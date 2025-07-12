@@ -19,7 +19,7 @@
   - [Enable Visualization Utilities](#enable-visualization-utilities)
 - [Usage](#usage)
 - [Cubist Model Features](#cubist-model-features)
-- [Package Features](#package-features)
+- [Package Contents](#package-contents)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
@@ -114,7 +114,7 @@ The Cubist model has the following distinguishing features, although not all are
 - Error can be further reduced by using multiple models (committees).
 - Allows for extrapolation beyond the original training target values (sets a minimum of zero for predicted output if all training target values are greater than zero).
 
-## Package Features
+## Package Contents
 
 - Cubist model exposed as a scikit-learn estimator.
 - Visualization utilities for:
