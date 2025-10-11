@@ -4,4 +4,4 @@ Exceptions
 CubistError
 -----------
 
-.. autoclass:: cubist.exceptions.CubistError
+.. autoclass:: cubist.CubistError

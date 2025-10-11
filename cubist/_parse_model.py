@@ -104,7 +104,16 @@ def _get_splits(model: list[str]):  # pylint: disable=R0914
 def _parse_model(
     model: str, feature_names: list
 ) -> tuple[
-    str, pd.DataFrame, pd.DataFrame, pd.DataFrame, Union[None, float], Union[None, int]
+    str,
+    pd.DataFrame,
+    pd.DataFrame,
+    pd.DataFrame,
+    Union[None, float],
+    Union[None, int],
+    float,
+    float,
+    float,
+    float,
 ]:
     """
     Parse Cubist model output to extract metadata and model splits as well as
@@ -120,10 +129,9 @@ def _parse_model(
 
     Returns
     -------
-
-
     ( model_version, splits, coeffs, feature_statistics,
-        committee_error_reduction, n_committees_used
+        committee_error_reduction, n_committees_used, precision, global_mean,
+        ceiling, floor
     ) : tuple
         Information parsed from the Cubist model including the model version,
         splits DataFrame, coefficients DataFrame, feature statistics DataFrame,
@@ -132,10 +140,17 @@ def _parse_model(
     """
     # split on newline
     model = deque(model.split("\n"))
+
     # get the cubist model version and build date
     version = _parser(model.popleft())[0]["id"]
+
     # get the global model statistics
-    model.popleft()
+    model_statistics = _parser(model.popleft())
+    precision = float(model_statistics["prec"])
+    global_mean = float(model_statistics["globalmean"])
+    ceiling = float(model_statistics["ceiling"])
+    floor = float(model_statistics["floor"])
+
     # get the feature statistics
     feature_statistics = []
     while model[0].startswith("att="):
@@ -143,8 +158,10 @@ def _parse_model(
     feature_statistics = pd.DataFrame(
         [{k: v for d in feat for k, v in d.items()} for feat in feature_statistics]
     )
+
     # get the number of committees
     committee_meta = _parser(model.popleft())
+
     # set default committee error reduction and number of committees
     committee_error_reduction = None
     n_committees_used = None
@@ -176,6 +193,10 @@ def _parse_model(
         feature_statistics,
         committee_error_reduction,
         n_committees_used,
+        precision,
+        global_mean,
+        floor,
+        ceiling,
     )
 
 

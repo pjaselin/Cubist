@@ -1,7 +1,7 @@
 Model
 #####
 
-The Cubist model class (``cubist.Cubist`` or ``cubist.cubist.Cubist``) has eleven parameters and eleven attributes available. Their use is demonstrated below and the class is documented in the :ref:`API Docs<api/model:Cubist>`.
+The Cubist model class (``cubist.Cubist``) has eleven parameters and eleven attributes available. Their use is demonstrated below and the class is documented in the :ref:`API Docs<api/model:Cubist>`.
 
 A simple use of Cubist with no added configuration is as follows:
 

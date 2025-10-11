@@ -31,6 +31,12 @@
 pip install --upgrade cubist
 ```
 
+or for those in the know:
+
+```bash
+uv add cubist
+```
+
 ### Enable Visualization Utilities
 
 ```bash

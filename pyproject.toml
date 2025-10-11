@@ -10,7 +10,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "cubist"
-version = "1.0.1"
+version = "1.1.0"
 requires-python = ">= 3.9"
 authors = [
   {name = "Ross Quinlan"},

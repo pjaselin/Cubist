@@ -13,6 +13,12 @@ Model-Only
 
    pip install cubist
 
+or for those in the know:
+
+.. code-block:: shell
+
+   uv add cubist
+
 Enable Visualization Utilities
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
