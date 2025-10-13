@@ -130,7 +130,7 @@ def _parse_model(
     Returns
     -------
     ( model_version, splits, coeffs, feature_statistics,
-        committee_error_reduction, n_committees_used, precision, global_mean,
+        committee_error_reduction, n_committees_used, global_mean,
         ceiling, floor
     ) : tuple
         Information parsed from the Cubist model including the model version,
@@ -146,7 +146,6 @@ def _parse_model(
 
     # get the global model statistics
     model_statistics = _parser(model.popleft())
-    precision = float(model_statistics["prec"])
     global_mean = float(model_statistics["globalmean"])
     ceiling = float(model_statistics["ceiling"])
     floor = float(model_statistics["floor"])
@@ -193,7 +192,6 @@ def _parse_model(
         feature_statistics,
         committee_error_reduction,
         n_committees_used,
-        precision,
         global_mean,
         floor,
         ceiling,

@@ -3,84 +3,27 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-cubist Documentation
+cubist
 ====================
 
 ``cubist`` is a Python package and wrapper for `Ross Quinlan <https://www.rulequest.com/Personal/>`_'s `Cubist <https://www.rulequest.com/cubist-unix.html>`_ v2.07 regression model with additional utilities for visualizing the model. The package is both inspired by and a translation of the `R wrapper for Cubist <https://github.com/topepo/Cubist>`_. This implementation of the model is compatible with and the visualization utilities are designed after those in `scikit-learn <https://scikit-learn.org/stable/>`_.
 
-TL;DR
------
+Contents
+--------
 
-Install ``cubist`` with:
+.. toctree::
+   :maxdepth: 2
+   :caption: Getting Started
 
-.. code-block:: shell
+   getting_started/installation
 
-   pip install cubist
+.. toctree::
+   :maxdepth: 2
+   :caption: API Docs
 
-or for those in the know:
-
-.. code-block:: shell
-
-   uv add cubist
-
-Example model use integrated with scikit-learn:
-
-.. doctest::
-
-    >>> from sklearn.datasets import load_iris
-    >>> from sklearn.model_selection import train_test_split
-    >>> from cubist import Cubist
-    >>> X, y = load_iris(return_X_y=True, as_frame=True)
-    >>> X_train, X_test, y_train, y_test = train_test_split(X, y,
-    ...                                                     random_state=42,
-    ...                                                     test_size=0.05)
-    >>> model = Cubist(n_rules=2, verbose=True)
-    >>> model.fit(X_train, y_train)  # doctest: +NORMALIZE_WHITESPACE
-    <BLANKLINE>
-    Cubist [Release 2.07 GPL Edition]  ...
-    ---------------------------------
-    <BLANKLINE>
-        Target attribute `outcome'
-    <BLANKLINE>
-    Read 142 cases (5 attributes)
-    <BLANKLINE>
-    Model:
-    <BLANKLINE>
-      Rule 1: [48 cases, mean 0.0, range 0 to 0, est err 0.0]
-    <BLANKLINE>
-        if
-            petal width (cm) <= 0.6
-        then
-            outcome = 0
-    <BLANKLINE>
-      Rule 2: [94 cases, mean 1.5, range 1 to 2, est err 0.2]
-    <BLANKLINE>
-        if
-            petal width (cm) > 0.6
-        then
-            outcome = 0.2 + 0.76 petal width (cm) + 0.271 petal length (cm)
-                    - 0.45 sepal width (cm)
-    <BLANKLINE>
-    <BLANKLINE>
-    Evaluation on training data (142 cases):
-    <BLANKLINE>
-        Average  |error|                0.1
-        Relative |error|               0.16
-        Correlation coefficient        0.98
-    <BLANKLINE>
-    <BLANKLINE>
-            Attribute usage:
-              Conds  Model
-    <BLANKLINE>
-              100%    66%    petal width (cm)
-                      66%    sepal width (cm)
-                      66%    petal length (cm)
-    <BLANKLINE>
-    <BLANKLINE>
-    Time: 0.0 secs
-    <BLANKLINE>
-    Cubist(n_rules=2, verbose=True)
-
+   api/model
+   api/visualizations
+   api/exceptions
 
 Background
 ----------
@@ -150,29 +93,6 @@ In addition to boosting, the model supports instance-based (nearest-neighbor) co
 
 A final difference with other models is that Cubist natively supports missing and categorical values. This means users are not required to introduce encodings and may exlore more patterns in the dataset (e.g. around missingness).
 
-Contents
---------
-
-.. toctree::
-   :maxdepth: 2
-   :caption: Getting Started
-
-   getting_started/installation
-
-.. toctree::
-   :maxdepth: 2
-   :caption: Usage
-
-   usage/model
-   usage/visualizations
-
-.. toctree::
-   :maxdepth: 2
-   :caption: API Docs
-
-   api/model
-   api/visualizations
-   api/exceptions
 
 Considerations
 --------------
