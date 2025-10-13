@@ -7,7 +7,6 @@
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
 import os
-import subprocess
 import sys
 import warnings
 
@@ -15,7 +14,6 @@ sys.path.insert(0, os.path.abspath(".."))
 
 project = "cubist"
 html_show_copyright = False
-release = "v1.0.0"
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
@@ -41,12 +39,6 @@ intersphinx_mapping = {
     "sklearn": ("http://scikit-learn.org/stable", None),
 }
 
-git_revision_short_hash = (
-    subprocess.check_output(["git", "rev-parse", "--short", "HEAD"])
-    .decode("ascii")
-    .strip()
-)
-
 
 def linkcode_resolve(domain, info):
     if domain != "py":
@@ -54,7 +46,7 @@ def linkcode_resolve(domain, info):
     if not info["module"]:
         return None
     filename = info["module"].replace(".", "/")
-    return f"https://github.com/pjaselin/Cubist/blob/{git_revision_short_hash}/{filename}.py"
+    return f"https://github.com/pjaselin/Cubist/blob/{os.environ['GITHUB_REF_NAME']}/{filename}.py"
 
 
 # silence matplotlib warnings when docs are tested
