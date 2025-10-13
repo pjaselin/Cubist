@@ -113,7 +113,6 @@ def _parse_model(
     float,
     float,
     float,
-    float,
 ]:
     """
     Parse Cubist model output to extract metadata and model splits as well as
@@ -146,6 +145,8 @@ def _parse_model(
 
     # get the global model statistics
     model_statistics = _parser(model.popleft())
+    # combine the list of dictionaries into a single dictionary
+    model_statistics = {k: v for d in model_statistics for k, v in d.items()}
     global_mean = float(model_statistics["globalmean"])
     ceiling = float(model_statistics["ceiling"])
     floor = float(model_statistics["floor"])
@@ -193,8 +194,8 @@ def _parse_model(
         committee_error_reduction,
         n_committees_used,
         global_mean,
-        floor,
         ceiling,
+        floor,
     )
 
 
