@@ -48,7 +48,8 @@ dev = [
   "pytest",
   "ruff",
   "coverage",
-  "pylint"
+  "pylint",
+  "mypy"
 ]
 viz = [
   "matplotlib"

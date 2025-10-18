@@ -37,10 +37,6 @@ repos:
     rev: 7.0.0
     hooks:
       - id: isort
-  # - repo: https://github.com/pre-commit/mirrors-mypy
-  #   rev: 'v1.15.0'
-  #   hooks:
-  #     - id: mypy
   - repo: https://github.com/commitizen-tools/commitizen
     rev: v4.9.1
     hooks:
@@ -49,3 +45,13 @@ repos:
     rev: v2.0.0
     hooks:
       - id: doc8
+  - repo: local
+    hooks:
+      - id: mypy
+        name: mypy
+        # or `entry: poetry run mypy`, but perhaps both are the same
+        entry: mypy
+        require_serial: true
+        # From the docs it is not clear the difference between `language: python` VS `language: system`
+        language: system
+        types: [ python ]
