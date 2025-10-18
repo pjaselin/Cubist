@@ -41,6 +41,7 @@ intersphinx_mapping = {
 
 
 def linkcode_resolve(domain, info):
+    """resolve link including current released github tag in the address"""
     if domain != "py":
         return None
     if not info["module"]:
