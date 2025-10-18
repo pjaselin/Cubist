@@ -47,7 +47,7 @@ def linkcode_resolve(domain, info):
     if not info["module"]:
         return None
     filename = info["module"].replace(".", "/")
-    return f"https://github.com/pjaselin/Cubist/blob/{os.environ['GITHUB_REF_NAME']}/{filename}.py"
+    return f"https://github.com/pjaselin/Cubist/blob/{os.getenv('GITHUB_REF_NAME', 'main')}/{filename}.py"
 
 
 # silence matplotlib warnings when docs are tested
