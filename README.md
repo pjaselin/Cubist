@@ -43,6 +43,12 @@ uv add cubist
 pip install cubist[viz]
 ```
 
+or
+
+```bash
+uv add cubist --extra viz
+```
+
 ## Usage
 
 ```python

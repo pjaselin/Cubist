@@ -26,6 +26,12 @@ Enable Visualization Utilities
 
    pip install cubist[viz]
 
+or
+
+.. code-block:: shell
+
+   uv add cubist --extra viz
+
 Development
 ^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -33,6 +39,11 @@ Development
 
    pip install cubist[dev,viz]
 
+or
+
+.. code-block:: shell
+
+   uv add cubist --extra viz --extra dev --extra docs
 
 GitHub
 ------
