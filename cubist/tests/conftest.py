@@ -5,7 +5,7 @@ from contextlib import contextmanager
 
 import pandas as pd
 import pytest
-from sklearn.datasets import fetch_california_housing, fetch_openml, load_iris
+from sklearn.datasets import fetch_openml, load_iris
 
 
 @contextmanager
@@ -25,7 +25,9 @@ def ames_housing_dataset():
 @pytest.fixture(scope="session")
 def california_housing_dataset():
     """Fixture for california housing dataset"""
-    return fetch_california_housing(return_X_y=True, as_frame=True)  # pylint: disable=W0621
+    return fetch_openml(  # pylint: disable=W0621
+        "california_housing", version=1, as_frame=True, return_X_y=True, parser="auto"
+    )
 
 
 @pytest.fixture(scope="session")
