@@ -13,7 +13,7 @@ def _attribute_usage(output: str, feature_names: Union[list, set]):
     Parameters
     ----------
     output : str
-        The Cubist verbose/pretty print summary of the trained model.
+        The Cubist verbose/printed summary of the trained model.
 
     feature_names : list or set
         The list of feature/attribute names used when training the model.
@@ -21,8 +21,8 @@ def _attribute_usage(output: str, feature_names: Union[list, set]):
     Returns
     -------
     output : pd.DataFrame
-        DataFrame of the variable/attribute usage in the conditions and linear
-        models created by Cubist.
+        DataFrame of the variable/attribute usage in the conditions and
+        linear models created by Cubist.
     """
     # get the attribute usage section of the model output
     start_i = output.find("Attribute usage:")

@@ -2,10 +2,9 @@
 
 import random
 
-import pytest
-
-import pandas as pd
 import numpy as np
+import pandas as pd
+import pytest
 from sklearn.datasets import load_diabetes
 from sklearn.model_selection import train_test_split
 from sklearn.utils.validation import check_is_fitted
@@ -13,9 +12,9 @@ from sklearn.utils.validation import check_is_fitted
 from ..cubist import Cubist, CubistError
 
 
-def test_one_model_one_committee(california_housing):
+def test_one_model_one_committee(california_housing_dataset):
     """Test one model/one committee"""
-    model = Cubist(n_rules=1, n_committees=1).fit(*california_housing)
+    model = Cubist(n_rules=1, n_committees=1).fit(*california_housing_dataset)
     check_is_fitted(model)
     assert model.splits_ is not None
     assert model.coeffs_ is not None

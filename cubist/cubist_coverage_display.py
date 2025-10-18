@@ -30,7 +30,7 @@ class CubistCoverageDisplay(_CubistDisplayMixin):
     variable and committee/rule pair are plotted along the x-axis.
 
     See the details in the docstrings of
-    :func:`~cubist.CubistCoefficientDisplay.from_estimator`to
+    :func:`~cubist.CubistCoverageDisplay.from_estimator` to
     create a visualizer. All parameters are stored as attributes.
 
     .. versionadded:: 1.0.0
@@ -62,7 +62,6 @@ class CubistCoverageDisplay(_CubistDisplayMixin):
     >>> X, y = load_iris(return_X_y=True, as_frame=True)
     >>> model = Cubist(n_rules=2).fit(X, y)
     >>> display = CubistCoverageDisplay.from_estimator(estimator=model, X=X)
-    <...>
     >>> plt.show()
     """
 
@@ -218,7 +217,6 @@ class CubistCoverageDisplay(_CubistDisplayMixin):
         >>> X, y = load_iris(return_X_y=True, as_frame=True)
         >>> model = Cubist(n_rules=2).fit(X, y)
         >>> display = CubistCoverageDisplay.from_estimator(estimator=model, X=X)
-        <...>
         >>> plt.show()
         """
         check_is_fitted(estimator)

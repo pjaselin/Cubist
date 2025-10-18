@@ -5,8 +5,8 @@ import re
 from collections import deque
 from typing import Union
 
-import pandas as pd
 import numpy as np
+import pandas as pd
 
 from ._utils import _format
 
@@ -104,7 +104,15 @@ def _get_splits(model: list[str]):  # pylint: disable=R0914
 def _parse_model(
     model: str, feature_names: list
 ) -> tuple[
-    str, pd.DataFrame, pd.DataFrame, pd.DataFrame, Union[None, float], Union[None, int]
+    str,
+    pd.DataFrame,
+    pd.DataFrame,
+    pd.DataFrame,
+    Union[None, float],
+    Union[None, int],
+    float,
+    float,
+    float,
 ]:
     """
     Parse Cubist model output to extract metadata and model splits as well as
@@ -120,10 +128,9 @@ def _parse_model(
 
     Returns
     -------
-
-
     ( model_version, splits, coeffs, feature_statistics,
-        committee_error_reduction, n_committees_used
+        committee_error_reduction, n_committees_used, global_mean,
+        ceiling, floor
     ) : tuple
         Information parsed from the Cubist model including the model version,
         splits DataFrame, coefficients DataFrame, feature statistics DataFrame,
@@ -132,10 +139,18 @@ def _parse_model(
     """
     # split on newline
     model = deque(model.split("\n"))
+
     # get the cubist model version and build date
     version = _parser(model.popleft())[0]["id"]
+
     # get the global model statistics
-    model.popleft()
+    model_statistics = _parser(model.popleft())
+    # combine the list of dictionaries into a single dictionary
+    model_statistics = {k: v for d in model_statistics for k, v in d.items()}
+    global_mean = float(model_statistics["globalmean"])
+    ceiling = float(model_statistics["ceiling"])
+    floor = float(model_statistics["floor"])
+
     # get the feature statistics
     feature_statistics = []
     while model[0].startswith("att="):
@@ -143,8 +158,10 @@ def _parse_model(
     feature_statistics = pd.DataFrame(
         [{k: v for d in feat for k, v in d.items()} for feat in feature_statistics]
     )
+
     # get the number of committees
     committee_meta = _parser(model.popleft())
+
     # set default committee error reduction and number of committees
     committee_error_reduction = None
     n_committees_used = None
@@ -176,6 +193,9 @@ def _parse_model(
         feature_statistics,
         committee_error_reduction,
         n_committees_used,
+        global_mean,
+        ceiling,
+        floor,
     )
 
 

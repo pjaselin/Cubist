@@ -1,64 +1,71 @@
 """Main Cubist estimator class"""
 
 import zlib
-from warnings import warn
 from numbers import Integral
+from warnings import warn
 
 import numpy as np
 import pandas as pd
-from sklearn.utils.validation import (
-    check_is_fitted,
-    check_random_state,
-    _check_sample_weight,
-    validate_data,
-)
+from sklearn.base import BaseEstimator, RegressorMixin, _fit_context
 from sklearn.utils import RegressorTags
 from sklearn.utils._param_validation import Interval, RealNotInt
-from sklearn.base import RegressorMixin, BaseEstimator, _fit_context
+from sklearn.utils.validation import (
+    _check_sample_weight,
+    check_is_fitted,
+    check_random_state,
+    validate_data,
+)
 
 from _cubist import _cubist, _predictions  # noqa E0611 # pylint: disable=E0611
 
-from ._make_names_string import _make_names_string
-from ._make_data_string import _make_data_string
-from ._parse_model import _parse_model
 from ._attribute_usage import _attribute_usage
+from ._make_data_string import _make_data_string
+from ._make_names_string import _make_names_string
+from ._parse_model import _parse_model
 from .exceptions import CubistError
 
 
 class Cubist(RegressorMixin, BaseEstimator):  # pylint: disable=R0902
     """
-    Cubist Regression Model (Public v2.07) developed by Quinlan.
+    Cubist Regression Model (Public v2.07) developed by Ross Quinlan.
 
-    References:
+    References
+    ----------
+
     - https://www.rdocumentation.org/packages/Cubist/versions/0.3.0
     - https://www.rulequest.com/cubist-unix.html
 
     Parameters
     ----------
     n_rules : int, default=500
-        Limit of the number of rules Cubist will build. Recommended and default
-        value is 500.
+        Changes the max number of rules Cubist will generate for a model.
+        Recommended and default value is 500.
 
     n_committees : int, default=1
-        Number of committees to construct. Each committee is a rule based model
-        and beyond the first tries to correct the prediction errors of the prior
-        constructed model. Recommended value is 5.
+        Number of models (called committees) Cubist will construct. Each
+        committee is a rule based model and beyond the first tries to correct
+        the prediction errors of the prior constructed model. Recommended value
+        is 5.
 
     neighbors : int, default=None
         Number between 1 and 9 for how many instances should be used to correct
-        the rule-based prediction. If no value is given, Cubist will build a
-        rule-based model only. If this value is set, Cubist will create a
-        composite model with the given number of neighbors. Regardless of the
-        value set, if auto=True, Cubist may override this input and choose a
-        different number of neighbors. Please assess the model for the selected
-        value for the number of neighbors used.
+        the rule-based prediction. If this value is set, Cubist will create a
+        composite model with the given number of neighbors. If no value is
+        given, Cubist will build a rule-based model only. If auto=True, Cubist
+        may override this input and choose a different number of neighbors. Note
+        that using a composite model may improve accuracy at the expense of
+        interpretability as the linear models won't be completely followed and
+        the training dataset will be stored along with the trained model if disk
+        space is a concern.
 
     unbiased : bool, default=False
-        Should unbiased rules be used? Since Cubist minimizes the MAE of the
-        predicted values, the rules may be biased and the mean predicted value
-        may differ from the actual mean. This is recommended when there are
-        frequent occurrences of the same value in a training dataset. Note that
-        MAE may be slightly higher.
+        Determines whether Cubist generates unbiased rules, that is, whether to
+        allow the mean predicted value for the training cases covered by a rule
+        to differ from their mean value. The default behavior is to minimize the
+        average absolute error. A case where this is recommended is where a
+        dataset has frequent occurrences of the same value. This may be
+        experimented during model development to assess the influence on
+        predictive performance.
 
     auto : bool, default=False
         A value of True allows the algorithm to choose whether to use
@@ -68,59 +75,68 @@ class Cubist(RegressorMixin, BaseEstimator):  # pylint: disable=R0902
         composite model to value passed to the `neighbors` parameter.
 
     extrapolation : float, default=0.05
-        Adjusts how much rule predictions are adjusted to be consistent with
-        the training dataset. Recommended value is 5% as a decimal (0.05)
+        Adjusts the percentage outside of the output values seen in the training
+        dataset to which Cubist can extrapolate. Recommended value is 5% as a
+        decimal (0.05).
 
     sample : float, default=None
-        Percentage of the data set to be randomly selected for model building
-        and held out for model testing. When using this parameter, Cubist will
-        report evaluation results on the testing set in addition to the training
-        set results.
+        Percentage of the training dataset to be randomly selected for model
+        building and held out for model testing. When using this parameter,
+        Cubist will report evaluation results on the testing set in addition to
+        the training set results. Note this is inadvisable for small datasets as
+        Cubist may not have enough samples to produce a representative model.
 
     cv : int, default=None
-        Whether to carry out cross-validation and how many folds to use
-        (recommended value is 10 per Quinlan)
+        Enable cross-validation and set the number of folds to use as an integer
+        greater than 1 (recommended value is 10 per Ross Quinlan). Note the
+        model only produces a report for the user and doesn't save a model so
+        this is only used for assessing model performance.
 
     random_state : int, default=None
-        An integer to set the random seed for the C Cubist code.
+        An integer to set the random seed for Cubist to enable repeatable
+        cross-validation and sampling.
 
     target_label : str, default="outcome"
-        A label for the outcome variable. This is only used for printing rules.
+        A label for the target/outcome (y) variable. This is only used when
+        printing the model summary and can be changed to show something other
+        than the default of "outcome".
 
     verbose : int, default=0
-        Should the Cubist output be printed?
+        Indicates whether Cubist should print the model report, summary, and
+        training performance to the console. Either an integer or Python boolean
+        is accepted.
 
     Attributes
     ----------
     model_ : str
-        The Cubist model string generated by the C code.
+        The raw model generated by the C Cubist library.
 
     output_ : str
-        The Cubist model pretty print summary generated by the C code.
+        The model summary generated by the C Cubist library.
 
         .. versionadded:: 1.0.0
 
     feature_importances_ : pd.DataFrame
-        Table of how training data variables are used in the Cubist model. The
-        first column for "Conditions" shows the approximate percentage of cases
-        for which the named attribute appears in a condition of an applicable
-        rule, while the second column "Attributes" gives the percentage of cases
-        for which the attribute appears in the linear formula of an applicable
-        rule.
+        Table of how training dataset variables are used in the Cubist model.
+        The first column for "Conditions" shows the approximate percentage of
+        cases for which the named attribute appears in a condition of an
+        applicable rule, while the second column "Attributes" gives the
+        percentage of cases for which the attribute appears in the linear
+        formula of an applicable rule.
 
     n_features_in_ : int
-        Number of features seen during :term:`fit`.
+        Number of training features (columns) seen during :term:`fit`.
 
     feature_names_in_ : ndarray of shape (`n_features_in_`,)
-        Names of features seen during :term:`fit`. Defined only when `X`
-        has feature names that are all strings.
+        Names of the training features (columns) seen during :term:`fit`.
+        Defined only when `X` has feature names that are all strings.
 
     splits_ : pd.DataFrame
-        Table of the splits built by the Cubist model for each rule.
+        Table of the split conditions created by rule (and committee if used).
 
     coeff_ : pd.DataFrame
-        Table of the regression coefficients found by the Cubist model for each
-        rule.
+        Table of the regression coefficients determined by rule (and committee
+        if used).
 
     version_ : str
         The Cubist version with the time of local build/install.
@@ -128,19 +144,35 @@ class Cubist(RegressorMixin, BaseEstimator):  # pylint: disable=R0902
         .. versionadded:: 1.0.0
 
     feature_statistics_ : pd.DataFrame
-        Table of statistics Cubist generated for each input attribute.
+        Table of statistics generated for each input attribute.
 
         .. versionadded:: 1.0.0
 
-    committee_error_reduction_ : float
+    committee_error_reduction_ : float | None
         The reduction in error by using committees.
 
         .. versionadded:: 1.0.0
 
     n_committees_used_ : int
-        Number of committees actually used by Cubist.
+        Number of committees actually used in the model.
 
         .. versionadded:: 1.0.0
+
+    global_mean_ : float
+        Mean of entire training set.
+
+        .. versionadded:: 1.1.0
+
+    ceiling_ : float
+        Maximum allowable global prediction.
+
+        .. versionadded:: 1.1.0
+
+    floor_ : float
+        Minimum allowable global prediction. If all target values are greater
+        than or equal to zero, the minimum allowable prediction will be zero.
+
+        .. versionadded:: 1.1.0
 
     Examples
     --------
@@ -149,12 +181,16 @@ class Cubist(RegressorMixin, BaseEstimator):  # pylint: disable=R0902
     >>> from sklearn.model_selection import train_test_split
     >>> X, y = fetch_california_housing(return_X_y=True, as_frame=True)
     >>> X_train, X_test, y_train, y_test = train_test_split(X, y,
-                                                            test_size=0.2,
-                                                            random_state=42)
+    ...                                                     random_state=42,
+    ...                                                     test_size=0.2)
     >>> model = Cubist()
     >>> model.fit(X_train, y_train)
+    Cubist()
     >>> model.predict(X_test)
+    array([0.50073832, 0.86456549, 5.14631033, ..., 4.76159859, 0.76238906,
+    ...    1.9493351 ], shape=(4128,))
     >>> model.score(X_test, y_test)
+    0.81783547...
     """
 
     _parameter_constraints: dict = {
@@ -275,6 +311,7 @@ class Cubist(RegressorMixin, BaseEstimator):  # pylint: disable=R0902
         Returns
         -------
         self : object
+            Fitted estimator.
         """
         # scikit-learn data validation
         X, y = validate_data(
@@ -395,7 +432,10 @@ class Cubist(RegressorMixin, BaseEstimator):  # pylint: disable=R0902
             self.feature_statistics_,
             self.committee_error_reduction_,
             self.n_committees_used_,
-        ) = _parse_model(self.model_, list(self.feature_names_in_))
+            self.global_mean_,
+            self.ceiling_,
+            self.floor_,
+        ) = _parse_model(model=self.model_, feature_names=list(self.feature_names_in_))
 
         # get the input data variable usage
         self.feature_importances_ = _attribute_usage(  # noqa W0201, pylint: disable=W0201
