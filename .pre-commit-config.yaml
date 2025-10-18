@@ -9,7 +9,7 @@ default_install_hook_types:
 
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v5.0.0
+    rev: v6.0.0
     hooks:
       - id: check-yaml
       - id: end-of-file-fixer
@@ -19,14 +19,14 @@ repos:
         args: [--pytest-test-first]
   - repo: https://github.com/astral-sh/ruff-pre-commit
     # Ruff version.
-    rev: v0.11.4
+    rev: v0.14.1
     hooks:
       # Run the linter.
       - id: ruff
       # Run the formatter.
       - id: ruff-format
   - repo: https://github.com/DavidAnson/markdownlint-cli2
-    rev: v0.17.2
+    rev: v0.18.1
     hooks:
       - id: markdownlint-cli2
   - repo: https://github.com/thlorenz/doctoc
@@ -34,12 +34,12 @@ repos:
     hooks:
       - id: doctoc
   - repo: https://github.com/crate-ci/typos
-    rev: v1.31.1
+    rev: v1.38.1
     hooks:
       - id: typos
         args: []
   - repo: https://github.com/pycqa/isort
-    rev: 6.0.1
+    rev: 7.0.0
     hooks:
       - id: isort
   # - repo: https://github.com/pre-commit/mirrors-mypy
@@ -47,10 +47,10 @@ repos:
   #   hooks:
   #     - id: mypy
   - repo: https://github.com/commitizen-tools/commitizen
-    rev: v4.5.0
+    rev: v4.9.1
     hooks:
       - id: commitizen
   - repo: https://github.com/PyCQA/doc8
-    rev: v1.1.2
+    rev: v2.0.0
     hooks:
       - id: doc8
