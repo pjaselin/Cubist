@@ -1,13 +1,13 @@
 """Visualization class for the Cubist Coverage Display"""
 
 import operator
+from typing import Any
 
 import pandas as pd
 from sklearn.utils.validation import check_is_fitted
 
-from .cubist import Cubist
 from ._cubist_display_mixin import _CubistDisplayMixin
-
+from .cubist import Cubist
 
 # mapping of operator string to operator function
 OPERATORS = {
@@ -73,11 +73,11 @@ class CubistCoverageDisplay(_CubistDisplayMixin):
     def plot(  # pylint: disable=R0913
         self,
         ax=None,
-        y_label_map: dict = None,
+        y_label_map: dict[str, Any] | None = None,
         *,
-        y_axis_label: str = None,
-        gridspec_kwargs: dict = None,
-        line_kwargs: dict = None,
+        y_axis_label: str | None = None,
+        gridspec_kwargs: dict[str, Any] | None = None,
+        line_kwargs: dict[str, Any] | None = None,
     ):
         """Plot visualization.
 
@@ -138,9 +138,10 @@ class CubistCoverageDisplay(_CubistDisplayMixin):
                 # set the x-axis limits of the subplot
                 self.ax_[i].set_xlim([-0.05, 1.05])
                 # set the y-axis tick labels
-                self.ax_[i].set_yticks(
-                    list(y_label_map.keys()), list(y_label_map.values())
-                )
+                if y_label_map is not None:
+                    self.ax_[i].set_yticks(
+                        list(y_label_map.keys()), list(y_label_map.values())
+                    )
 
         # turn off any unused plots
         for j in range(i + 1, self.ax_.shape[0]):  # noqa W0631, pylint: disable=W0631
@@ -158,9 +159,9 @@ class CubistCoverageDisplay(_CubistDisplayMixin):
         estimator: Cubist,
         X,
         *,
-        committee: int = None,
-        rule: int = None,
-        feature_names: list = None,
+        committee: int | None = None,
+        rule: int | None = None,
+        feature_names: list[str] | None = None,
         ax=None,
         line_kwargs=None,
         gridspec_kwargs=None,
@@ -184,7 +185,7 @@ class CubistCoverageDisplay(_CubistDisplayMixin):
         rule : int
             Max rule number to be included in plot.
 
-        feature_names : list of str
+        feature_names : list[str]
             Feature names to filter to in the plot. Leaving unset plots all
             features.
 

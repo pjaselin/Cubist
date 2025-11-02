@@ -1,5 +1,7 @@
 """Visualization class for the Cubist Coefficient Display"""
 
+from typing import Any
+
 import pandas as pd
 from sklearn.utils._optional_dependencies import check_matplotlib_support
 from sklearn.utils.validation import check_is_fitted
@@ -61,11 +63,11 @@ class CubistCoefficientDisplay(_CubistDisplayMixin):
     def plot(  # pylint: disable=R0913
         self,
         ax=None,
-        y_label_map: dict = None,
+        y_label_map: dict[str, Any] | None = None,
         *,
-        y_axis_label: str = None,
-        gridspec_kwargs: dict = None,
-        scatter_kwargs: dict = None,
+        y_axis_label: str | None = None,
+        gridspec_kwargs: dict[str, Any] | None = None,
+        scatter_kwargs: dict[str, Any] | None = None,
     ):
         """Plot visualization.
 
@@ -127,7 +129,10 @@ class CubistCoefficientDisplay(_CubistDisplayMixin):
             self.ax_[i].set_title(var)
             self.ax_[i].xaxis.set_major_locator(MaxNLocator(prune="both"))
             # set the y-axis ticks
-            self.ax_[i].set_yticks(list(y_label_map.keys()), list(y_label_map.values()))
+            if y_label_map is not None:
+                self.ax_[i].set_yticks(
+                    list(y_label_map.keys()), list(y_label_map.values())
+                )
 
         # turn off any remaining unused plots
         for j in range(i + 1, self.ax_.shape[0]):  # noqa W0631, pylint: disable=W0631
@@ -142,9 +147,9 @@ class CubistCoefficientDisplay(_CubistDisplayMixin):
         cls,
         estimator: Cubist,
         *,
-        committee: int = None,
-        rule: int = None,
-        feature_names: list = None,
+        committee: int | None = None,
+        rule: int | None = None,
+        feature_names: list[str] | None = None,
         ax=None,
         scatter_kwargs=None,
         gridspec_kwargs=None,
@@ -164,7 +169,7 @@ class CubistCoefficientDisplay(_CubistDisplayMixin):
         rule : int
             Max rule number to be included in plot.
 
-        feature_names : list of str
+        feature_names : list[str]
             Feature names to filter to in the plot. Leaving unset plots all
             features.
 

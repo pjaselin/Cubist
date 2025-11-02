@@ -23,7 +23,7 @@ static void cubist(char **namesv, char **datav, int *unbiased,
   // to parsing the command line in the cubist program.
   setglobals(*unbiased, *compositev, *neighbors, *committees, *sample, *seed,
              *rules, *extrapolation, *cv);
-  
+
   // Handles the strbufv data structure
   rbm_removeall();
 
@@ -55,7 +55,7 @@ static void cubist(char **namesv, char **datav, int *unbiased,
   if ((val = setjmp(rbm_buf)) == 0) {
     // Real work is done here
     cubistmain();
-    
+
     // Get the contents of the the model file if not using cross-validation
     if (*cv == 0){
       char *modelString = strbuf_getall(rbm_lookup("undefined.model"));

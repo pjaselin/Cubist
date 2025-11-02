@@ -74,7 +74,7 @@ html_theme_options = {
 }
 html_title = project  # turns off <project> <release> documentation format
 html_theme_options = {
-    "footer_icons": [
+    "footer_icons": [  # type: ignore
         {
             "name": "GitHub",
             "url": "https://github.com/pjaselin/Cubist",

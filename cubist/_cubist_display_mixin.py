@@ -2,9 +2,8 @@
 
 import math
 
-import pandas as pd
 import numpy as np
-
+import pandas as pd
 from sklearn.utils._optional_dependencies import check_matplotlib_support
 
 
@@ -16,7 +15,11 @@ class _CubistDisplayMixin:  # pylint: disable=R0903
     """
 
     def _validate_plot_params(
-        self, *, ax=None, df: pd.DataFrame = None, gridspec_kwargs: dict = None
+        self,
+        *,
+        df: pd.DataFrame,
+        gridspec_kwargs,
+        ax=None,
     ):
         check_matplotlib_support(f"{self.__class__.__name__}.plot")
         import matplotlib.pyplot as plt  # pylint: disable=C0415
@@ -60,10 +63,10 @@ class _CubistDisplayMixin:  # pylint: disable=R0903
     def _validate_from_estimator_params(
         cls,
         *,
-        df: pd.DataFrame = None,
-        committee: int = None,
-        rule: int = None,
-        feature_names: list = None,
+        df: pd.DataFrame,
+        committee: int | None = None,
+        rule: int | None = None,
+        feature_names: list[str] | None = None,
     ):
         check_matplotlib_support(f"{cls.__name__}.from_estimator")
 

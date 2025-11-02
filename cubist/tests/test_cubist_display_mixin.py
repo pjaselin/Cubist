@@ -28,7 +28,7 @@ def test_plot_grid_arrangement(california_housing_dataset):
 
 
 def test_validate_from_estimator_params_all_valid(california_housing_dataset):
-    """Test using valie commmittee and rule parameters"""
+    """Test using value commmittee and rule parameters"""
     model = Cubist(n_committees=5).fit(*california_housing_dataset)
     display = _CubistDisplayMixin()
     display._validate_from_estimator_params(df=model.splits_, committee=2, rule=2)  # pylint: disable=W0212
