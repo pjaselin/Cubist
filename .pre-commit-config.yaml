@@ -8,7 +8,9 @@ repos:
     hooks:
       - id: check-yaml
       - id: end-of-file-fixer
+        exclude: ^cubist/src
       - id: trailing-whitespace
+        exclude: ^cubist/src
       - id: check-merge-conflict
       - id: name-tests-test
         args: [--pytest-test-first]
@@ -20,6 +22,7 @@ repos:
       - id: ruff
       # Run the formatter.
       - id: ruff-format
+        exclude: ^cubist/src
   - repo: https://github.com/DavidAnson/markdownlint-cli2
     rev: v0.18.1
     hooks:

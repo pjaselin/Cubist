@@ -628,8 +628,8 @@ void DayToDate(int Day, String Date)
     Year++;
   }
 
-  sprintf(Date,
-          "%d/%d%d/%d%d",
+  sprintf(Date, 
+          "%d/%d%d/%d%d", 
           Year, Month / 10, Month % 10, Day / 10, Day % 10);
 }
 
@@ -668,7 +668,7 @@ void SecsToTime(int Secs, String Time)
   Secs = Secs % 60;
 
   sprintf(Time,
-          "%d%d:%d%d:%d%d",
+          "%d%d:%d%d:%d%d", 
           Hour / 10, Hour % 10, Mins / 10, Mins % 10, Secs / 10, Secs % 10);
 }
 
