@@ -16,7 +16,7 @@ from sklearn.utils.validation import (
     validate_data,
 )
 
-from _cubist import _cubist, _predictions  # noqa E0611 # pylint: disable=E0611
+from _cubist import _cubist, _predictions  # noqa E0611
 
 from ._attribute_usage import _attribute_usage
 from ._make_data_string import _make_data_string
@@ -25,7 +25,7 @@ from ._parse_model import _parse_model
 from .exceptions import CubistError
 
 
-class Cubist(RegressorMixin, BaseEstimator):  # pylint: disable=R0902
+class Cubist(RegressorMixin, BaseEstimator):
     """
     Cubist Regression Model (Public v2.07) developed by Ross Quinlan.
 
@@ -216,7 +216,7 @@ class Cubist(RegressorMixin, BaseEstimator):  # pylint: disable=R0902
         tags.input_tags.string = True
         return tags
 
-    def __init__(  # pylint: disable=R0913
+    def __init__(
         self,
         n_rules: int = 500,
         *,
@@ -292,7 +292,7 @@ class Cubist(RegressorMixin, BaseEstimator):  # pylint: disable=R0902
         return self.cv
 
     @_fit_context(prefer_skip_nested_validation=True)
-    def fit(self, X, y, sample_weight=None):  # pylint: disable=R0914
+    def fit(self, X, y, sample_weight=None):
         """Build a Cubist regression model from training set (X, y).
 
         Parameters
@@ -327,7 +327,7 @@ class Cubist(RegressorMixin, BaseEstimator):  # pylint: disable=R0902
 
         # set the feature names if it hasn't already been done
         if not hasattr(self, "feature_names_in_"):
-            self.feature_names_in_ = [f"var{i}" for i in range(X.shape[1])]  # noqa W0201, pylint: disable=W0201
+            self.feature_names_in_ = [f"var{i}" for i in range(X.shape[1])]  # noqa W0201
 
         # check to see if any of the feature names are empty
         if any(n == "" or pd.isnull(n) for n in self.feature_names_in_):
@@ -339,9 +339,9 @@ class Cubist(RegressorMixin, BaseEstimator):  # pylint: disable=R0902
         # check sample weighting
         if sample_weight is not None:
             sample_weight = _check_sample_weight(sample_weight, X)
-            self.is_sample_weighted_ = True  # noqa W0201, pylint: disable=W0201
+            self.is_sample_weighted_ = True  # noqa W0201
         else:
-            self.is_sample_weighted_ = False  # noqa W0201, pylint: disable=W0201
+            self.is_sample_weighted_ = False  # noqa W0201
 
         neighbors = self._check_neighbors()
         composite = self._check_composite(neighbors)
@@ -350,9 +350,9 @@ class Cubist(RegressorMixin, BaseEstimator):  # pylint: disable=R0902
         random_state = check_random_state(self.random_state)
 
         # number of input features
-        self.n_features_in_ = X.shape[1]  # noqa W0201, pylint: disable=W0201
+        self.n_features_in_ = X.shape[1]  # noqa W0201
         # number of outputs is 1 (single output regression)
-        self.n_outputs_ = 1  # noqa W0201, pylint: disable=W0201
+        self.n_outputs_ = 1  # noqa W0201
 
         # (re)construct a dataframe from X
         X = pd.DataFrame(X, columns=self.feature_names_in_)
@@ -380,8 +380,8 @@ class Cubist(RegressorMixin, BaseEstimator):  # pylint: disable=R0902
         )
 
         # convert output from raw to strings
-        self.model_ = model.decode()  # pylint: disable=W0201
-        self.output_ = output.decode()  # pylint: disable=W0201
+        self.model_ = model.decode()
+        self.output_ = output.decode()
 
         # raise Cubist training errors
         if ("***" in self.output_) or ("Error" in self.output_):
@@ -404,10 +404,10 @@ class Cubist(RegressorMixin, BaseEstimator):  # pylint: disable=R0902
 
         # replace "__Sample" with "sample" if this is used in the model
         if "\n_Sample" in names_string:
-            self.output_ = self.output_.replace("_Sample", "sample")  # pylint: disable=W0201
-            self.model_ = self.model_.replace("_Sample", "sample")  # pylint: disable=W0201
+            self.output_ = self.output_.replace("_Sample", "sample")
+            self.model_ = self.model_.replace("_Sample", "sample")
             # clean model string when using reserved sample name
-            self.model_ = (  # pylint: disable=W0201
+            self.model_ = (
                 self.model_[: self.model_.index("sample")]
                 + self.model_[self.model_.index("entries") :]
             )
@@ -421,11 +421,11 @@ class Cubist(RegressorMixin, BaseEstimator):  # pylint: disable=R0902
             data_string = "1"
 
         # compress and save descriptors/data
-        self._names_string = zlib.compress(names_string.encode())  # noqa W0201, pylint: disable=W0201
-        self._data_string = zlib.compress(data_string.encode())  # noqa W0201, pylint: disable=W0201
+        self._names_string = zlib.compress(names_string.encode())  # noqa W0201
+        self._data_string = zlib.compress(data_string.encode())  # noqa W0201
 
         # parse model contents and store useful information
-        (  # noqa W0201, pylint: disable=W0201
+        (  # noqa W0201
             self.version_,
             self.splits_,
             self.coeffs_,
@@ -438,7 +438,7 @@ class Cubist(RegressorMixin, BaseEstimator):  # pylint: disable=R0902
         ) = _parse_model(model=self.model_, feature_names=list(self.feature_names_in_))
 
         # get the input data variable usage
-        self.feature_importances_ = _attribute_usage(  # noqa W0201, pylint: disable=W0201
+        self.feature_importances_ = _attribute_usage(  # noqa W0201
             self.output_, list(self.feature_names_in_)
         )
 

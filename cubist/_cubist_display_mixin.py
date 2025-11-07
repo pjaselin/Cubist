@@ -7,7 +7,7 @@ import pandas as pd
 from sklearn.utils._optional_dependencies import check_matplotlib_support
 
 
-class _CubistDisplayMixin:  # pylint: disable=R0903
+class _CubistDisplayMixin:
     """Mixin class to be used in Displays for Cubist.
 
     The aim of this class is to centralize some validations for generating the
@@ -22,7 +22,7 @@ class _CubistDisplayMixin:  # pylint: disable=R0903
         ax=None,
     ):
         check_matplotlib_support(f"{self.__class__.__name__}.plot")
-        import matplotlib.pyplot as plt  # pylint: disable=C0415
+        import matplotlib.pyplot as plt
 
         if gridspec_kwargs is None:
             gridspec_kwargs = {}

@@ -11,7 +11,7 @@ import pandas as pd
 from ._utils import _format
 
 
-def _get_splits(model: list[str]):  # pylint: disable=R0914
+def _get_splits(model: list[str]):
     """Get splits from model along with the committee and rule indexed vectors"""
     # get length of model
     model_len = len(model)

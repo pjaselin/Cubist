@@ -70,7 +70,7 @@ class CubistCoverageDisplay(_CubistDisplayMixin):
         self.ax_ = None
         self.figure_ = None
 
-    def plot(  # pylint: disable=R0913
+    def plot(
         self,
         ax=None,
         y_label_map: dict[str, Any] | None = None,
@@ -144,7 +144,7 @@ class CubistCoverageDisplay(_CubistDisplayMixin):
                     )
 
         # turn off any unused plots
-        for j in range(i + 1, self.ax_.shape[0]):  # noqa W0631, pylint: disable=W0631
+        for j in range(i + 1, self.ax_.shape[0]):  # noqa W0631
             self.ax_[j].set_axis_off()
 
         self.figure_.supxlabel("Data Coverage")
@@ -154,7 +154,7 @@ class CubistCoverageDisplay(_CubistDisplayMixin):
         return self
 
     @classmethod
-    def from_estimator(  # pylint: disable=R0913
+    def from_estimator(
         cls,
         estimator: Cubist,
         X,

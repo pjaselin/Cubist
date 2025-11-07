@@ -67,11 +67,11 @@ def test_n_committees(n_committees, raises, ames_housing_dataset):
         (5, True, 0, pytest.raises(ValueError)),
     ],
 )
-def test_neighbors(neighbors, auto, expected, raises, ames_housing_dataset):  # pylint: disable=R0913,R0917
+def test_neighbors(neighbors, auto, expected, raises, ames_housing_dataset):
     """Test `neighbors` parameter"""
     model = Cubist(neighbors=neighbors, auto=auto)
     with raises:
-        assert expected == model._check_neighbors()  # noqa W0212, pylint: disable=W0212
+        assert expected == model._check_neighbors()  # noqa W0212
         model.fit(*ames_housing_dataset)
         check_is_fitted(model)
 
@@ -155,10 +155,10 @@ def test_cv(cv, raises, ames_housing_dataset):
         ("1234", 5, "auto", pytest.raises(TypeError), no_raise()),
     ],
 )
-def test_auto(auto, n, expected, raises, warns, iris_dataset):  # pylint: disable=R0913,R0917
+def test_auto(auto, n, expected, raises, warns, iris_dataset):
     """Test `auto` parameter"""
     model = Cubist(auto=auto)
-    assert expected == model._check_composite(n)  # noqa W0212, pylint: disable=W0212
+    assert expected == model._check_composite(n)  # noqa W0212
     with raises:
         with warns:
             model.fit(*iris_dataset)

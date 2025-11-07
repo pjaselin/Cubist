@@ -60,7 +60,7 @@ class CubistCoefficientDisplay(_CubistDisplayMixin):
         self.ax_ = None
         self.figure_ = None
 
-    def plot(  # pylint: disable=R0913
+    def plot(
         self,
         ax=None,
         y_label_map: dict[str, Any] | None = None,
@@ -102,7 +102,7 @@ class CubistCoefficientDisplay(_CubistDisplayMixin):
             Object that stores computed values.
         """
         check_matplotlib_support(f"{self.__class__.__name__}.plot")
-        from matplotlib.ticker import MaxNLocator  # pylint: disable=C0415
+        from matplotlib.ticker import MaxNLocator
 
         self.figure_, self.ax_ = self._validate_plot_params(
             ax=ax, df=self.coeffs, gridspec_kwargs=gridspec_kwargs
@@ -135,7 +135,7 @@ class CubistCoefficientDisplay(_CubistDisplayMixin):
                 )
 
         # turn off any remaining unused plots
-        for j in range(i + 1, self.ax_.shape[0]):  # noqa W0631, pylint: disable=W0631
+        for j in range(i + 1, self.ax_.shape[0]):  # noqa W0631
             self.ax_[j].set_axis_off()
 
         self.figure_.supxlabel("Coefficient Value")
@@ -143,7 +143,7 @@ class CubistCoefficientDisplay(_CubistDisplayMixin):
         self.figure_.suptitle(f"Model Coefficients by {y_axis_label} and Variable")
 
     @classmethod
-    def from_estimator(  # pylint: disable=R0913
+    def from_estimator(
         cls,
         estimator: Cubist,
         *,
