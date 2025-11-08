@@ -1,9 +1,8 @@
 import glob
 
-from Cython.Build import cythonize
-from setuptools import setup, Extension
 import numpy as np
-
+from Cython.Build import cythonize
+from setuptools import Extension, setup
 
 extensions = [
     Extension(

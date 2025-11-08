@@ -2,13 +2,12 @@
 
 import math
 
-import pandas as pd
 import numpy as np
-
+import pandas as pd
 from sklearn.utils._optional_dependencies import check_matplotlib_support
 
 
-class _CubistDisplayMixin:  # pylint: disable=R0903
+class _CubistDisplayMixin:
     """Mixin class to be used in Displays for Cubist.
 
     The aim of this class is to centralize some validations for generating the
@@ -16,10 +15,18 @@ class _CubistDisplayMixin:  # pylint: disable=R0903
     """
 
     def _validate_plot_params(
-        self, *, ax=None, df: pd.DataFrame = None, gridspec_kwargs: dict = None
+        self,
+        *,
+        ax=None,
+        df: pd.DataFrame,
+        y_label_map=None,
+        gridspec_kwargs=None,
     ):
         check_matplotlib_support(f"{self.__class__.__name__}.plot")
-        import matplotlib.pyplot as plt  # pylint: disable=C0415
+        import matplotlib.pyplot as plt
+
+        if y_label_map is None:
+            y_label_map = {}
 
         if gridspec_kwargs is None:
             gridspec_kwargs = {}
@@ -54,16 +61,16 @@ class _CubistDisplayMixin:  # pylint: disable=R0903
         # if ax is provided, get the current figure
         else:
             fig = plt.gcf()
-        return fig, ax
+        return fig, ax, y_label_map, gridspec_kwargs
 
     @classmethod
     def _validate_from_estimator_params(
         cls,
         *,
-        df: pd.DataFrame = None,
-        committee: int = None,
-        rule: int = None,
-        feature_names: list = None,
+        df: pd.DataFrame,
+        committee: int | None = None,
+        rule: int | None = None,
+        feature_names: list[str] | None = None,
     ):
         check_matplotlib_support(f"{cls.__name__}.from_estimator")
 

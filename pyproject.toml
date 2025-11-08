@@ -11,7 +11,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "cubist"
 version = "1.1.0"
-requires-python = ">= 3.9"
+requires-python = ">= 3.10"
 authors = [
   {name = "Ross Quinlan"},
   {name = "Max Kuhn"},
@@ -30,7 +30,6 @@ classifiers = [
   "Topic :: Scientific/Engineering :: Artificial Intelligence",
   "Topic :: Scientific/Engineering :: Mathematics",
   "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
-  "Programming Language :: Python :: 3.9",
   "Programming Language :: Python :: 3.10",
   "Programming Language :: Python :: 3.11",
   "Programming Language :: Python :: 3.12",
@@ -48,7 +47,11 @@ dev = [
   "pytest",
   "ruff",
   "coverage",
-  "pylint"
+  "mypy"
+]
+typing = [
+  "pandas-stubs",
+  "types-setuptools"
 ]
 viz = [
   "matplotlib"
@@ -87,17 +90,45 @@ omit = [
 [tool.coverage.report]
 skip_covered = true
 
-[tool.pylint.'MESSAGES CONTROL']
-ignore-paths = '^docs/.*$'
-good-names = [
-  "X",
-  "X_train",
-  "X_test"
-]
-
 [tool.isort]
 known_first_party = ["_cubist"]
 profile = "black"
 
 [tool.doc8]
 ignore = ["D001"]
+
+[tool.mypy]
+exclude = [
+  "docs/",
+  "cubist/tests/",
+  "setup.py",
+  "cubist/cubist_coefficient_display.py",
+  "cubist/cubist_coverage_display.py",
+]
+warn_unreachable = true
+warn_no_return = true
+
+[[tool.mypy.overrides]]
+module = [
+  "sklearn.*",
+]
+ignore_errors = true
+follow_imports = "skip"
+follow_untyped_imports = true
+
+[[tool.mypy.overrides]]
+module = [
+  "_cubist.*",
+  "Cython.Build.*",
+]
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = [
+  "cubist.cubist_coefficient_display",
+  "cubist.cubist_coverage_display",
+]
+follow_imports = "skip"
+ignore_errors = true
+follow_untyped_imports = true
+disable_error_code = "index,attr-defined"

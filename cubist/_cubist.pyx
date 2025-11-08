@@ -1,4 +1,5 @@
 cimport numpy as np
+
 np.import_array()
 
 # external declarations for cubist and predictions function from the top.c file
@@ -7,11 +8,11 @@ cdef extern from "src/top.c":
                 char **compositev, int *neighbors, int *committees,
                 double *sample, int *seed, int *rules, double *extrapolation,
                 int *cv, char **modelv, char **outputv)
-    void predictions(char **casev, char **namesv, char **datav, char **modelv, 
+    void predictions(char **casev, char **namesv, char **datav, char **modelv,
                      double *predv, char **outputv)
 
 # define the Python functions that interface with the C functions
-def _cubist(namesv_, datav_, unbiased_, compositev_, neighbors_, committees_, 
+def _cubist(namesv_, datav_, unbiased_, compositev_, neighbors_, committees_,
             sample_, seed_, rules_, extrapolation_, cv_, modelv_, outputv_):
     """
     Train and return Cubist model and output from C code
@@ -29,12 +30,12 @@ def _cubist(namesv_, datav_, unbiased_, compositev_, neighbors_, committees_,
     cdef int cv = cv_;
     cdef char *modelv = modelv_;
     cdef char *outputv = outputv_;
-    cubist(&namesv, &datav, &unbiased, &compositev, &neighbors, &committees, 
+    cubist(&namesv, &datav, &unbiased, &compositev, &neighbors, &committees,
            &sample, &seed, &rules, &extrapolation, &cv, &modelv, &outputv);
     return (modelv, outputv)
 
 
-def _predictions(casev_, namesv_, datav_, modelv_, 
+def _predictions(casev_, namesv_, datav_, modelv_,
                  np.ndarray[double, ndim=1, mode="c"] predv_, outputv_):
     """
     Obtain predictions using existing Cubist model and return output if raised
@@ -45,6 +46,6 @@ def _predictions(casev_, namesv_, datav_, modelv_,
     cdef char *datav = datav_;
     cdef char *modelv = modelv_;
     cdef char *outputv = outputv_;
-    predictions(&casev, &namesv, &datav, &modelv, 
+    predictions(&casev, &namesv, &datav, &modelv,
                 <double*> np.PyArray_DATA(predv_), &outputv);
     return (predv_, outputv)
