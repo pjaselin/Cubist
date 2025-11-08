@@ -19,7 +19,7 @@ on:
       - main
 
 jobs:
-  test:
+  lint-and-test:
     name: Test and lint on ${{ matrix.os }} with Python 3.12
     strategy:
       matrix:
@@ -72,10 +72,10 @@ jobs:
       env:
         CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
-  build:
+  test-docs:
     name: Build docs on ubuntu-latest with with Python 3.12
     runs-on: ubuntu-latest
-    needs: test
+    needs: lint-and-test
 
     steps:
     - name: Checkout repo

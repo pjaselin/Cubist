@@ -5,7 +5,7 @@ import numpy as np
 from Cython.Build import cythonize
 from setuptools import Extension, setup
 
-extra_compile_args = []
+extra_compile_args: list[str] = []
 if sys.platform == "darwin":
     extra_compile_args.extend(
         [

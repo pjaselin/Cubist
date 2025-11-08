@@ -1,14 +1,14 @@
 """Functions for determining the data types of input datasets in order to
 describe them for Cubist"""
 
+import numpy as np
 import pandas as pd
 from pandas.api.types import (
-    is_string_dtype,
-    is_numeric_dtype,
-    is_datetime64_any_dtype,
     is_complex_dtype,
+    is_datetime64_any_dtype,
+    is_numeric_dtype,
+    is_string_dtype,
 )
-import numpy as np
 
 
 def _is_all_float_dtype(x: pd.Series):

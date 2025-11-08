@@ -1,6 +1,6 @@
 """Functions for parsing the 'Attribute usage' section of the Cubist model output"""
 
-from typing import Union
+from typing import Any, Union
 
 import pandas as pd
 
@@ -38,19 +38,21 @@ def _attribute_usage(output: str, feature_names: Union[list, set]):
     # filter output down to the string containing the attribute usage data
     output = output[start_i + 17 : end_i].rstrip("\n")
     # filter out empty strings
-    output = [o for o in output.split("\n") if o != ""]
+    output_list = [o for o in output.split("\n") if o != ""]
     # remove the first element as this is the column headers
-    output.pop(0)
+    output_list.pop(0)
 
     # per line in the attribute usage, parse the percentages and attribute name
-    output = [_parse_attribute(o.lstrip("\t").strip()) for o in output]
-    # create dataframe
-    output = pd.DataFrame(output, columns=["Conditions", "Model", "Variable"])
+    # and create dataframe
+    output_df = pd.DataFrame(
+        [_parse_attribute(o.lstrip("\t").strip()) for o in output_list],
+        columns=["Conditions", "Model", "Variable"],
+    )
     # check to see if there are more features than reported in the attribute
     # usage table
-    if output.shape[0] < len(feature_names):
+    if output_df.shape[0] < len(feature_names):
         # get the list of missing features
-        missing_vars = list(set(feature_names) - set(output.Variable))
+        missing_vars = list(set(feature_names) - set(output_df.Variable))
         # create a list of zeros equal to the length of missing_vars
         zero_list = [0.0] * len(missing_vars)
         # create a dataframe of zeros for the Conditions and Model columns for
@@ -62,11 +64,11 @@ def _attribute_usage(output: str, feature_names: Union[list, set]):
                 "Variable": missing_vars,
             }
         )
-        output = pd.concat([output, missing_vars_df], axis=0)
-    return output
+        output_df = pd.concat([output_df, missing_vars_df], axis=0)
+    return output_df
 
 
-def _parse_attribute(x) -> list[float, float, str]:
+def _parse_attribute(x: str) -> list[Any]:
     """Parse an attribute row from the attribute usage table and return as a
     list of [Condition, Model, Variable]"""
     # get the variable name as the string following the last occurrence of four
@@ -76,7 +78,7 @@ def _parse_attribute(x) -> list[float, float, str]:
     return _get_values(x[:attribute_start_i]) + [attribute_name]
 
 
-def _get_values(x) -> list[float, float]:
+def _get_values(x: str) -> list[float]:
     """Takes the string containing the percentages of usage and assigns them to
     the conditions (index 0) or model (index 1), removes the % symbol and
     converts to a number"""
@@ -87,9 +89,7 @@ def _get_values(x) -> list[float, float]:
         return [float(c.replace("%", "")) for c in x2]
     pct_ind = [i for i, c in enumerate(x2) if "%" in c][0]
     if x2[1 : pct_ind + 1].count("") < x2[pct_ind + 1 :].count(""):
-        x2 = [c for c in x2 if "%" in c][0]
-        x2 = float(x2.replace("%", ""))
-        return [x2, 0.0]
-    x2 = [c for c in x2 if "%" in c][0]
-    x2 = float(x2.replace("%", ""))
-    return [0.0, x2]
+        x2 = [c for c in x2 if "%" in c]
+        return [float(x2[0].replace("%", "")), 0.0]
+    x2 = [c for c in x2 if "%" in c]
+    return [0.0, float(x2[0].replace("%", ""))]

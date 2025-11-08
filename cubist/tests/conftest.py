@@ -17,7 +17,7 @@ def no_raise():
 @pytest.fixture(scope="session")
 def ames_housing_dataset():
     """Fixture for ames housing dataset"""
-    return fetch_openml(  # pylint: disable=W0621
+    return fetch_openml(
         "ames_housing", version=1, as_frame=True, return_X_y=True, parser="auto"
     )
 
@@ -25,7 +25,7 @@ def ames_housing_dataset():
 @pytest.fixture(scope="session")
 def california_housing_dataset():
     """Fixture for california housing dataset"""
-    return fetch_openml(  # pylint: disable=W0621
+    return fetch_openml(
         "california_housing", version=1, as_frame=True, return_X_y=True, parser="auto"
     )
 
@@ -33,7 +33,7 @@ def california_housing_dataset():
 @pytest.fixture(scope="session")
 def iris_dataset():
     """Fixture for iris dataset"""
-    return load_iris(return_X_y=True, as_frame=True)  # pylint: disable=W0621
+    return load_iris(return_X_y=True, as_frame=True)
 
 
 @pytest.fixture(scope="session")
