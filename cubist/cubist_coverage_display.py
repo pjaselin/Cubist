@@ -111,8 +111,13 @@ class CubistCoverageDisplay(_CubistDisplayMixin):
         display : :class:`~cubist.CubistCoverageDisplay`
             Object that stores computed values.
         """
-        self.figure_, self.ax_ = self._validate_plot_params(
-            ax=ax, df=self.splits, gridspec_kwargs=gridspec_kwargs
+        self.figure_, self.ax_, y_label_map, gridspec_kwargs = (
+            self._validate_plot_params(
+                ax=ax,
+                df=self.splits,
+                y_label_map=y_label_map,
+                gridspec_kwargs=gridspec_kwargs,
+            )
         )
 
         if line_kwargs is None:
@@ -138,10 +143,9 @@ class CubistCoverageDisplay(_CubistDisplayMixin):
                 # set the x-axis limits of the subplot
                 self.ax_[i].set_xlim([-0.05, 1.05])
                 # set the y-axis tick labels
-                if y_label_map is not None:
-                    self.ax_[i].set_yticks(
-                        list(y_label_map.keys()), list(y_label_map.values())
-                    )
+                self.ax_[i].set_yticks(
+                    list(y_label_map.keys()), list(y_label_map.values())
+                )
 
         # turn off any unused plots
         for j in range(i + 1, self.ax_.shape[0]):  # noqa W0631

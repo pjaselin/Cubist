@@ -17,12 +17,16 @@ class _CubistDisplayMixin:
     def _validate_plot_params(
         self,
         *,
-        df: pd.DataFrame,
-        gridspec_kwargs,
         ax=None,
+        df: pd.DataFrame,
+        y_label_map=None,
+        gridspec_kwargs=None,
     ):
         check_matplotlib_support(f"{self.__class__.__name__}.plot")
         import matplotlib.pyplot as plt
+
+        if y_label_map is None:
+            y_label_map = {}
 
         if gridspec_kwargs is None:
             gridspec_kwargs = {}
@@ -57,7 +61,7 @@ class _CubistDisplayMixin:
         # if ax is provided, get the current figure
         else:
             fig = plt.gcf()
-        return fig, ax
+        return fig, ax, y_label_map, gridspec_kwargs
 
     @classmethod
     def _validate_from_estimator_params(

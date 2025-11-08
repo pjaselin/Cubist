@@ -104,8 +104,13 @@ class CubistCoefficientDisplay(_CubistDisplayMixin):
         check_matplotlib_support(f"{self.__class__.__name__}.plot")
         from matplotlib.ticker import MaxNLocator
 
-        self.figure_, self.ax_ = self._validate_plot_params(
-            ax=ax, df=self.coeffs, gridspec_kwargs=gridspec_kwargs
+        self.figure_, self.ax_, y_label_map, gridspec_kwargs = (
+            self._validate_plot_params(
+                ax=ax,
+                df=self.coeffs,
+                y_label_map=y_label_map,
+                gridspec_kwargs=gridspec_kwargs,
+            )
         )
 
         if scatter_kwargs is None:
@@ -129,10 +134,7 @@ class CubistCoefficientDisplay(_CubistDisplayMixin):
             self.ax_[i].set_title(var)
             self.ax_[i].xaxis.set_major_locator(MaxNLocator(prune="both"))
             # set the y-axis ticks
-            if y_label_map is not None:
-                self.ax_[i].set_yticks(
-                    list(y_label_map.keys()), list(y_label_map.values())
-                )
+            self.ax_[i].set_yticks(list(y_label_map.keys()), list(y_label_map.values()))
 
         # turn off any remaining unused plots
         for j in range(i + 1, self.ax_.shape[0]):  # noqa W0631
