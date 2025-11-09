@@ -37,13 +37,7 @@ Development
 
 .. code-block:: shell
 
-   pip install cubist[dev,viz]
-
-or
-
-.. code-block:: shell
-
-   uv add cubist --extra viz --extra dev --extra docs
+   uv sync --all-groups --all-extras
 
 GitHub
 ------
