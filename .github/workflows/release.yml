@@ -47,7 +47,9 @@ jobs:
           cp -r winsys/ cubist/sys
 
       - name: Install cibuildwheel
-        run: uv pip install cibuildwheel==3.2.1
+        run: |
+          uv venv
+          uv pip install cibuildwheel==3.2.1
 
       - name: Build wheels
         run: uv run cibuildwheel --output-dir wheelhouse
@@ -76,6 +78,7 @@ jobs:
 
       - name: Build source distribution
         run: |
+          uv venv
           uv pip install build
           uv run python -m build
 
