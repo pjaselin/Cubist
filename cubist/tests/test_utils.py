@@ -2,8 +2,8 @@
 
 import pytest
 
-from .conftest import no_raise
 from .._utils import _format
+from .conftest import no_raise
 
 
 @pytest.mark.parametrize(

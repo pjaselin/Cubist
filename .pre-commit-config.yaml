@@ -4,24 +4,27 @@ default_language_version:
 
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v5.0.0
+    rev: v6.0.0
     hooks:
       - id: check-yaml
       - id: end-of-file-fixer
+        exclude: ^cubist/src
       - id: trailing-whitespace
+        exclude: ^cubist/src
       - id: check-merge-conflict
       - id: name-tests-test
         args: [--pytest-test-first]
   - repo: https://github.com/astral-sh/ruff-pre-commit
     # Ruff version.
-    rev: v0.8.6
+    rev: v0.14.4
     hooks:
       # Run the linter.
       - id: ruff
       # Run the formatter.
       - id: ruff-format
+        exclude: ^cubist/src
   - repo: https://github.com/DavidAnson/markdownlint-cli2
-    rev: v0.17.1
+    rev: v0.18.1
     hooks:
       - id: markdownlint-cli2
   - repo: https://github.com/thlorenz/doctoc
@@ -29,15 +32,30 @@ repos:
     hooks:
       - id: doctoc
   - repo: https://github.com/crate-ci/typos
-    rev: v1.29.4
+    rev: v1.39.0
     hooks:
       - id: typos
+        exclude: ^cubist/src
         args: []
+  - repo: https://github.com/pycqa/isort
+    rev: 7.0.0
+    hooks:
+      - id: isort
+  - repo: https://github.com/commitizen-tools/commitizen
+    rev: v4.9.1
+    hooks:
+      - id: commitizen
+  - repo: https://github.com/PyCQA/doc8
+    rev: v2.0.0
+    hooks:
+      - id: doc8
   - repo: local
     hooks:
-      - id: pylint
-        name: pylint
-        entry: pylint
-        language: system
-        types: [python]
+      - id: mypy
+        name: mypy
+        # or `entry: poetry run mypy`, but perhaps both are the same
+        entry: mypy
         require_serial: true
+        # From the docs it is not clear the difference between `language: python` VS `language: system`
+        language: system
+        types: [ python ]

@@ -38,8 +38,8 @@ def _make_names_string(x, w=None, label="outcome"):
     python_version = tuple(sys.version_info)
     now = datetime.now()
     out = (
-        f'| Generated using Python {python_version[0]}.{python_version[1]}.{python_version[2]}\n'
-        f'| on {now.strftime("%a %b %d %H:%M:%S %Y")}'
+        f"| Generated using Python {python_version[0]}.{python_version[1]}.{python_version[2]}\n"
+        f"| on {now.strftime('%a %b %d %H:%M:%S %Y')}"
     )
 
     # define the outcome data type

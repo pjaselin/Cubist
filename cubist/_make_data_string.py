@@ -1,8 +1,8 @@
 """Function to create the Cubist datav_ input"""
 
-import pandas as pd
-from pandas.api.types import is_string_dtype, is_numeric_dtype
 import numpy as np
+import pandas as pd
+from pandas.api.types import is_numeric_dtype, is_string_dtype
 
 from ._make_names_string import _escapes
 from ._utils import _format
@@ -58,8 +58,11 @@ def _make_data_string(x, y=None, w=None):
     # convert all columns to strings
     for col in x:
         if is_numeric_dtype(x[col]):
-            x[col] = x[col].apply(_format)
-            x[col] = x[col].astype(str)
+            x[col] = (
+                x[col]
+                .apply(lambda val: val if pd.isna(val) else _format(val))
+                .astype(str)
+            )
         else:
             x[col] = x[col].astype(str)
 

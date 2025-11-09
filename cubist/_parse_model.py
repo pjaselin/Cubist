@@ -5,19 +5,19 @@ import re
 from collections import deque
 from typing import Union
 
-import pandas as pd
 import numpy as np
+import pandas as pd
 
 from ._utils import _format
 
 
-def _get_splits(model: list[str]):  # pylint: disable=R0914
+def _get_splits(model: list[str]):
     """Get splits from model along with the committee and rule indexed vectors"""
     # get length of model
     model_len = len(model)
     # define initial lists and index variables
-    com_num = [None] * model_len
-    rule_num = [None] * model_len
+    com_num: list[None | int] = [None] * model_len
+    rule_num: list[None | int] = [None] * model_len
     com_idx = r_idx = 0
 
     # loop through model and indicate
@@ -104,7 +104,15 @@ def _get_splits(model: list[str]):  # pylint: disable=R0914
 def _parse_model(
     model: str, feature_names: list
 ) -> tuple[
-    str, pd.DataFrame, pd.DataFrame, pd.DataFrame, Union[None, float], Union[None, int]
+    str,
+    pd.DataFrame,
+    pd.DataFrame,
+    pd.DataFrame,
+    Union[None, float],
+    Union[None, int],
+    float,
+    float,
+    float,
 ]:
     """
     Parse Cubist model output to extract metadata and model splits as well as
@@ -120,10 +128,9 @@ def _parse_model(
 
     Returns
     -------
-
-
     ( model_version, splits, coeffs, feature_statistics,
-        committee_error_reduction, n_committees_used
+        committee_error_reduction, n_committees_used, global_mean,
+        ceiling, floor
     ) : tuple
         Information parsed from the Cubist model including the model version,
         splits DataFrame, coefficients DataFrame, feature statistics DataFrame,
@@ -131,20 +138,30 @@ def _parse_model(
         actually used.
     """
     # split on newline
-    model = deque(model.split("\n"))
+    model_seq: deque[str] = deque(model.split("\n"))
+
     # get the cubist model version and build date
-    version = _parser(model.popleft())[0]["id"]
+    version = _parser(model_seq.popleft())[0]["id"]
+
     # get the global model statistics
-    model.popleft()
+    model_statistics = _parser(model_seq.popleft())
+    # combine the list of dictionaries into a single dictionary
+    model_statistics = {k: v for d in model_statistics for k, v in d.items()}
+    global_mean = float(model_statistics["globalmean"])
+    ceiling = float(model_statistics["ceiling"])
+    floor = float(model_statistics["floor"])
+
     # get the feature statistics
     feature_statistics = []
-    while model[0].startswith("att="):
-        feature_statistics.append(_parser(model.popleft()))
-    feature_statistics = pd.DataFrame(
+    while model_seq[0].startswith("att="):
+        feature_statistics.append(_parser(model_seq.popleft()))
+    feature_statistics_df = pd.DataFrame(
         [{k: v for d in feat for k, v in d.items()} for feat in feature_statistics]
     )
+
     # get the number of committees
-    committee_meta = _parser(model.popleft())
+    committee_meta = _parser(model_seq.popleft())
+
     # set default committee error reduction and number of committees
     committee_error_reduction = None
     n_committees_used = None
@@ -155,15 +172,17 @@ def _parse_model(
             n_committees_used = int(val["entries"])  # noqa F841
 
     # clean out empty strings
-    model = [m for m in model if m.strip() != ""]
+    model_rules = [m for m in model_seq if m.strip() != ""]
 
     # parse model splits and get vectors for committees and rules
-    com_num, rule_num, splits = _get_splits(model)
+    com_num, rule_num, splits = _get_splits(model_rules)
 
     # get the indices of rows in model that contain model coefficients
-    is_eqn = [i for i, c in enumerate(model) if c.startswith("coeff=")]
+    is_eqn = [i for i, c in enumerate(model_rules) if c.startswith("coeff=")]
     # extract the model coefficients from the row
-    coeffs = pd.DataFrame([_eqn(model[i], var_names=feature_names) for i in is_eqn])
+    coeffs = pd.DataFrame(
+        [_eqn(model_rules[i], var_names=feature_names) for i in is_eqn]
+    )
     # get the committee number
     coeffs["committee"] = [com_num[i] for i in is_eqn]
     # get the rule number for the committee
@@ -173,13 +192,16 @@ def _parse_model(
         version,
         splits,
         coeffs,
-        feature_statistics,
+        feature_statistics_df,
         committee_error_reduction,
         n_committees_used,
+        global_mean,
+        ceiling,
+        floor,
     )
 
 
-def _type2(x, dig=3):
+def _type2(x: str, dig: int = 3):
     """Parse type2 (continuous) splits"""
     x = x.replace('"', "")
 
@@ -196,18 +218,17 @@ def _type2(x, dig=3):
         result = "="
     else:
         var = x[att_ind + 4 : cut_ind - 1]
-        val = x[cut_ind + 4 : result_ind - 1]
-        val = _format(float(val), dig)
+        val = _format(float(x[cut_ind + 4 : result_ind - 1]), dig)
         result = x[result_ind + 7 :]
     return {
         "var": var,
-        "val": float(val),
+        "val": val if val is None else float(val),
         "result": result,
         "text": f"{var} {result} {val}",
     }
 
 
-def _type3(x):
+def _type3(x: str):
     """Parse type3 (categorical) splits"""
     # get the indices where these keywords start
     att_ind = x.find("att=")
@@ -227,7 +248,7 @@ def _type3(x):
     return {"var": var, "val": val, "text": txt}
 
 
-def _eqn(x, var_names: list):
+def _eqn(x: str, var_names: list):
     """Parse out the linear equation"""
     x = x.replace('"', "")
     starts = [m.start(0) for m in re.finditer("(coeff=)|(att=)", x)]
@@ -239,30 +260,25 @@ def _eqn(x, var_names: list):
             txt = x[val:]
         tmp[i] = txt.replace("coeff=", "").replace("att=", "")
 
-    vals = tmp[::2]
-    vals = [float(c) for c in vals]
-    nms = tmp[1::2]
-    nms = ["(Intercept)"] + nms
-    vals = dict(zip(nms, vals))
+    vals = [float(c) for c in tmp[::2]]
+    nms = ["(Intercept)"] + tmp[1::2]
+    coeff_vals = dict(zip(nms, vals))
 
     # handle column headers
     vars2 = [var for var in var_names if var not in nms]
     vals2 = [np.nan] * len(vars2)
-    vals2 = dict(zip(vars2, vals2))
-    vals = {**vals, **vals2}
+    coeff_vars = dict(zip(vars2, vals2))
+    equations = {**coeff_vals, **coeff_vars}
     new_names = ["(Intercept)"] + var_names
-    vals = {nm: vals[nm] for nm in new_names}
-    return vals
+    return {nm: equations[nm] for nm in new_names}
 
 
-def _make_parsed_dict(x):
+def _make_parsed_dict(x: str):
     """Parse string to dictionary"""
-    x = x.split("=")
-    return {x[0]: x[1].strip('"')}
+    x_list = x.split("=")
+    return {x_list[0]: x_list[1].strip('"')}
 
 
-def _parser(x):
+def _parser(x: str):
     """Parse string to list of dictionaries"""
-    x = x.split('" ')
-    x = [_make_parsed_dict(c) for c in x]
-    return x
+    return [_make_parsed_dict(c) for c in x.split('" ')]

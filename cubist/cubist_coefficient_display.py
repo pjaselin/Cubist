@@ -1,25 +1,26 @@
 """Visualization class for the Cubist Coefficient Display"""
 
-import pandas as pd
+from typing import Any
 
+import pandas as pd
 from sklearn.utils._optional_dependencies import check_matplotlib_support
 from sklearn.utils.validation import check_is_fitted
 
-from .cubist import Cubist
 from ._cubist_display_mixin import _CubistDisplayMixin
+from .cubist import Cubist
 
 
 class CubistCoefficientDisplay(_CubistDisplayMixin):
     """Visualization of the regression coefficients used in the Cubist model.
 
     This tool plots the linear coefficients and intercepts created for a Cubist
-    model and stored in the `coeffs_` attribute. One subplot is created for
-    each variable or intercept with the rule number or committee/rule pair on
-    the y-axis. The coefficient values for the given variable and rule pair or
+    model and stored in the `coeffs_` attribute. One subplot is created for each
+    variable or intercept with the rule number or committee/rule pair on the
+    y-axis. The coefficient values for the given variable and rule pair or
     variable and committee/rule pair are plotted along the x-axis.
 
     See the details in the docstrings of
-    :func:`~cubist.CubistCoefficientDisplay.from_estimator`to
+    :func:`~cubist.CubistCoefficientDisplay.from_estimator` to
     create a visualizer. All parameters are stored as attributes.
 
     .. versionadded:: 1.0.0
@@ -51,7 +52,6 @@ class CubistCoefficientDisplay(_CubistDisplayMixin):
     >>> X, y = load_iris(return_X_y=True, as_frame=True)
     >>> model = Cubist(n_rules=2).fit(X, y)
     >>> display = CubistCoefficientDisplay.from_estimator(estimator=model)
-    <...>
     >>> plt.show()
     """
 
@@ -60,14 +60,14 @@ class CubistCoefficientDisplay(_CubistDisplayMixin):
         self.ax_ = None
         self.figure_ = None
 
-    def plot(  # pylint: disable=R0913
+    def plot(
         self,
         ax=None,
-        y_label_map: dict = None,
+        y_label_map: dict[str, Any] | None = None,
         *,
-        y_axis_label: str = None,
-        gridspec_kwargs: dict = None,
-        scatter_kwargs: dict = None,
+        y_axis_label: str | None = None,
+        gridspec_kwargs: dict[str, Any] | None = None,
+        scatter_kwargs: dict[str, Any] | None = None,
     ):
         """Plot visualization.
 
@@ -102,10 +102,15 @@ class CubistCoefficientDisplay(_CubistDisplayMixin):
             Object that stores computed values.
         """
         check_matplotlib_support(f"{self.__class__.__name__}.plot")
-        from matplotlib.ticker import MaxNLocator  # pylint: disable=C0415
+        from matplotlib.ticker import MaxNLocator
 
-        self.figure_, self.ax_ = self._validate_plot_params(
-            ax=ax, df=self.coeffs, gridspec_kwargs=gridspec_kwargs
+        self.figure_, self.ax_, y_label_map, gridspec_kwargs = (
+            self._validate_plot_params(
+                ax=ax,
+                df=self.coeffs,
+                y_label_map=y_label_map,
+                gridspec_kwargs=gridspec_kwargs,
+            )
         )
 
         if scatter_kwargs is None:
@@ -132,7 +137,7 @@ class CubistCoefficientDisplay(_CubistDisplayMixin):
             self.ax_[i].set_yticks(list(y_label_map.keys()), list(y_label_map.values()))
 
         # turn off any remaining unused plots
-        for j in range(i + 1, self.ax_.shape[0]):  # noqa W0631, pylint: disable=W0631
+        for j in range(i + 1, self.ax_.shape[0]):  # noqa W0631
             self.ax_[j].set_axis_off()
 
         self.figure_.supxlabel("Coefficient Value")
@@ -140,13 +145,13 @@ class CubistCoefficientDisplay(_CubistDisplayMixin):
         self.figure_.suptitle(f"Model Coefficients by {y_axis_label} and Variable")
 
     @classmethod
-    def from_estimator(  # pylint: disable=R0913
+    def from_estimator(
         cls,
         estimator: Cubist,
         *,
-        committee: int = None,
-        rule: int = None,
-        feature_names: list = None,
+        committee: int | None = None,
+        rule: int | None = None,
+        feature_names: list[str] | None = None,
         ax=None,
         scatter_kwargs=None,
         gridspec_kwargs=None,
@@ -166,7 +171,7 @@ class CubistCoefficientDisplay(_CubistDisplayMixin):
         rule : int
             Max rule number to be included in plot.
 
-        feature_names : list of str
+        feature_names : list[str]
             Feature names to filter to in the plot. Leaving unset plots all
             features.
 
@@ -199,7 +204,6 @@ class CubistCoefficientDisplay(_CubistDisplayMixin):
         >>> X, y = load_iris(return_X_y=True, as_frame=True)
         >>> model = Cubist(n_rules=2).fit(X, y)
         >>> display = CubistCoefficientDisplay.from_estimator(estimator=model)
-        <...>
         >>> plt.show()
         """
         check_is_fitted(estimator)

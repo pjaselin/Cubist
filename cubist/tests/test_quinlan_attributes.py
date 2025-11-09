@@ -1,20 +1,18 @@
-"""Tests for obtaining Quinlan attributes from input datasets"""
+"""Tests for obtaining Quinlan's attributes from input datasets"""
 
 import random
 
+import numpy as np
+import pandas as pd
 import pytest
 
-import pandas as pd
-import numpy as np
-
 from .._quinlan_attributes import (
-    _quinlan_attributes,
     _get_data_format,
     _is_all_float_dtype,
     _is_all_int_dtype,
+    _quinlan_attributes,
 )
 from .conftest import no_raise
-
 
 # create sample series for different data types
 int_series = pd.Series(random.sample(range(10, 30), 5))
