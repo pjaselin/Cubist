@@ -97,13 +97,13 @@ jobs:
         run: uv sync --group docs
 
       - name: Test Docs
-        run: uv run make doctest -C ./docs/
+        run: make doctest -C ./docs/
 
       - name: Collect Docs coverage
-        run: uv run make coverage -C ./docs/
+        run: make coverage -C ./docs/
 
       - name: Build Docs
-        run: uv run make html -C ./docs/
+        run: make html -C ./docs/
 
       - name: Upload artifacts
         id: deployment
