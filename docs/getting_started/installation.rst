@@ -35,15 +35,11 @@ or
 Development
 ^^^^^^^^^^^^^^^^^^^^^^^
 
-.. code-block:: shell
-
-   pip install cubist[dev,viz]
-
-or
+With `uv <https://docs.astral.sh/uv/>`_ installed:
 
 .. code-block:: shell
 
-   uv add cubist --extra viz --extra dev --extra docs
+   uv sync --all-groups --all-extras
 
 GitHub
 ------
