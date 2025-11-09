@@ -25,12 +25,12 @@ jobs:
       CIBW_SKIP: "cp36-* cp37-* pp* *-win32 *-manylinux_i686 *_ppc64le *_s390x"
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
-      - uses: actions/setup-python@v5
-        name: Install Python
+      - name: Set up Python
+        uses: actions/setup-python@v6
         with:
-          python-version: '3.12'
+          python-version-file: "pyproject.toml"
 
       - name: Enable Developer Command Prompt for Windows
         if: matrix.os == 'windows-latest'
@@ -57,12 +57,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Checkout repo
-      uses: actions/checkout@v4
+      uses: actions/checkout@v5
 
     - name: Set up Python
-      uses: actions/setup-python@v5
+      uses: actions/setup-python@v6
       with:
-        python-version: "3.12"
+        python-version-file: "pyproject.toml"
 
     - name: Build source distribution
       run: |
