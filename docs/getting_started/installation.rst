@@ -35,6 +35,8 @@ or
 Development
 ^^^^^^^^^^^^^^^^^^^^^^^
 
+With `uv <https://docs.astral.sh/uv/>`_ installed:
+
 .. code-block:: shell
 
    uv sync --all-groups --all-extras
