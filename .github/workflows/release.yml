@@ -204,12 +204,14 @@ jobs:
           pattern: python-package-distributions-*
           path: dist/
           merge-multiple: true
+
       - name: Sign the dists with Sigstore
         uses: sigstore/gh-action-sigstore-python@v3.0.1
         with:
           inputs: >-
             ./dist/*.tar.gz
             ./dist/*.whl
+
       - name: Upload Release Asset
         uses: softprops/action-gh-release@v2
         with:
