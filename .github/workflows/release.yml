@@ -15,7 +15,7 @@ on:
       - published
 
 jobs:
-  build_wheels:
+  build-wheels:
     name: Build wheels on ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
     strategy:
@@ -52,32 +52,34 @@ jobs:
           name: python-package-distributions-${{ matrix.os }}
           path: ./wheelhouse/*.whl
 
-  build_sdist:
+  build-sdist:
     name: Build source distribution 📦
     runs-on: ubuntu-latest
     steps:
-    - name: Checkout repo
-      uses: actions/checkout@v5
+      - name: Checkout repo
+        uses: actions/checkout@v5
 
-    - name: Set up Python
-      uses: actions/setup-python@v6
-      with:
-        python-version-file: "pyproject.toml"
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version-file: "pyproject.toml"
 
-    - name: Build source distribution
-      run: |
-        python -m pip install build
-        python -m build
-    - uses: actions/upload-artifact@v4
-      with:
-        name: python-package-distributions-source
-        path: dist/*.tar.gz
+      - name: Build source distribution
+        run: |
+          python -m pip install build
+          python -m build
+      - uses: actions/upload-artifact@v4
+        with:
+          name: python-package-distributions-source
+          path: dist/*.tar.gz
 
   publish-to-testpypi:
     name: >-
       Publish Python 🐍 distribution 📦 to TestPyPI
     if: startsWith(github.ref, 'refs/tags/')
-    needs: [build_wheels, build_sdist]
+    needs:
+      - build-wheels
+      - build-sdist
     runs-on: ubuntu-latest
     environment:
       name: testpypi
@@ -86,17 +88,17 @@ jobs:
       id-token: write
 
     steps:
-    - name: Download all artifacts
-      uses: actions/download-artifact@v4
-      with:
-        pattern: python-package-distributions-*
-        path: dist/
-        merge-multiple: true
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          pattern: python-package-distributions-*
+          path: dist/
+          merge-multiple: true
 
-    - name: Publish distribution 📦 to Test PyPI
-      uses: pypa/gh-action-pypi-publish@release/v1
-      with:
-        repository-url: https://test.pypi.org/legacy/
+      - name: Publish distribution 📦 to Test PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          repository-url: https://test.pypi.org/legacy/
 
   publish-to-pypi:
     # release only tagged commits to pypi / github
@@ -111,20 +113,52 @@ jobs:
       id-token: write
 
     steps:
-    - name: Download all artifacts
-      uses: actions/download-artifact@v4
-      with:
-        pattern: python-package-distributions-*
-        path: dist/
-        merge-multiple: true
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          pattern: python-package-distributions-*
+          path: dist/
+          merge-multiple: true
 
-    - name: Publish distribution 📦 to PyPI
-      uses: pypa/gh-action-pypi-publish@release/v1
+      - name: Publish distribution 📦 to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
+
+  build-docs:
+    name: Build docs on ubuntu-latest
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v5
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version-file: "pyproject.toml"
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v6
+        with:
+          version: "0.9.8"
+
+      - name: Install dependencies
+        run: uv sync --group docs
+
+      - name: Build Docs
+        run: make html -C ./docs/
+
+      - name: Upload artifacts
+        id: deployment
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: docs/_build/html
 
   github-pages:
     name: Deploy docs to GitHub Pages
     runs-on: ubuntu-latest
-    needs: publish-to-pypi
+    needs:
+      - publish-to-pypi
+      - build-docs
 
     # Grant GITHUB_TOKEN the permissions required to make a Pages deployment
     permissions:
@@ -137,9 +171,9 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
 
     steps:
-    - name: Deploy to GitHub Pages
-      id: deployment
-      uses: actions/deploy-pages@v4
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
 
   github-release:
     name: >-
@@ -153,25 +187,25 @@ jobs:
       id-token: write  # IMPORTANT: mandatory for sigstore
 
     steps:
-    - name: Download all the dists
-      uses: actions/download-artifact@v4
-      with:
-        pattern: python-package-distributions-*
-        path: dist/
-        merge-multiple: true
-    - name: Sign the dists with Sigstore
-      uses: sigstore/gh-action-sigstore-python@v3.0.1
-      with:
-        inputs: >-
-          ./dist/*.tar.gz
-          ./dist/*.whl
-    - name: Upload Release Asset
-      uses: softprops/action-gh-release@v2
-      with:
-        name: latest
-        tag_name: latest
-        body: Latest version of distribution
-        files: |
-          dist/*
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Download all the dists
+        uses: actions/download-artifact@v4
+        with:
+          pattern: python-package-distributions-*
+          path: dist/
+          merge-multiple: true
+      - name: Sign the dists with Sigstore
+        uses: sigstore/gh-action-sigstore-python@v3.0.1
+        with:
+          inputs: >-
+            ./dist/*.tar.gz
+            ./dist/*.whl
+      - name: Upload Release Asset
+        uses: softprops/action-gh-release@v2
+        with:
+          name: latest
+          tag_name: latest
+          body: Latest version of distribution
+          files: |
+            dist/*
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

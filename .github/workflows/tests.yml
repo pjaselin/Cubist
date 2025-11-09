@@ -104,9 +104,3 @@ jobs:
 
       - name: Build Docs
         run: make html -C ./docs/
-
-      - name: Upload artifacts
-        id: deployment
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: docs/_build/html
