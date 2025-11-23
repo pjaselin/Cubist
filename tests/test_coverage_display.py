@@ -31,7 +31,7 @@ def test_iris_coverage_display(iris_dataset):
     """Test creating the readme iris coverage plot"""
     model = Cubist().fit(*iris_dataset)
     CubistCoverageDisplay.from_estimator(estimator=model, X=iris_dataset[0])
-    plt.savefig("static/iris_coverage_display.png")
+    plt.savefig("iris_coverage_display.png")
 
 
 def test_coverage_display_line_kwargs(california_housing_dataset):
