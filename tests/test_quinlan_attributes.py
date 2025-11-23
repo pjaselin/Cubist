@@ -6,12 +6,13 @@ import numpy as np
 import pandas as pd
 import pytest
 
-from .._quinlan_attributes import (
+from cubist._quinlan_attributes import (
     _get_data_format,
     _is_all_float_dtype,
     _is_all_int_dtype,
     _quinlan_attributes,
 )
+
 from .conftest import no_raise
 
 # create sample series for different data types

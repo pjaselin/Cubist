@@ -26,7 +26,7 @@ def test_coefficient_iris_display(iris_dataset):
     """Test creating the readme iris coefficient plot"""
     model = Cubist().fit(*iris_dataset)
     CubistCoefficientDisplay.from_estimator(estimator=model)
-    plt.savefig("static/iris_coefficient_display.png")
+    plt.savefig("iris_coefficient_display.png")
 
 
 def test_coefficient_display_scatter_kwargs(ames_housing_dataset):

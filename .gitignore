@@ -211,6 +211,5 @@ __marimo__/
 
 # images produced from matplotlib tests
 **/*.png
-!static/*
 
 cubist/_cubist.c

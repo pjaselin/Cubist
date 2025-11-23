@@ -9,7 +9,7 @@ from sklearn.datasets import load_diabetes
 from sklearn.model_selection import train_test_split
 from sklearn.utils.validation import check_is_fitted
 
-from ..cubist import Cubist, CubistError
+from cubist import Cubist, CubistError
 
 
 def test_one_model_one_committee(california_housing_dataset):

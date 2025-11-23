@@ -2,7 +2,8 @@
 
 import pytest
 
-from .._utils import _format
+from cubist._utils import _format
+
 from .conftest import no_raise
 
 
