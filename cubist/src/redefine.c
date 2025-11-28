@@ -21,7 +21,7 @@
 #include "strbuf.h"
 
 /* Don't want to include R.h which has conflicts */
-extern void printf(const char *, ...);
+// extern void printf(const char *, ...);
 
 /*
  * Not sure what value to use, but it will be automatically increased
