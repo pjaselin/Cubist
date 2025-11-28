@@ -19,7 +19,6 @@
 #include "hash.h"
 #include "redefine.h"
 #include "strbuf.h"
-#include "transform.h"
 
 /* Don't want to include R.h which has conflicts */
 extern void Rprintf(const char *, ...);

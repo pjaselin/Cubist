@@ -5,7 +5,6 @@
 #include "redefine.h"
 #include "rulebasedmodels.h"
 #include "strbuf.h"
-#include "transform.h"
 
 /* Global variables defined in update.d */
 extern int Stage;
