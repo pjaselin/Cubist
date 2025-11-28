@@ -3,8 +3,8 @@
 import matplotlib.pyplot as plt
 import pytest
 
-from .._cubist_display_mixin import _CubistDisplayMixin
-from ..cubist import Cubist
+from cubist import Cubist
+from cubist._cubist_display_mixin import _CubistDisplayMixin
 
 
 def test_gridspec_kwargs_and_existing_plot(iris_dataset):

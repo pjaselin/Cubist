@@ -3,7 +3,7 @@
 from sklearn.datasets import make_regression
 from sklearn.utils.estimator_checks import parametrize_with_checks
 
-from ..cubist import Cubist
+from cubist import Cubist
 
 
 def expected_failed_checks(estimator):

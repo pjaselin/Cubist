@@ -32,6 +32,7 @@ jobs:
           - "3.11"
           - "3.12"
           - "3.13"
+          - "3.14"
     runs-on: ${{ matrix.os }}
     defaults:
       run:
@@ -69,7 +70,7 @@ jobs:
       - name: Test with pytest
         run: |
           uv run coverage run -m pytest --junit-xml=junit.xml -o junit_family=legacy
-          uv run coverage report -m
+          uv run coverage xml
 
       - name: Upload test results to Codecov
         if: ${{ !cancelled() }}
@@ -78,7 +79,7 @@ jobs:
           token: ${{ secrets.CODECOV_TOKEN }}
 
       - name: Upload Coverage to Codecov
-        uses: codecov/codecov-action@v4
+        uses: codecov/codecov-action@v5
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 

@@ -6,7 +6,8 @@ from copy import deepcopy
 import pytest
 from sklearn.utils.validation import check_is_fitted
 
-from ..cubist import Cubist, CubistError
+from cubist import Cubist, CubistError
+
 from .conftest import no_raise
 
 

@@ -50,7 +50,7 @@ class CubistCoefficientDisplay(_CubistDisplayMixin):
     >>> from sklearn.datasets import load_iris
     >>> from cubist import Cubist, CubistCoefficientDisplay
     >>> X, y = load_iris(return_X_y=True, as_frame=True)
-    >>> model = Cubist(n_rules=2).fit(X, y)
+    >>> model = Cubist().fit(X, y)
     >>> display = CubistCoefficientDisplay.from_estimator(estimator=model)
     >>> plt.show()
     """
