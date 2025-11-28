@@ -14,7 +14,7 @@ extern FILE *Uf;
 jmp_buf rbm_buf;
 
 /* Don't want to include R.h, which has conflicts with cubist headers */
-// extern void Rprintf(const char *, ...);
+extern void Rprintf(const char *, ...);
 
 /*
  * Reset all global variables to their initial value
@@ -170,8 +170,8 @@ void initglobals(void)
  * Set global variables in preparation for creating a model
  */
 void setglobals(int unbiased, char *composite, int neighbors, int committees,
-                double sample, int seed, int rules, double extrapolation,
-                int cv) {
+                double sample, int seed, int rules, double extrapolation) {
+  /* XXX What about setting FOLDS? */
 
   UNBIASED = unbiased != 0 ? bintrue : binfalse;
 
@@ -192,10 +192,6 @@ void setglobals(int unbiased, char *composite, int neighbors, int committees,
   KRInit = seed;
   MAXRULES = rules;
   EXTRAP = extrapolation;
-  FOLDS = cv;
-  if (FOLDS > 0){
-    XVAL = bintrue;
-  }
 }
 
 void setOf(void) {
@@ -205,7 +201,6 @@ void setOf(void) {
 
 char *closeOf(void) {
   if (Of) {
-
     rbm_fclose(Of);
     return strbuf_getall((STRBUF *)Of);
   } else {

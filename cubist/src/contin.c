@@ -3,7 +3,7 @@
 /*  Copyright 2010 Rulequest Research Pty Ltd.                           */
 /*                                                                       */
 /*  This file is part of Cubist GPL Edition, a single-threaded version   */
-/*  of Cubist release 2.07.                                           */
+/*  of Cubist release 2.07.                                              */
 /*                                                                       */
 /*  Cubist GPL Edition is free software: you can redistribute it and/or  */
 /*  modify it under the terms of the GNU General Public License as       */

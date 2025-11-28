@@ -22,5 +22,5 @@
 
 #define exit(X) rbm_exit(X)
 
-// #define printf Rprintf
-#define puts(X) printf("%s", X)
+#define printf Rprintf
+#define puts(X) Rprintf("%s", X)

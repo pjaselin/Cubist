@@ -29,9 +29,6 @@
 /*                                                                       */
 /*************************************************************************/
 
-#define _CRT_SECURE_NO_WARNINGS
-#include <sys/time.h>
-
 #include "defns.h"
 #include "extern.h"
 
@@ -472,7 +469,7 @@ FILE *GetFile(String Extension, String RW)
 /*                                                                       */
 /*************************************************************************/
 
-#include <time.h>
+#include <sys/time.h>
 
 double ExecTime(void)
 /*      --------  */
@@ -631,8 +628,8 @@ void DayToDate(int Day, String Date, size_t DT_size)
   }
 
   snprintf(Date, DT_size,
-          "%d/%d%d/%d%d",
-          Year, Month / 10, Month % 10, Day / 10, Day % 10);
+           "%d/%d%d/%d%d",
+           Year, Month / 10, Month % 10, Day / 10, Day % 10);
 }
 
 /*************************************************************************/
@@ -670,8 +667,8 @@ void SecsToTime(int Secs, String Time, size_t DT_size)
   Secs = Secs % 60;
 
   snprintf(Time, DT_size,
-          "%d%d:%d%d:%d%d",
-          Hour / 10, Hour % 10, Mins / 10, Mins % 10, Secs / 10, Secs % 10);
+           "%d%d:%d%d:%d%d",
+           Hour / 10, Hour % 10, Mins / 10, Mins % 10, Secs / 10, Secs % 10);
 }
 
 void SetTSBase(int y)

@@ -32,7 +32,7 @@
 #include "defns.h"
 #include "extern.h"
 
-#include <time.h>
+#include <sys/time.h>
 
 #include "redefine.h"
 #include "transform.h"
@@ -63,7 +63,7 @@ int cubistmain(void)
   if (!(F = GetFile(".data", "r")))
     Error(NOFILE, "", "");
   GetData(F, bintrue, binfalse);
-  fprintf(Of, TX_ReadData(MaxCase + 1, MaxAtt));
+  fprintf(Of, TX_ReadData(MaxCase + 1, MaxAtt, FileStem));
 
   if (XVAL && (F = GetFile(".test", "r"))) {
     SaveMaxCase = MaxCase;

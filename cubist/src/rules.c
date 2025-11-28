@@ -264,8 +264,8 @@ void PrintRules(RRuleSet RS, String Msg)
 void PrintRule(CRule R)
 /*   ---------  */
 {
-  Attribute Att;
   int c, d, dd, id, LineLen, EntryLen, Indent, NCoeff = 0;
+  Attribute Att;
   size_t size = 1000;
   char Entry[size];
   double *Model;
@@ -314,10 +314,10 @@ void PrintRule(CRule R)
     }
   }
 
-  snprintf(Entry, size, "%s =", AttName[ClassAtt]);
+  snprintf(Entry, size,  "%s =", AttName[ClassAtt]);
   Indent = CharWidth(Entry);
 
-  snprintf(Entry + Indent, size, " %.14g", Model[0]);
+  snprintf(Entry + Indent, size - Indent, " %.14g", Model[0]);
   fprintf(Of, "\t%s", Entry);
   LineLen = CharWidth(Entry);
 

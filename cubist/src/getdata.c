@@ -36,23 +36,16 @@
 
 #include "redefine.h"
 #include "transform.h"
-// #include "nmath.h"
-//#include <Rmath.h>
-
-float runif( float min, float max )
-{
-    float scale = rand() / (float) RAND_MAX; /* [0, 1.0] */
-    return min + scale * ( max - min );      /* [min, max] */
-}
+#include <Rmath.h>
 
 /*  Alternative random number generator  */
 
 #define AltRandom my_rand()
 static double my_rand(void) {
   double dval;
-  // GetRNGstate();
+  GetRNGstate();
   dval = runif(0, 1);
-  // PutRNGstate();
+  PutRNGstate();
   return dval;
 }
 

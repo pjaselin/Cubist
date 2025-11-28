@@ -54,7 +54,7 @@ AttValue *KDBlock; /* copy of instances in KDTree order to
 /* Prepare for instance-based prediction     */
 /*                                                                       */
 /* The modified K-D tree algorithm adds to each instance the  */
-/* distances to two "reference" points.  The first is an artificial  */
+/* distances to two "reference" points.  The first is an artifical  */
 /* point intended to play the role of an origin: its value for an  */
 /* attribute should be lower than most of the instances' values.  */
 /* The second reference point is the instance that is furthest  */

@@ -181,7 +181,6 @@ void WriteFilePrefix(String Extension)
 void ReadFilePrefix(String Extension)
 /*   --------------  */
 {
-
   if (!(Mf = GetFile(Extension, "r")))
     Error(NOFILE, Fn, "");
 
