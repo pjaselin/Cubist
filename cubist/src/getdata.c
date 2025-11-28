@@ -36,7 +36,6 @@
 
 #include "redefine.h"
 #include "transform.h"
-#include <Rmath.h>
 
 /*  Alternative random number generator  */
 
