@@ -13,7 +13,7 @@ extern void FreeCases(void);
 static void cubist(char **namesv, char **datav, int *unbiased,
                    char **compositev, int *neighbors, int *committees,
                    double *sample, int *seed, int *rules, double *extrapolation,
-                   char **modelv, char **outputv) {
+                   int *cv, char **modelv, char **outputv) {
   int val; /* Used by setjmp/longjmp for implementing rbm_exit */
 
   // Announce ourselves for testing
