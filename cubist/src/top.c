@@ -16,9 +16,6 @@ static void cubist(char **namesv, char **datav, int *unbiased,
                    int *cv, char **modelv, char **outputv) {
   int val; /* Used by setjmp/longjmp for implementing rbm_exit */
 
-  // Announce ourselves for testing
-  // Rprintf("cubist called\n");
-
   // Initialize the globals to the values that the cubist
   // program would have at the start of execution
   initglobals();
