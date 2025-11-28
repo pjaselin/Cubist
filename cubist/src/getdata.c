@@ -37,6 +37,12 @@
 #include "redefine.h"
 #include "transform.h"
 
+float runif( float min, float max )
+{
+    float scale = rand() / (float) RAND_MAX; /* [0, 1.0] */
+    return min + scale * ( max - min );      /* [min, max] */
+}
+
 /*  Alternative random number generator  */
 
 #define AltRandom my_rand()
