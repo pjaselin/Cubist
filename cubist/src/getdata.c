@@ -48,9 +48,7 @@ float runif( float min, float max )
 #define AltRandom my_rand()
 static double my_rand(void) {
   double dval;
-  // GetRNGstate();
   dval = runif(0, 1);
-  // PutRNGstate();
   return dval;
 }
 

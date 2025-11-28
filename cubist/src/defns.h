@@ -445,11 +445,6 @@ typedef struct _elt_rec {
 /*									 */
 /*************************************************************************/
 
-/* for R c functions */
-
-// void GetRNGstate(void);
-// void PutRNGstate(void);
-
 /* cubist.c */
 
 int Xmain(int, char *[]);
