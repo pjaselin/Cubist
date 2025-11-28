@@ -57,7 +57,7 @@ void SingleCttee(void)
   NotifyStage(EVALTRAIN);
   Progress(-(MaxCase + 1.0));
 
-  EvaluateCttee(Cttee, false);
+  EvaluateCttee(Cttee, binfalse);
 
   if ((F = GetFile((SAMPLE ? ".data" : ".test"), "r"))) {
     NotifyStage(READTEST);
@@ -72,14 +72,14 @@ void SingleCttee(void)
     }
     Case = Nil;
 
-    GetData(F, false, false);
+    GetData(F, binfalse, binfalse);
 
     fprintf(Of, T_EvalTest, MaxCase + 1);
 
     NotifyStage(EVALTEST);
     Progress(-(MaxCase + 1.0));
 
-    EvaluateCttee(Cttee, true);
+    EvaluateCttee(Cttee, bintrue);
   } else if ((F = GetFile(".pred", "r"))) {
     fclose(F);
     remove(Fn); /* set by GetFile */
@@ -111,7 +111,7 @@ void ConstructCttee(void)
   FindGlobalProperties();
 
   if (CHOOSEMODE)
-    USEINSTANCES = true;
+    USEINSTANCES = bintrue;
 
   /*  Set minimum target coverage for a rule as 1% of cases (to a
       maximum of 20).  However, it must be at least MINSPLIT and
@@ -161,7 +161,7 @@ void ConstructCttee(void)
     /*  Calculate the error reduction achieved by committee model  */
 
     SaveUSEINSTANCES = USEINSTANCES;
-    USEINSTANCES = false;
+    USEINSTANCES = binfalse;
 
     FindPredictedValues(Cttee, 0, MaxCase);
 
@@ -194,7 +194,8 @@ RRuleSet ConstructRuleSet(int ModelNo)
 /*       ----------------  */
 {
   RRuleSet RS;
-  char Msg[20];
+  size_t size = 20;
+  char Msg[size];
   CaseNo i;
   RuleNo r;
   float TempMTSize;
@@ -227,9 +228,9 @@ RRuleSet ConstructRuleSet(int ModelNo)
   ForEach(r, 1, RS->SNRules) { RS->SRule[r]->MNo = ModelNo; }
 
   if (MEMBERS > 1) {
-    sprintf(Msg, "Model %d:", ModelNo + 1);
+    snprintf(Msg, size, "Model %d:", ModelNo + 1);
   } else {
-    sprintf(Msg, "Model:");
+    snprintf(Msg, size, "Model:");
   }
 
   PrintRules(RS, Msg);
@@ -370,7 +371,8 @@ void AttributeUsage(void)
   int m;
   RuleNo r;
   Attribute Att, BestAtt;
-  char U1[5], U2[5];
+  size_t size = 5;
+  char U1[size], U2[size];
 
   /*  Initialise counts  */
 
@@ -391,7 +393,7 @@ void AttributeUsage(void)
 
   fprintf(Of, T_AttUsage);
 
-  while (true) {
+  while (bintrue) {
     BestAtt = 0;
 
     ForEach(Att, 1, MaxAtt) {
@@ -406,8 +408,8 @@ void AttributeUsage(void)
     if (!BestAtt)
       break;
 
-    sprintf(U1, "%3.0f%%", rint((100.0 * SumCond[BestAtt]) / SumCases));
-    sprintf(U2, "%3.0f%%", rint((100.0 * SumModel[BestAtt]) / SumCases));
+    snprintf(U1, size, "%3.0f%%", rint((100.0 * SumCond[BestAtt]) / SumCases));
+    snprintf(U2, size, "%3.0f%%", rint((100.0 * SumModel[BestAtt]) / SumCases));
 
     fprintf(Of, "\t  %4s   %4s    %s\n",
             (SumCond[BestAtt] >= 0.01 * SumCases ? U1 : " "),
@@ -433,7 +435,7 @@ void UpdateUsage(CRule R)
   /*  Attributes used in conditions.  Must assemble in table in case
       same attribute appears more than once  */
 
-  memset(AttUsed, false, MaxAtt + 1);
+  memset(AttUsed, binfalse, MaxAtt + 1);
 
   ForEach(d, 1, R->Size) { NoteUsed(R->Lhs[d]->Tested); }
 
@@ -444,7 +446,7 @@ void UpdateUsage(CRule R)
 
   /*  Attributes used in model  */
 
-  memset(AttUsed, false, MaxAtt + 1);
+  memset(AttUsed, binfalse, MaxAtt + 1);
 
   ForEach(Att, 1, MaxAtt) {
     if (R->Rhs[Att])
@@ -465,7 +467,7 @@ void NoteUsed(Attribute Att)
   if (AttUsed[Att])
     return;
 
-  AttUsed[Att] = true;
+  AttUsed[Att] = bintrue;
 
   if (AttDef[Att]) {
     /*  Include attributes that appear in definition  */

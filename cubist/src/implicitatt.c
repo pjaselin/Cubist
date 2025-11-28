@@ -53,12 +53,12 @@ AttValue _UNK, /* quasi-constant for unknown value */
 #define FailSyn(Msg)                                                           \
   {                                                                            \
     DefSyntaxError(Msg);                                                       \
-    return false;                                                              \
+    return binfalse;                                                              \
   }
 #define FailSem(Msg)                                                           \
   {                                                                            \
     DefSemanticsError(Fi, Msg, OpCode);                                        \
-    return false;                                                              \
+    return binfalse;                                                              \
   }
 
 typedef union _xstack_elt {
@@ -100,7 +100,7 @@ void ImplicitAtt(FILE *Nf)
 
   ReadDefinition(Nf);
 
-  PreviousError = false;
+  PreviousError = binfalse;
   BN = 0;
 
   /*  Allocate initial stack and attribute definition  */
@@ -161,13 +161,13 @@ void ImplicitAtt(FILE *Nf)
 void ReadDefinition(FILE *f)
 /*   --------------  */
 {
-  Boolean LastWasPeriod = false;
+  Boolean LastWasPeriod = binfalse;
   char c;
 
   Buff = Alloc(BuffSize = 50, char);
   BN = 0;
 
-  while (true) {
+  while (bintrue) {
     c = InChar(f);
 
     if (c == '|')
@@ -247,7 +247,7 @@ Boolean Expression(void)
     DumpOp(OP_OR, Fi);
   }
 
-  return true;
+  return bintrue;
 }
 
 Boolean Conjunct(void)
@@ -267,7 +267,7 @@ Boolean Conjunct(void)
     DumpOp(OP_AND, Fi);
   }
 
-  return true;
+  return bintrue;
 }
 
 String RelOps[] = {">=", "<=", "!=", "<>", ">", "<", "=", (String)0};
@@ -301,7 +301,7 @@ Boolean SExpression(void)
            Fi);
   }
 
-  return true;
+  return bintrue;
 }
 
 String AddOps[] = {"+", "-", (String)0};
@@ -333,7 +333,7 @@ Boolean AExpression(void)
     DumpOp((char)(OP_PLUS + o), Fi);
   }
 
-  return true;
+  return bintrue;
 }
 
 String MultOps[] = {"*", "/", "%", (String)0};
@@ -355,7 +355,7 @@ Boolean Term(void)
     DumpOp((char)(OP_MULT + o), Fi);
   }
 
-  return true;
+  return bintrue;
 }
 
 Boolean Factor(void)
@@ -375,14 +375,14 @@ Boolean Factor(void)
     DumpOp(OP_POW, Fi);
   }
 
-  return true;
+  return bintrue;
 }
 
 Boolean Primary(void)
 /*      -------  */
 {
   if (Atom()) {
-    return true;
+    return bintrue;
   } else if (Find("(")) {
     BN++;
     if (!Expression())
@@ -390,7 +390,7 @@ Boolean Primary(void)
     if (!Find(")"))
       FailSyn("')'");
     BN++;
-    return true;
+    return bintrue;
   } else {
     FailSyn("attribute, value, or '('");
   }
@@ -498,10 +498,10 @@ Boolean Atom(void)
       Dump(OP_STR, 0, strdup("N/A"), Fi);
     }
   } else {
-    return false;
+    return binfalse;
   }
 
-  return true;
+  return bintrue;
 }
 
 /*************************************************************************/
@@ -516,7 +516,7 @@ Boolean Find(String S)
   if (Buff[BN] == ' ')
     BN++;
 
-  return (!Buff[BN] ? false : !memcmp(Buff + BN, S, strlen(S)));
+  return (!Buff[BN] ? binfalse : !memcmp(Buff + BN, S, strlen(S)));
 }
 
 /*************************************************************************/
@@ -590,94 +590,96 @@ void DefSyntaxError(String Msg)
     }
 
     Error(BADDEF1, RestOfText, Msg);
-    PreviousError = true;
+    PreviousError = bintrue;
   }
 }
 
 void DefSemanticsError(int Fi, String Msg, int OpCode)
 /*   -----------------  */
 {
-  char Exp[1000], XMsg[1008], Op[1000];
+  size_t size = 1000;
+  size_t size_x = 1008;
+  char Exp[size], XMsg[size_x], Op[size];
 
   if (!PreviousError) {
     /*  Abbreviate the input if necessary  */
 
     if (BN - Fi > 23) {
-      sprintf(Exp, "%.10s...%.10s", Buff + Fi, Buff + BN - 10);
+      snprintf(Exp, size, "%.10s...%.10s", Buff + Fi, Buff + BN - 10);
     } else {
-      sprintf(Exp, "%.*s", BN - Fi, Buff + Fi);
+      snprintf(Exp, size, "%.*s", BN - Fi, Buff + Fi);
     }
 
     switch (OpCode) {
     case OP_AND:
-      sprintf(Op, "%s", "and");
+      snprintf(Op, size, "%s", "and");
       break;
     case OP_OR:
-      sprintf(Op, "%s", "or");
+      snprintf(Op, size, "%s", "or");
       break;
     case OP_SEQ:
     case OP_EQ:
-      sprintf(Op, "%s", "=");
+      snprintf(Op, size, "%s", "=");
       break;
     case OP_SNE:
     case OP_NE:
-      sprintf(Op, "%s", "<>");
+      snprintf(Op, size, "%s", "<>");
       break;
     case OP_GT:
-      sprintf(Op, "%s", ">");
+      snprintf(Op, size, "%s", ">");
       break;
     case OP_GE:
-      sprintf(Op, "%s", ">=");
+      snprintf(Op, size, "%s", ">=");
       break;
     case OP_LT:
-      sprintf(Op, "%s", "<");
+      snprintf(Op, size, "%s", "<");
       break;
     case OP_LE:
-      sprintf(Op, "%s", "<=");
+      snprintf(Op, size, "%s", "<=");
       break;
     case OP_PLUS:
-      sprintf(Op, "%s", "+");
+      snprintf(Op, size, "%s", "+");
       break;
     case OP_MINUS:
-      sprintf(Op, "%s", "-");
+      snprintf(Op, size, "%s", "-");
       break;
     case OP_UMINUS:
-      sprintf(Op, "%s", "unary -");
+      snprintf(Op, size, "%s", "unary -");
       break;
     case OP_MULT:
-      sprintf(Op, "%s", "*");
+      snprintf(Op, size, "%s", "*");
       break;
     case OP_DIV:
-      sprintf(Op, "%s", "/");
+      snprintf(Op, size, "%s", "/");
       break;
     case OP_MOD:
-      sprintf(Op, "%s", "%");
+      snprintf(Op, size, "%s", "%");
       break;
     case OP_POW:
-      sprintf(Op, "%s", "^");
+      snprintf(Op, size, "%s", "^");
       break;
     case OP_SIN:
-      sprintf(Op, "%s", "sin");
+      snprintf(Op, size, "%s", "sin");
       break;
     case OP_COS:
-      sprintf(Op, "%s", "cos");
+      snprintf(Op, size, "%s", "cos");
       break;
     case OP_TAN:
-      sprintf(Op, "%s", "tan");
+      snprintf(Op, size, "%s", "tan");
       break;
     case OP_LOG:
-      sprintf(Op, "%s", "log");
+      snprintf(Op, size, "%s", "log");
       break;
     case OP_EXP:
-      sprintf(Op, "%s", "exp");
+      snprintf(Op, size, "%s", "exp");
       break;
     case OP_INT:
-      sprintf(Op, "%s", "int");
+      snprintf(Op, size, "%s", "int");
     }
 
-    sprintf(XMsg, "%s with '%s'", Msg, Op);
+    snprintf(XMsg, size_x, "%s with '%s'", Msg, Op);
     Error(BADDEF2, Exp, XMsg);
-    PreviousError = true;
+    PreviousError = bintrue;
   }
 }
 
@@ -811,7 +813,7 @@ Boolean UpdateTStack(char OpCode, ContValue F, String S, int Fi)
   TStack[TSN].Li = BN - 1;
   TSN++;
 
-  return true;
+  return bintrue;
 }
 
 /*************************************************************************/

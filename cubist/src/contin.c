@@ -3,7 +3,7 @@
 /*  Copyright 2010 Rulequest Research Pty Ltd.                           */
 /*                                                                       */
 /*  This file is part of Cubist GPL Edition, a single-threaded version   */
-/*  of Cubist release 2.07.                                           */
+/*  of Cubist release 2.07.                                              */
 /*                                                                       */
 /*  Cubist GPL Edition is free software: you can redistribute it and/or  */
 /*  modify it under the terms of the GNU General Public License as       */
@@ -228,7 +228,7 @@ void AdjustAllThresholds(Tree T)
 
   ForEach(Att, 1, MaxAtt) {
     if (Continuous(Att)) {
-      Sorted = false;
+      Sorted = binfalse;
       AdjustThresholds(T, Att);
     }
   }
@@ -248,7 +248,7 @@ void AdjustThresholds(Tree T, Attribute Att)
       ForEach(i, 0, MaxCase) { SRec[i].V = CVal(Case[i], Att); }
 
       Cachesort(0, MaxCase);
-      Sorted = true;
+      Sorted = bintrue;
     }
 
     T->Cut = GreatestValueBelow(T->Cut);

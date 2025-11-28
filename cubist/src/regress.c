@@ -64,16 +64,16 @@ void Regress(CaseNo Fp, CaseNo Lp, double *Model)
   GEnv.ModelAtt[0] = 0;
 
   GEnv.Mean[0] = GEnv.Var[0] = Model[0] = GEnv.AvDev[0] = 0;
-  GEnv.ZeroCoeff[0] = false;
+  GEnv.ZeroCoeff[0] = binfalse;
 
   ForEach(Att, 1, MaxAtt) {
     if (Continuous(Att) && Att != ClassAtt && !Skip(Att) &&
         (!GEnv.DoNotUse || !GEnv.DoNotUse[Att])) {
       GEnv.ModelAtt[++GEnv.NModelAtt] = Att;
       GEnv.Mean[Att] = GEnv.Var[Att] = Model[Att] = GEnv.AvDev[Att] = 0;
-      GEnv.ZeroCoeff[Att] = false;
+      GEnv.ZeroCoeff[Att] = binfalse;
     } else {
-      GEnv.ZeroCoeff[Att] = true;
+      GEnv.ZeroCoeff[Att] = bintrue;
     }
   }
 
@@ -87,7 +87,7 @@ void Regress(CaseNo Fp, CaseNo Lp, double *Model)
       Att = GEnv.ModelAtt[a];
 
       if (a > 0 && NotApplic(Case[i], Att)) {
-        GEnv.ZeroCoeff[Att] = true;
+        GEnv.ZeroCoeff[Att] = bintrue;
         GEnv.ModelAtt[a--] = GEnv.ModelAtt[GEnv.NModelAtt--];
       } else {
         GEnv.Mean[Att] += Wt * (Val = CVal(Case[i], Att));
@@ -105,7 +105,7 @@ void Regress(CaseNo Fp, CaseNo Lp, double *Model)
         (GEnv.Var[Att] - Cases * GEnv.Mean[Att] * GEnv.Mean[Att]) / (Cases - 1);
 
     if (GEnv.Var[Att] < 1E-6) {
-      GEnv.ZeroCoeff[Att] = true;
+      GEnv.ZeroCoeff[Att] = bintrue;
       GEnv.ModelAtt[a--] = GEnv.ModelAtt[GEnv.NModelAtt--];
     }
   }
@@ -165,7 +165,7 @@ void Regress(CaseNo Fp, CaseNo Lp, double *Model)
   Model[0] += Bias / Cases;
 
   Kp = Fp - 1;
-  First = true;
+  First = bintrue;
 
   ForEach(i, Fp, Lp) {
     if (fabs(GEnv.Resid[i]) > 5 * AvResid) {
@@ -174,7 +174,7 @@ void Regress(CaseNo Fp, CaseNo Lp, double *Model)
 
       if (First) {
         FindActiveAtts();
-        First = false;
+        First = binfalse;
       }
 
       /*  Remove contribution of this case  */
@@ -280,7 +280,7 @@ void Solve(double *Model)
 {
   int j, k, jj, max;
   double Pivot, MinPivot, MaxElt, Try;
-  Boolean Singular = false;
+  Boolean Singular = binfalse;
 
   if (!GEnv.NModelAtt) {
     Model[0] = GEnv.xTy[0] / GEnv.xTx[0][0];
@@ -331,7 +331,7 @@ void Solve(double *Model)
         matrix is singular and exclude this attribute  */
 
     if (Pivot < MinPivot) {
-      GEnv.ZeroCoeff[GEnv.ModelAtt[j]] = Singular = true;
+      GEnv.ZeroCoeff[GEnv.ModelAtt[j]] = Singular = bintrue;
       Verbosity(3, printf("=== no pivot for %s (%g, max elt=%g)\n",
                           AttName[GEnv.ModelAtt[j]], Pivot, MaxElt))
     } else {
@@ -496,7 +496,7 @@ void SimplifyModel(DataRec *D, CaseNo Fp, CaseNo Lp, double *Model)
                 fprintf(Of, "\n");
               })
 
-        Stable = true;
+        Stable = bintrue;
     Drop = 0;
     ForEach(a, 1, GEnv.NModelAtt) {
       Att = GEnv.ModelAtt[a];
@@ -508,7 +508,7 @@ void SimplifyModel(DataRec *D, CaseNo Fp, CaseNo Lp, double *Model)
       }
 
       if (Contrib > 1000 * GEnv.AvDev[0])
-        Stable = false;
+        Stable = binfalse;
     }
 
     /*  Check whether current model is best so far  */
@@ -533,7 +533,7 @@ void SimplifyModel(DataRec *D, CaseNo Fp, CaseNo Lp, double *Model)
                            GEnv.AvDev[Drop]))
 
           Model[Drop] = 0;
-      GEnv.ZeroCoeff[Drop] = true;
+      GEnv.ZeroCoeff[Drop] = bintrue;
 
       /*  Construct new model using remaining attributes  */
 

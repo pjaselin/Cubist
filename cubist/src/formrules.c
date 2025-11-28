@@ -252,13 +252,13 @@ void PruneRule(Condition Cond[], float InitCoeffs)
 
   Bestd = 0;
 
-  ForEach(d, 0, NCond) { Deleted[d] = false; }
+  ForEach(d, 0, NCond) { Deleted[d] = binfalse; }
 
   /*  Find conditions to delete  */
 
   Verbosity(1, fprintf(Of, "\n  Pruning rule"))
 
-      while (true) {
+      while (bintrue) {
     /*  Initialise or update fail lists, totals, and predicted errors  */
 
     ProcessLists();
@@ -303,7 +303,7 @@ void PruneRule(Condition Cond[], float InitCoeffs)
 
     Verbosity(1, fprintf(Of, "\teliminate test %d\n", Bestid))
 
-        Deleted[Bestd] = true;
+        Deleted[Bestd] = bintrue;
     Remaining--;
   }
 
