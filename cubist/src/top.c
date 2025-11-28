@@ -1,6 +1,5 @@
-#include <R.h>
-#include <R_ext/Rdynload.h>
-#include <Rinternals.h>
+#define PY_SSIZE_T_CLEAN
+#include <Python.h>
 #include <setjmp.h>
 
 #include "redefine.h"
