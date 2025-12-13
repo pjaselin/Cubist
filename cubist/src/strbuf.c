@@ -297,7 +297,6 @@ char *strbuf_gets(STRBUF *sb, char *s, unsigned int n) {
   int i, j;
 
   for (i = 0, j = sb->i; i < n - 1 && j < sb->n && c != '\n'; i++, j++) {
-    /* XXX Does this need to be cast to a char? */
     s[i] = sb->buf[j];
     c = sb->buf[j];
   }

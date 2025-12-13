@@ -4,7 +4,7 @@
 #include <stdarg.h>
 
 typedef struct _STRBUF {
-  char *buf; // The buffer itself
+  char *buf;          // The buffer itself
   unsigned int i;     // Current position in buffer
   unsigned int n;     // Current size of the data in the buffer
   unsigned int len;   // Current length of buffer

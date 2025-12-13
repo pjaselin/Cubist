@@ -50,7 +50,7 @@ Boolean NewRule(Condition Cond[], int NCond, Boolean *Deleted, CaseCount Cover,
   int d, dd, id, r, Size = 0, Bytes;
   CRule R;
   Condition *Lhs;
-  Boolean Exclude = false;
+  Boolean Exclude = binfalse;
   float Range, V;
   extern double *Total;
 
@@ -80,14 +80,14 @@ Boolean NewRule(Condition Cond[], int NCond, Boolean *Deleted, CaseCount Cover,
       memcpy(Lhs[d]->Subset, Cond[dd]->Subset, Bytes);
     }
 
-    Deleted[dd] = true;
+    Deleted[dd] = bintrue;
   }
 
   /*  See if rule already exists  */
 
   for (r = 1; !Exclude && r <= NRules; r++) {
     if (SameRule(r, Lhs, Size)) {
-      Verbosity(1, fprintf(Of, "\tduplicates rule %d\n", r)) Exclude = true;
+      Verbosity(1, fprintf(Of, "\tduplicates rule %d\n", r)) Exclude = bintrue;
 
       /*  Save this model if has lower estimated error  */
 
@@ -109,7 +109,7 @@ Boolean NewRule(Condition Cond[], int NCond, Boolean *Deleted, CaseCount Cover,
 
     FreeVector((void **)Lhs, 1, Size);
 
-    return false;
+    return binfalse;
   }
 
   /*  Make sure there is enough room for the new rule  */
@@ -148,7 +148,7 @@ Boolean NewRule(Condition Cond[], int NCond, Boolean *Deleted, CaseCount Cover,
 
   Verbosity(1, PrintRule(R))
 
-      return true;
+      return bintrue;
 }
 
 /*************************************************************************/
@@ -163,26 +163,26 @@ Boolean SameRule(RuleNo r, Condition Cond[], int NConds)
   int d, i, Bytes;
 
   if (Rule[r]->Size != NConds) {
-    return false;
+    return binfalse;
   }
 
   ForEach(d, 1, NConds) {
     if (Rule[r]->Lhs[d]->NodeType != Cond[d]->NodeType ||
         Rule[r]->Lhs[d]->Tested != Cond[d]->Tested) {
-      return false;
+      return binfalse;
     }
 
     switch (Cond[d]->NodeType) {
     case BrDiscr:
       if (Rule[r]->Lhs[d]->TestValue != Cond[d]->TestValue) {
-        return false;
+        return binfalse;
       }
       break;
 
     case BrThresh:
       if (Rule[r]->Lhs[d]->TestValue != Cond[d]->TestValue ||
           Rule[r]->Lhs[d]->Cut != Cond[d]->Cut) {
-        return false;
+        return binfalse;
       }
       break;
 
@@ -190,13 +190,13 @@ Boolean SameRule(RuleNo r, Condition Cond[], int NConds)
       Bytes = (MaxAttVal[Cond[d]->Tested] >> 3) + 1;
       ForEach(i, 0, Bytes - 1) {
         if (Rule[r]->Lhs[d]->Subset[i] != Cond[d]->Subset[i]) {
-          return false;
+          return binfalse;
         }
       }
     }
   }
 
-  return true;
+  return bintrue;
 }
 
 /*************************************************************************/
@@ -264,9 +264,10 @@ void PrintRules(RRuleSet RS, String Msg)
 void PrintRule(CRule R)
 /*   ---------  */
 {
-  Attribute Att;
   int c, d, dd, id, LineLen, EntryLen, Indent, NCoeff = 0;
-  char Entry[1000];
+  Attribute Att;
+  size_t size = 1000;
+  char Entry[size];
   double *Model;
   float *Importance;
 
@@ -313,10 +314,10 @@ void PrintRule(CRule R)
     }
   }
 
-  sprintf(Entry, "%s =", AttName[ClassAtt]);
+  snprintf(Entry, size,  "%s =", AttName[ClassAtt]);
   Indent = CharWidth(Entry);
 
-  sprintf(Entry + Indent, " %.14g", Model[0]);
+  snprintf(Entry + Indent, size - Indent, " %.14g", Model[0]);
   fprintf(Of, "\t%s", Entry);
   LineLen = CharWidth(Entry);
 
@@ -332,7 +333,7 @@ void PrintRule(CRule R)
 
     /*  Print, breaking lines when necessary  */
 
-    sprintf(Entry, " %c %.14g %s", (Model[Att] > 0 ? '+' : '-'),
+    snprintf(Entry, size, " %c %.14g %s", (Model[Att] > 0 ? '+' : '-'),
             fabs(Model[Att]), AttName[Att]);
     EntryLen = CharWidth(Entry);
 
@@ -357,10 +358,11 @@ void PrintCondition(Condition C)
 /*  --------------  */
 {
   DiscrValue v, pv, Last, Values = 0;
-  Boolean First = true;
+  Boolean First = bintrue;
   Attribute Att;
   int Col, Base, Entry;
-  char CVS[20];
+  size_t size = 20;
+  char CVS[size];
 
   v = C->TestValue;
   Att = C->Tested;
@@ -381,7 +383,7 @@ void PrintCondition(Condition C)
     if (v == 1) {
       fprintf(Of, " = N/A\n");
     } else {
-      CValToStr(C->Cut, Att, CVS);
+      CValToStr(C->Cut, Att, CVS, size);
       fprintf(Of, " %s %s\n", (v == 2 ? "<=" : ">"), CVS);
     }
     break;
@@ -422,7 +424,7 @@ void PrintCondition(Condition C)
         Entry = CharWidth(AttValName[Att][pv]);
 
         if (First) {
-          First = false;
+          First = binfalse;
         } else if (Col + Entry + 2 >= Width) {
           Col = Base;
           fprintf(Of, ",\n%*s", Col, "");

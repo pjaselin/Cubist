@@ -21,7 +21,7 @@
 #include "strbuf.h"
 
 /* Don't want to include R.h which has conflicts */
-// extern void Rprintf(const char *, ...);
+// extern void printf(const char *, ...);
 
 /*
  * Not sure what value to use, but it will be automatically increased
@@ -52,7 +52,7 @@ int rbm_init(void) {
 
 /* This is similar to rbm_fopen */
 int rbm_register(STRBUF *sb, const char *filename, int force) {
-  // Rprintf("rbm_register: registering file: %s\n", filename);
+  // printf("rbm_register: registering file: %s\n", filename);
 
   if (ht_lookup(strbufv, filename) != NULL) {
     if (force) {
@@ -77,7 +77,7 @@ int rbm_register(STRBUF *sb, const char *filename, int force) {
 
 /* This is similar to rbm_remove, but doesn't destroy the STRBUF */
 int rbm_deregister(const char *filename) {
-  // Rprintf("rbm_deregister: deregistering file: %s\n", filename);
+  // printf("rbm_deregister: deregistering file: %s\n", filename);
 
   if (ht_delete(strbufv, filename) != 0) {
     printf("rbm_deregister: error: file not registered: %s\n", filename);
@@ -103,7 +103,7 @@ FILE *rbm_fopen(const char *filename, const char *mode) {
 
   /* Only the "w" mode is currently supported */
   if (strcmp(mode, "w") == 0) {
-    // Rprintf("rbm_fopen: opening file to write: %s\n", filename);
+    // printf("rbm_fopen: opening file to write: %s\n", filename);
     sb = strbuf_create_empty(STRBUF_LEN);
     if (id != NULL) {
       printf("rbm_fopen: warning: destroying previous STRBUF: %s\n", filename);
@@ -111,7 +111,7 @@ FILE *rbm_fopen(const char *filename, const char *mode) {
     }
     ht_setvoid(strbufv, filename, sb);
   } else {
-    // Rprintf("rbm_fopen: opening file to read: %s\n", filename);
+    // printf("rbm_fopen: opening file to read: %s\n", filename);
     sb = id;
     if (sb != NULL) {
       if (sb->open) {
@@ -122,7 +122,7 @@ FILE *rbm_fopen(const char *filename, const char *mode) {
         strbuf_rewind(sb);
       }
     } else {
-      // Rprintf("rbm_fopen: no such file: %s\n", filename);
+      // printf("rbm_fopen: no such file: %s\n", filename);
       sb = NULL;
     }
   }

@@ -149,7 +149,7 @@ void initglobals(void)
 
   SAMPLE = 0.0;
   KRInit = 0;
-  LOCK = false;
+  LOCK = binfalse;
 
   MINITEMS = 0;
   MAXRULES = 100;
@@ -170,20 +170,20 @@ void initglobals(void)
  * Set global variables in preparation for creating a model
  */
 void setglobals(int unbiased, char *composite, int neighbors, int committees,
-                double sample, int seed, int rules, double extrapolation,
-                int cv) {
+                double sample, int seed, int rules, double extrapolation) {
+  /* XXX What about setting FOLDS? */
 
-  UNBIASED = unbiased != 0 ? true : false;
+  UNBIASED = unbiased != 0 ? bintrue : binfalse;
 
   if (strcmp(composite, "yes") == 0) {
-    USEINSTANCES = true;
-    CHOOSEMODE = false;
+    USEINSTANCES = bintrue;
+    CHOOSEMODE = binfalse;
   } else if (strcmp(composite, "auto") == 0) {
-    USEINSTANCES = true;
-    CHOOSEMODE = true;
+    USEINSTANCES = bintrue;
+    CHOOSEMODE = bintrue;
   } else {
     USEINSTANCES = neighbors > 0;
-    CHOOSEMODE = false;
+    CHOOSEMODE = binfalse;
   }
 
   NN = neighbors;
@@ -192,10 +192,6 @@ void setglobals(int unbiased, char *composite, int neighbors, int committees,
   KRInit = seed;
   MAXRULES = rules;
   EXTRAP = extrapolation;
-  FOLDS = cv;
-  if (FOLDS > 0){
-    XVAL = true;
-  }
 }
 
 void setOf(void) {
@@ -205,7 +201,6 @@ void setOf(void) {
 
 char *closeOf(void) {
   if (Of) {
-
     rbm_fclose(Of);
     return strbuf_getall((STRBUF *)Of);
   } else {

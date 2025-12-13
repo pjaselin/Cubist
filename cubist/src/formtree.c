@@ -257,10 +257,10 @@ void FormTree(CaseNo Fp, CaseNo Lp, int Level, Tree *Result, Tree Parent)
       /*  Find local model and residuals  */
 
       if (!(Root = (Lp - Fp >= MaxCase))) {
-    ForEach(Att, 1, MaxAtt) { GEnv.DoNotUse[Att] = true; }
+    ForEach(Att, 1, MaxAtt) { GEnv.DoNotUse[Att] = bintrue; }
 
     for (P = Parent; P; P = Parent(P)) {
-      GEnv.DoNotUse[P->Tested] = false;
+      GEnv.DoNotUse[P->Tested] = binfalse;
     }
 
     AddDefAtts();
@@ -392,11 +392,11 @@ void AddModels(CaseNo Fp, CaseNo Lp, Tree T, Tree Parent)
 
   /*  Find a new model for this node  */
 
-  ForEach(Att, 1, MaxAtt) { GEnv.DoNotUse[Att] = true; }
+  ForEach(Att, 1, MaxAtt) { GEnv.DoNotUse[Att] = bintrue; }
 
   while (Parent) {
     if (Continuous((Att = Parent->Tested))) {
-      GEnv.DoNotUse[Att] = false;
+      GEnv.DoNotUse[Att] = binfalse;
     }
 
     Parent = Parent(Parent);
@@ -519,7 +519,7 @@ void AddSplitAtts(Tree T)
 
   if (T->NodeType) {
     if (Continuous(T->Tested)) {
-      GEnv.DoNotUse[T->Tested] = false;
+      GEnv.DoNotUse[T->Tested] = binfalse;
     }
 
     ForEach(v, 1, T->Forks) { AddSplitAtts(T->Branch[v]); }
@@ -547,7 +547,7 @@ void AddDefAtts(void)
             !GEnv.DoNotUse[(long)(intptr_t)DefSVal(D[e])]) {
           Verbosity(2, fprintf(Of, "adding %s from %s\n", AttName[Att],
                                AttName[(int)DefSVal(D[e])]))
-              GEnv.DoNotUse[Att] = false;
+              GEnv.DoNotUse[Att] = binfalse;
           break;
         } else if (DefOp(D[e]) == OP_END) {
           break;
