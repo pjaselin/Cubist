@@ -228,7 +228,7 @@ void AdjustAllThresholds(Tree T)
 
   ForEach(Att, 1, MaxAtt) {
     if (Continuous(Att)) {
-      Sorted = false;
+      Sorted = binfalse;
       AdjustThresholds(T, Att);
     }
   }
@@ -248,7 +248,7 @@ void AdjustThresholds(Tree T, Attribute Att)
       ForEach(i, 0, MaxCase) { SRec[i].V = CVal(Case[i], Att); }
 
       Cachesort(0, MaxCase);
-      Sorted = true;
+      Sorted = bintrue;
     }
 
     T->Cut = GreatestValueBelow(T->Cut);

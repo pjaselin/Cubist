@@ -57,7 +57,7 @@ void SingleCttee(void)
   NotifyStage(EVALTRAIN);
   Progress(-(MaxCase + 1.0));
 
-  EvaluateCttee(Cttee, false);
+  EvaluateCttee(Cttee, binfalse);
 
   if ((F = GetFile((SAMPLE ? ".data" : ".test"), "r"))) {
     NotifyStage(READTEST);
@@ -72,14 +72,14 @@ void SingleCttee(void)
     }
     Case = Nil;
 
-    GetData(F, false, false);
+    GetData(F, binfalse, binfalse);
 
     fprintf(Of, T_EvalTest, MaxCase + 1);
 
     NotifyStage(EVALTEST);
     Progress(-(MaxCase + 1.0));
 
-    EvaluateCttee(Cttee, true);
+    EvaluateCttee(Cttee, bintrue);
   } else if ((F = GetFile(".pred", "r"))) {
     fclose(F);
     remove(Fn); /* set by GetFile */
@@ -111,7 +111,7 @@ void ConstructCttee(void)
   FindGlobalProperties();
 
   if (CHOOSEMODE)
-    USEINSTANCES = true;
+    USEINSTANCES = bintrue;
 
   /*  Set minimum target coverage for a rule as 1% of cases (to a
       maximum of 20).  However, it must be at least MINSPLIT and
@@ -161,7 +161,7 @@ void ConstructCttee(void)
     /*  Calculate the error reduction achieved by committee model  */
 
     SaveUSEINSTANCES = USEINSTANCES;
-    USEINSTANCES = false;
+    USEINSTANCES = binfalse;
 
     FindPredictedValues(Cttee, 0, MaxCase);
 
@@ -391,7 +391,7 @@ void AttributeUsage(void)
 
   fprintf(Of, T_AttUsage);
 
-  while (true) {
+  while (bintrue) {
     BestAtt = 0;
 
     ForEach(Att, 1, MaxAtt) {
@@ -433,7 +433,7 @@ void UpdateUsage(CRule R)
   /*  Attributes used in conditions.  Must assemble in table in case
       same attribute appears more than once  */
 
-  memset(AttUsed, false, MaxAtt + 1);
+  memset(AttUsed, binfalse, MaxAtt + 1);
 
   ForEach(d, 1, R->Size) { NoteUsed(R->Lhs[d]->Tested); }
 
@@ -444,7 +444,7 @@ void UpdateUsage(CRule R)
 
   /*  Attributes used in model  */
 
-  memset(AttUsed, false, MaxAtt + 1);
+  memset(AttUsed, binfalse, MaxAtt + 1);
 
   ForEach(Att, 1, MaxAtt) {
     if (R->Rhs[Att])
@@ -465,7 +465,7 @@ void NoteUsed(Attribute Att)
   if (AttUsed[Att])
     return;
 
-  AttUsed[Att] = true;
+  AttUsed[Att] = bintrue;
 
   if (AttDef[Att]) {
     /*  Include attributes that appear in definition  */
