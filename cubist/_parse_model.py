@@ -220,11 +220,11 @@ def _type2(x: str, dig: int | None = None):
         var = x[att_ind + 4 : cut_ind - 1]
         val = float(x[cut_ind + 4 : result_ind - 1])
         if dig is not None:
-            val = _format(val, dig)
+            val = float(_format(val, dig))
         result = x[result_ind + 7 :]
     return {
         "var": var,
-        "val": val if val is None else float(val),
+        "val": val,
         "result": result,
         "text": f"{var} {result} {val}",
     }
