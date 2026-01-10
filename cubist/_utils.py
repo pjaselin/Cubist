@@ -9,7 +9,7 @@ def _format(x: float, digits: int = 15) -> str:
     string rounded to `digits` number of digits from the left."""
     # if x is NA return NA
     if pd.isna(x):
-        return str(x)  # type: ignore
+        return "nan"  # type: ignore
     if np.iscomplex(x):
         raise ValueError("Complex numbers not supported")
 
