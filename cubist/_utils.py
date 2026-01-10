@@ -4,7 +4,7 @@ import numpy as np
 import pandas as pd
 
 
-def _format(x: float, digits: int = 15) -> str | None:
+def _format(x: float, digits: int = 15) -> float | None:
     """Python version of the R format function to return a number formatted as a
     string rounded to `digits` number of digits from the left."""
     # if x is NA return NA
@@ -13,6 +13,8 @@ def _format(x: float, digits: int = 15) -> str | None:
     if np.iscomplex(x):
         raise ValueError("Complex numbers not supported")
 
-    return np.format_float_positional(
-        x, precision=digits, unique=False, fractional=False, trim="-"
+    return float(
+        np.format_float_positional(
+            x, precision=digits, unique=False, fractional=False, trim="-"
+        )
     )

@@ -201,7 +201,7 @@ def _parse_model(
     )
 
 
-def _type2(x: str, dig: int = 3):
+def _type2(x: str, dig: int | None = None):
     """Parse type2 (continuous) splits"""
     x = x.replace('"', "")
 
@@ -218,7 +218,9 @@ def _type2(x: str, dig: int = 3):
         result = "="
     else:
         var = x[att_ind + 4 : cut_ind - 1]
-        val = _format(float(x[cut_ind + 4 : result_ind - 1]), dig)
+        val = float(x[cut_ind + 4 : result_ind - 1])
+        if dig is not None:
+            val = _format(val, dig)
         result = x[result_ind + 7 :]
     return {
         "var": var,
