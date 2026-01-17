@@ -1,5 +1,6 @@
 """Tests for cubist._utils functions"""
 
+import numpy as np
 import pytest
 
 from cubist._utils import _format
@@ -19,7 +20,7 @@ from .conftest import no_raise
         (-123.45678901234567, no_raise(), "-123.456789012346"),
         (123.456789, no_raise(), "123.456789"),
         (-123.456789, no_raise(), "-123.456789"),
-        (None, no_raise(), None),
+        (np.nan, no_raise(), "nan"),
     ],
 )
 def test_format(val, raises, returns):

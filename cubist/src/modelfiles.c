@@ -223,7 +223,7 @@ void SaveCommittee(RRuleSet *Cttee, String Extension)
 {
   int m;
 
-  CheckFile(Extension, true);
+  CheckFile(Extension, bintrue);
 
   ForEach(m, 0, MEMBERS - 1) { SaveRules(Cttee[m]); }
 }
@@ -269,12 +269,12 @@ void SaveRules(RRuleSet RS)
         break;
 
       case BrSubset:
-        First = true;
+        First = bintrue;
         ForEach(v, 1, MaxAttVal[C->Tested]) {
           if (In(v, C->Subset)) {
             if (First) {
               AsciiOut(" elts=", AttValName[C->Tested][v]);
-              First = false;
+              First = binfalse;
             } else {
               AsciiOut(",", AttValName[C->Tested][v]);
             }
@@ -337,7 +337,7 @@ void ReadHeader(void)
   AttMinVal = Alloc(MaxAtt + 1, ContValue);
   Modal = Alloc(MaxAtt + 1, DiscrValue);
 
-  while (true) {
+  while (bintrue) {
     switch (ReadProp(&Dummy)) {
     case IDP:
       /*  Recover year run and set base date for timestamps  */
@@ -489,7 +489,7 @@ RRuleSet *GetCommittee(String Extension)
 
   ErrMsgs = 0;
 
-  CheckFile(Extension, false);
+  CheckFile(Extension, binfalse);
   if (ErrMsgs) {
     if (Mf) {
       fclose(Mf);
@@ -679,7 +679,7 @@ int ReadProp(char *Delim)
 {
   int c, i;
   char *p;
-  Boolean Quote = false;
+  Boolean Quote = binfalse;
 
   for (p = PropName; (c = fgetc(Mf)) != '=';) {
     if (p - PropName >= 19 || c == EOF) {

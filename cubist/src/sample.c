@@ -63,7 +63,7 @@ int MAIN(int Argc, char *Argv[])
   if (USEINSTANCES) {
     if (!(F = GetFile(".data", "r")))
       Error(0, Fn, "");
-    GetData(F, true, false); /* GetData closes the file */
+    GetData(F, bintrue, binfalse); /* GetData closes the file */
 
     /* Prepare the file of instances and the kd-tree index  */
     InitialiseInstances(CubistModel);
@@ -80,7 +80,7 @@ int MAIN(int Argc, char *Argv[])
     Error(0, Fn, "");
 
   /* Not training, but allow unknown target */
-  GetData(F, false, true); /* GetData closes the file */
+  GetData(F, binfalse, bintrue); /* GetData closes the file */
 
   FindPredictedValues(CubistModel, 0, MaxCase);
 

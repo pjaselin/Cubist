@@ -50,7 +50,7 @@ Boolean NewRule(Condition Cond[], int NCond, Boolean *Deleted, CaseCount Cover,
   int d, dd, id, r, Size = 0, Bytes;
   CRule R;
   Condition *Lhs;
-  Boolean Exclude = false;
+  Boolean Exclude = binfalse;
   float Range, V;
   extern double *Total;
 
@@ -80,14 +80,14 @@ Boolean NewRule(Condition Cond[], int NCond, Boolean *Deleted, CaseCount Cover,
       memcpy(Lhs[d]->Subset, Cond[dd]->Subset, Bytes);
     }
 
-    Deleted[dd] = true;
+    Deleted[dd] = bintrue;
   }
 
   /*  See if rule already exists  */
 
   for (r = 1; !Exclude && r <= NRules; r++) {
     if (SameRule(r, Lhs, Size)) {
-      Verbosity(1, fprintf(Of, "\tduplicates rule %d\n", r)) Exclude = true;
+      Verbosity(1, fprintf(Of, "\tduplicates rule %d\n", r)) Exclude = bintrue;
 
       /*  Save this model if has lower estimated error  */
 
@@ -109,7 +109,7 @@ Boolean NewRule(Condition Cond[], int NCond, Boolean *Deleted, CaseCount Cover,
 
     FreeVector((void **)Lhs, 1, Size);
 
-    return false;
+    return binfalse;
   }
 
   /*  Make sure there is enough room for the new rule  */
@@ -148,7 +148,7 @@ Boolean NewRule(Condition Cond[], int NCond, Boolean *Deleted, CaseCount Cover,
 
   Verbosity(1, PrintRule(R))
 
-      return true;
+      return bintrue;
 }
 
 /*************************************************************************/
@@ -163,26 +163,26 @@ Boolean SameRule(RuleNo r, Condition Cond[], int NConds)
   int d, i, Bytes;
 
   if (Rule[r]->Size != NConds) {
-    return false;
+    return binfalse;
   }
 
   ForEach(d, 1, NConds) {
     if (Rule[r]->Lhs[d]->NodeType != Cond[d]->NodeType ||
         Rule[r]->Lhs[d]->Tested != Cond[d]->Tested) {
-      return false;
+      return binfalse;
     }
 
     switch (Cond[d]->NodeType) {
     case BrDiscr:
       if (Rule[r]->Lhs[d]->TestValue != Cond[d]->TestValue) {
-        return false;
+        return binfalse;
       }
       break;
 
     case BrThresh:
       if (Rule[r]->Lhs[d]->TestValue != Cond[d]->TestValue ||
           Rule[r]->Lhs[d]->Cut != Cond[d]->Cut) {
-        return false;
+        return binfalse;
       }
       break;
 
@@ -190,13 +190,13 @@ Boolean SameRule(RuleNo r, Condition Cond[], int NConds)
       Bytes = (MaxAttVal[Cond[d]->Tested] >> 3) + 1;
       ForEach(i, 0, Bytes - 1) {
         if (Rule[r]->Lhs[d]->Subset[i] != Cond[d]->Subset[i]) {
-          return false;
+          return binfalse;
         }
       }
     }
   }
 
-  return true;
+  return bintrue;
 }
 
 /*************************************************************************/
@@ -357,7 +357,7 @@ void PrintCondition(Condition C)
 /*  --------------  */
 {
   DiscrValue v, pv, Last, Values = 0;
-  Boolean First = true;
+  Boolean First = bintrue;
   Attribute Att;
   int Col, Base, Entry;
   char CVS[20];
@@ -422,7 +422,7 @@ void PrintCondition(Condition C)
         Entry = CharWidth(AttValName[Att][pv]);
 
         if (First) {
-          First = false;
+          First = binfalse;
         } else if (Col + Entry + 2 >= Width) {
           Col = Base;
           fprintf(Of, ",\n%*s", Col, "");
