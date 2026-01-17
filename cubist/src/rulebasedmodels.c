@@ -170,8 +170,8 @@ void initglobals(void)
  * Set global variables in preparation for creating a model
  */
 void setglobals(int unbiased, char *composite, int neighbors, int committees,
-                double sample, int seed, int rules, double extrapolation,
-                int cv) {
+                double sample, int seed, int rules, double extrapolation) {
+  /* XXX What about setting FOLDS? */
 
   UNBIASED = unbiased != 0 ? bintrue : binfalse;
 
@@ -205,7 +205,6 @@ void setOf(void) {
 
 char *closeOf(void) {
   if (Of) {
-
     rbm_fclose(Of);
     return strbuf_getall((STRBUF *)Of);
   } else {

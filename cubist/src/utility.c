@@ -29,9 +29,6 @@
 /*                                                                       */
 /*************************************************************************/
 
-#define _CRT_SECURE_NO_WARNINGS
-#include <sys/time.h>
-
 #include "defns.h"
 #include "extern.h"
 
@@ -45,12 +42,13 @@
 void PrintHeader(String Title)
 /*   -----------  */
 {
-  char TitleLine[80];
+  size_t size = 80;
+  char TitleLine[size];
   time_t clock;
   int Underline;
 
   clock = time(0);
-  sprintf(TitleLine, "%s%s [%s]", NAME, Title, TX_Release(RELEASE));
+  snprintf(TitleLine, size, "%s%s [%s]", NAME, Title, TX_Release(RELEASE));
   fprintf(Of, "\n%s  %s", TitleLine, ctime(&clock));
 
   Underline = CharWidth(TitleLine);
@@ -281,132 +279,133 @@ void Error(int ErrNo, String S1, String S2)
 /*   -----  */
 {
   Boolean Quit = binfalse, WarningOnly = binfalse;
-  char Buffer[10000];
+  size_t size = 10000;
+  char Buffer[size];
   char *Msg = Buffer;
 
   if (!ErrMsgs)
     fprintf(Of, "\n");
 
   if (ErrNo == NOFILE || ErrNo == NOMEM || ErrNo == MODELFILE) {
-    sprintf(Msg, "*** ");
+    snprintf(Msg, size, "*** ");
   } else {
-    sprintf(Msg, TX_Line(LineNo, Fn));
+    snprintf(Msg, size, TX_Line(LineNo, Fn));
   }
   Msg += strlen(Buffer);
 
   switch (ErrNo) {
   case NOFILE:
-    sprintf(Msg, E_NOFILE(Fn, S2));
+    snprintf(Msg, size, E_NOFILE(Fn, S2));
     Quit = bintrue;
     break;
 
   case BADATTNAME:
-    sprintf(Msg, E_BADATTNAME, S1);
+    snprintf(Msg, size, E_BADATTNAME, S1);
     break;
 
   case EOFINATT:
-    sprintf(Msg, E_EOFINATT, S1);
+    snprintf(Msg, size, E_EOFINATT, S1);
     break;
 
   case SINGLEATTVAL:
-    sprintf(Msg, E_SINGLEATTVAL(S1, S2));
+    snprintf(Msg, size, E_SINGLEATTVAL(S1, S2));
     break;
 
   case DUPATTNAME:
-    sprintf(Msg, E_DUPATTNAME, S1);
+    snprintf(Msg, size, E_DUPATTNAME, S1);
     break;
 
   case CWTATTERR:
-    sprintf(Msg, E_CWTATTERR);
+    snprintf(Msg, size, E_CWTATTERR);
     break;
 
   case BADATTVAL:
-    sprintf(Msg, E_BADATTVAL(S2, S1));
+    snprintf(Msg, size, E_BADATTVAL(S2, S1));
     break;
 
   case BADNUMBER:
-    sprintf(Msg, E_BADNUMBER(S1));
+    snprintf(Msg, size, E_BADNUMBER(S1));
     break;
 
   case NOMEM:
-    sprintf(Msg, E_NOMEM);
+    snprintf(Msg, size, E_NOMEM);
     Quit = bintrue;
     break;
 
   case TOOMANYVALS:
-    sprintf(Msg, E_TOOMANYVALS(S1, (int)(intptr_t)S2));
+    snprintf(Msg, size, E_TOOMANYVALS(S1, (int)(intptr_t)S2));
     Quit = bintrue;
     break;
 
   case BADDISCRETE:
-    sprintf(Msg, E_BADDISCRETE, S1);
+    snprintf(Msg, size, E_BADDISCRETE, S1);
     Quit = bintrue;
     break;
 
   case NOTARGET:
-    sprintf(Msg, E_NOTARGET, S1);
+    snprintf(Msg, size, E_NOTARGET, S1);
     Quit = bintrue;
     break;
 
   case BADTARGET:
-    sprintf(Msg, E_BADTARGET, S1);
+    snprintf(Msg, size, E_BADTARGET, S1);
     Quit = bintrue;
     break;
 
   case LONGNAME:
-    sprintf(Msg, E_LONGNAME);
+    snprintf(Msg, size, E_LONGNAME);
     Quit = bintrue;
     break;
 
   case HITEOF:
-    sprintf(Msg, E_HITEOF);
+    snprintf(Msg, size, E_HITEOF);
     break;
 
   case MISSNAME:
-    sprintf(Msg, E_MISSNAME, S2);
+    snprintf(Msg, size, E_MISSNAME, S2);
     break;
 
   case BADTSTMP:
-    sprintf(Msg, E_BADTSTMP(S2, S1));
+    snprintf(Msg, size, E_BADTSTMP(S2, S1));
     break;
 
   case BADDATE:
-    sprintf(Msg, E_BADDATE(S2, S1));
+    snprintf(Msg, size, E_BADDATE(S2, S1));
     break;
 
   case BADTIME:
-    sprintf(Msg, E_BADTIME(S2, S1));
+    snprintf(Msg, size, E_BADTIME(S2, S1));
     break;
 
   case UNKNOWNATT:
-    sprintf(Msg, E_UNKNOWNATT, S1);
+    snprintf(Msg, size, E_UNKNOWNATT, S1);
     break;
 
   case BADDEF1:
-    sprintf(Msg, E_BADDEF1(AttName[MaxAtt], S1, S2));
+    snprintf(Msg, size, E_BADDEF1(AttName[MaxAtt], S1, S2));
     break;
 
   case BADDEF2:
-    sprintf(Msg, E_BADDEF2(AttName[MaxAtt], S1, S2));
+    snprintf(Msg, size, E_BADDEF2(AttName[MaxAtt], S1, S2));
     break;
 
   case SAMEATT:
-    sprintf(Msg, E_SAMEATT(AttName[MaxAtt], S1));
+    snprintf(Msg, size, E_SAMEATT(AttName[MaxAtt], S1));
     WarningOnly = bintrue;
     break;
 
   case BADDEF3:
-    sprintf(Msg, E_BADDEF3, AttName[MaxAtt]);
+    snprintf(Msg, size, E_BADDEF3, AttName[MaxAtt]);
     break;
 
   case BADDEF4:
-    sprintf(Msg, E_BADDEF4, AttName[MaxAtt]);
+    snprintf(Msg, size, E_BADDEF4, AttName[MaxAtt]);
     WarningOnly = bintrue;
     break;
 
   case MODELFILE:
-    sprintf(Msg, EX_MODELFILE(Fn));
-    sprintf(Msg, "    (%s `%s')\n", S1, S2);
+    snprintf(Msg, size, EX_MODELFILE(Fn));
+    snprintf(Msg, size, "    (%s `%s')\n", S1, S2);
     Quit = bintrue;
     break;
   }
@@ -443,7 +442,7 @@ String CaseLabel(CaseNo N)
   if (LabelAtt && (p = IgnoredVals + SVal(Case[N], LabelAtt)))
     ;
   else {
-    sprintf(LabelBuffer, "#%d", N + 1);
+    snprintf(LabelBuffer, sizeof(LabelBuffer), "#%d", N + 1);
     p = LabelBuffer;
   }
 
@@ -470,7 +469,7 @@ FILE *GetFile(String Extension, String RW)
 /*                                                                       */
 /*************************************************************************/
 
-#include <time.h>
+#include <sys/time.h>
 
 double ExecTime(void)
 /*      --------  */
@@ -592,7 +591,7 @@ int DateToDay(String DS) /*  Day 1 is 0000/03/01  */
          Day - 30;
 }
 
-void DayToDate(int Day, String Date)
+void DayToDate(int Day, String Date, size_t DT_size)
 /*   ---------  */
 {
   int Year, Month, OrigDay = Day;
@@ -628,9 +627,9 @@ void DayToDate(int Day, String Date)
     Year++;
   }
 
-  sprintf(Date, 
-          "%d/%d%d/%d%d", 
-          Year, Month / 10, Month % 10, Day / 10, Day % 10);
+  snprintf(Date, DT_size,
+           "%d/%d%d/%d%d",
+           Year, Month / 10, Month % 10, Day / 10, Day % 10);
 }
 
 /*************************************************************************/
@@ -658,7 +657,7 @@ int TimeToSecs(String TS)
   return Hour * 3600 + Mins * 60 + Secs;
 }
 
-void SecsToTime(int Secs, String Time)
+void SecsToTime(int Secs, String Time, size_t DT_size)
 /*   ----------  */
 {
   int Hour, Mins;
@@ -667,9 +666,9 @@ void SecsToTime(int Secs, String Time)
   Mins = (Secs % 3600) / 60;
   Secs = Secs % 60;
 
-  sprintf(Time,
-          "%d%d:%d%d:%d%d", 
-          Hour / 10, Hour % 10, Mins / 10, Mins % 10, Secs / 10, Secs % 10);
+  snprintf(Time, DT_size,
+           "%d%d:%d%d:%d%d",
+           Hour / 10, Hour % 10, Mins / 10, Mins % 10, Secs / 10, Secs % 10);
 }
 
 void SetTSBase(int y)
@@ -717,22 +716,22 @@ int TStampToMins(String TS)
 /*                                                                       */
 /*************************************************************************/
 
-void CValToStr(ContValue CV, Attribute Att, String DS)
+void CValToStr(ContValue CV, Attribute Att, String DS, size_t DS_size)
 /*   ---------  */
 {
   int Mins;
 
   if (TStampVal(Att)) {
-    DayToDate(floor(CV / 1440) + TSBase, DS);
+    DayToDate(floor(CV / 1440) + TSBase, DS, DS_size);
     DS[10] = ' ';
     Mins = rint(CV) - floor(CV / 1440) * 1440;
-    SecsToTime(Mins * 60, DS + 11);
+    SecsToTime(Mins * 60, DS + 11, DS_size - 11);
   } else if (DateVal(Att)) {
-    DayToDate(CV, DS);
+    DayToDate(CV, DS, DS_size);
   } else if (TimeVal(Att)) {
-    SecsToTime(CV, DS);
+    SecsToTime(CV, DS, DS_size);
   } else {
-    sprintf(DS, "%.*g", PREC, CV);
+    snprintf(DS, DS_size, "%.*g", PREC, CV);
   }
 }
 

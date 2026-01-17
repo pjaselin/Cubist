@@ -1,6 +1,7 @@
 #define PY_SSIZE_T_CLEAN
 #include <Python.h>
 #include <setjmp.h>
+
 #include "redefine.h"
 #include "rulebasedmodels.h"
 #include "strbuf.h"
@@ -22,8 +23,8 @@ static void cubist(char **namesv, char **datav, int *unbiased,
   // Set globals based on the arguments.  This is analogous
   // to parsing the command line in the cubist program.
   setglobals(*unbiased, *compositev, *neighbors, *committees, *sample, *seed,
-             *rules, *extrapolation, *cv);
-  
+             *rules, *extrapolation);
+
   // Handles the strbufv data structure
   rbm_removeall();
 
@@ -55,16 +56,14 @@ static void cubist(char **namesv, char **datav, int *unbiased,
   if ((val = setjmp(rbm_buf)) == 0) {
     // Real work is done here
     cubistmain();
-    
-    // Get the contents of the the model file if not using cross-validation
-    if (*cv == 0){
-      char *modelString = strbuf_getall(rbm_lookup("undefined.model"));
-      char *model = PyMem_Calloc(strlen(modelString) + 1, 1);
-      strcpy(model, modelString);
 
-      // I think the previous value of *modelv will be garbage collected
-      *modelv = model;
-    }
+    // Get the contents of the the model file
+    char *modelString = strbuf_getall(rbm_lookup("undefined.model"));
+    char *model = PyMem_Calloc(strlen(modelString) + 1, 1);
+    strcpy(model, modelString);
+
+    // I think the previous value of *modelv will be garbage collected
+    *modelv = model;
   }
 
   // Close file object "Of", and return its contents via argument outputv
@@ -100,7 +99,7 @@ static void predictions(char **casev, char **namesv, char **datav,
   rbm_register(sb_names, "undefined.names", 1);
 
   STRBUF *sb_datav = strbuf_create_full(*datav, strlen(*datav));
-  // /* XXX why is sb_datav copied? */
+  /* XXX why is sb_datav copied? */
   rbm_register(strbuf_copy(sb_datav), "undefined.data", 1);
 
   STRBUF *sb_modelv = strbuf_create_full(*modelv, strlen(*modelv));
@@ -114,10 +113,7 @@ static void predictions(char **casev, char **namesv, char **datav,
   if ((val = setjmp(rbm_buf)) == 0) {
     // Real work is done here
     samplemain(predv);
-
-  } //else {
-    // printf("prediction code called exit with value %d\n", val - JMP_OFFSET);
-  // }
+  }
 
   // Close file object "Of", and return its contents via argument outputv
   char *outputString = closeOf();

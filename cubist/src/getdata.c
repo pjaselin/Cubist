@@ -36,8 +36,6 @@
 
 #include "redefine.h"
 #include "transform.h"
-// #include "nmath.h"
-//#include <Rmath.h>
 
 float runif( float min, float max )
 {
@@ -50,9 +48,7 @@ float runif( float min, float max )
 #define AltRandom my_rand()
 static double my_rand(void) {
   double dval;
-  // GetRNGstate();
   dval = runif(0, 1);
-  // PutRNGstate();
   return dval;
 }
 
@@ -83,7 +79,8 @@ void GetData(FILE *Df, Boolean Train, Boolean AllowUnknownTarget)
   Boolean AnyUnknown = binfalse, FirstIgnore = bintrue, *AttMsg;
   Attribute Att;
   ContValue Val, Range;
-  char CVS[20];
+  size_t size = 20;
+  char CVS[size];
   CaseCount *Freq; /* discrete value frequencies */
   CaseNo Count, WantTrain, LeftTrain, WantTest, LeftTest;
   Boolean SelectTrain;
@@ -267,7 +264,7 @@ void GetData(FILE *Df, Boolean Train, Boolean AllowUnknownTarget)
         if (Discrete(Att)) {
           fprintf(Of, "`%s'\n", AttValName[Att][Modal[Att]]);
         } else {
-          CValToStr(AttMean[Att], Att, CVS);
+          CValToStr(AttMean[Att], Att, CVS, size);
           fprintf(Of, "%s\n", CVS);
         }
       }
