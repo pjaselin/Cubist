@@ -72,11 +72,11 @@ Boolean ReadName(FILE *f, String s, int n, char ColonOpt)
       SkipComment;
   }
 
-  /*  Return false if no names to read  */
+  /*  Return binfalse if no names to read  */
 
   if (c == EOF) {
     Delimiter = EOF;
-    return false;
+    return binfalse;
   }
 
   /*  Read in characters up to the next delimiter  */
@@ -134,7 +134,7 @@ Boolean ReadName(FILE *f, String s, int n, char ColonOpt)
   }
 
   *Sp++ = '\0';
-  return true;
+  return bintrue;
 }
 
 /*************************************************************************/
@@ -432,7 +432,7 @@ void ListAttsUsed(void)
     if (DefOp(D[e]) == OP_ATT) {
       Att = (Attribute)(intptr_t)DefSVal(D[e]);
       if (!DefUses[Att]) {
-        DefUses[Att] = true;
+        DefUses[Att] = bintrue;
         NUsed++;
       }
     } else if (DefOp(D[e]) == OP_END) {

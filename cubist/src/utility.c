@@ -280,7 +280,7 @@ void ResetKR(int KRInit)
 void Error(int ErrNo, String S1, String S2)
 /*   -----  */
 {
-  Boolean Quit = false, WarningOnly = false;
+  Boolean Quit = binfalse, WarningOnly = binfalse;
   char Buffer[10000];
   char *Msg = Buffer;
 
@@ -297,7 +297,7 @@ void Error(int ErrNo, String S1, String S2)
   switch (ErrNo) {
   case NOFILE:
     sprintf(Msg, E_NOFILE(Fn, S2));
-    Quit = true;
+    Quit = bintrue;
     break;
 
   case BADATTNAME:
@@ -330,32 +330,32 @@ void Error(int ErrNo, String S1, String S2)
 
   case NOMEM:
     sprintf(Msg, E_NOMEM);
-    Quit = true;
+    Quit = bintrue;
     break;
 
   case TOOMANYVALS:
     sprintf(Msg, E_TOOMANYVALS(S1, (int)(intptr_t)S2));
-    Quit = true;
+    Quit = bintrue;
     break;
 
   case BADDISCRETE:
     sprintf(Msg, E_BADDISCRETE, S1);
-    Quit = true;
+    Quit = bintrue;
     break;
 
   case NOTARGET:
     sprintf(Msg, E_NOTARGET, S1);
-    Quit = true;
+    Quit = bintrue;
     break;
 
   case BADTARGET:
     sprintf(Msg, E_BADTARGET, S1);
-    Quit = true;
+    Quit = bintrue;
     break;
 
   case LONGNAME:
     sprintf(Msg, E_LONGNAME);
-    Quit = true;
+    Quit = bintrue;
     break;
 
   case HITEOF:
@@ -392,7 +392,7 @@ void Error(int ErrNo, String S1, String S2)
 
   case SAMEATT:
     sprintf(Msg, E_SAMEATT(AttName[MaxAtt], S1));
-    WarningOnly = true;
+    WarningOnly = bintrue;
     break;
 
   case BADDEF3:
@@ -401,13 +401,13 @@ void Error(int ErrNo, String S1, String S2)
 
   case BADDEF4:
     sprintf(Msg, E_BADDEF4, AttName[MaxAtt]);
-    WarningOnly = true;
+    WarningOnly = bintrue;
     break;
 
   case MODELFILE:
     sprintf(Msg, EX_MODELFILE(Fn));
     sprintf(Msg, "    (%s `%s')\n", S1, S2);
-    Quit = true;
+    Quit = bintrue;
     break;
   }
 
@@ -419,7 +419,7 @@ void Error(int ErrNo, String S1, String S2)
   if (ErrMsgs == 1) {
     fprintf(Of, T_ErrorLimit);
     MaxCase--;
-    Quit = true;
+    Quit = bintrue;
   }
 
   if (Quit && Of) {

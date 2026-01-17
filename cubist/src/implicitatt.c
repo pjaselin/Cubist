@@ -53,12 +53,12 @@ AttValue _UNK, /* quasi-constant for unknown value */
 #define FailSyn(Msg)                                                           \
   {                                                                            \
     DefSyntaxError(Msg);                                                       \
-    return false;                                                              \
+    return binfalse;                                                              \
   }
 #define FailSem(Msg)                                                           \
   {                                                                            \
     DefSemanticsError(Fi, Msg, OpCode);                                        \
-    return false;                                                              \
+    return binfalse;                                                              \
   }
 
 typedef union _xstack_elt {
@@ -100,7 +100,7 @@ void ImplicitAtt(FILE *Nf)
 
   ReadDefinition(Nf);
 
-  PreviousError = false;
+  PreviousError = binfalse;
   BN = 0;
 
   /*  Allocate initial stack and attribute definition  */
@@ -161,13 +161,13 @@ void ImplicitAtt(FILE *Nf)
 void ReadDefinition(FILE *f)
 /*   --------------  */
 {
-  Boolean LastWasPeriod = false;
+  Boolean LastWasPeriod = binfalse;
   char c;
 
   Buff = Alloc(BuffSize = 50, char);
   BN = 0;
 
-  while (true) {
+  while (bintrue) {
     c = InChar(f);
 
     if (c == '|')
@@ -247,7 +247,7 @@ Boolean Expression(void)
     DumpOp(OP_OR, Fi);
   }
 
-  return true;
+  return bintrue;
 }
 
 Boolean Conjunct(void)
@@ -267,7 +267,7 @@ Boolean Conjunct(void)
     DumpOp(OP_AND, Fi);
   }
 
-  return true;
+  return bintrue;
 }
 
 String RelOps[] = {">=", "<=", "!=", "<>", ">", "<", "=", (String)0};
@@ -301,7 +301,7 @@ Boolean SExpression(void)
            Fi);
   }
 
-  return true;
+  return bintrue;
 }
 
 String AddOps[] = {"+", "-", (String)0};
@@ -333,7 +333,7 @@ Boolean AExpression(void)
     DumpOp((char)(OP_PLUS + o), Fi);
   }
 
-  return true;
+  return bintrue;
 }
 
 String MultOps[] = {"*", "/", "%", (String)0};
@@ -355,7 +355,7 @@ Boolean Term(void)
     DumpOp((char)(OP_MULT + o), Fi);
   }
 
-  return true;
+  return bintrue;
 }
 
 Boolean Factor(void)
@@ -375,14 +375,14 @@ Boolean Factor(void)
     DumpOp(OP_POW, Fi);
   }
 
-  return true;
+  return bintrue;
 }
 
 Boolean Primary(void)
 /*      -------  */
 {
   if (Atom()) {
-    return true;
+    return bintrue;
   } else if (Find("(")) {
     BN++;
     if (!Expression())
@@ -390,7 +390,7 @@ Boolean Primary(void)
     if (!Find(")"))
       FailSyn("')'");
     BN++;
-    return true;
+    return bintrue;
   } else {
     FailSyn("attribute, value, or '('");
   }
@@ -498,10 +498,10 @@ Boolean Atom(void)
       Dump(OP_STR, 0, strdup("N/A"), Fi);
     }
   } else {
-    return false;
+    return binfalse;
   }
 
-  return true;
+  return bintrue;
 }
 
 /*************************************************************************/
@@ -516,7 +516,7 @@ Boolean Find(String S)
   if (Buff[BN] == ' ')
     BN++;
 
-  return (!Buff[BN] ? false : !memcmp(Buff + BN, S, strlen(S)));
+  return (!Buff[BN] ? binfalse : !memcmp(Buff + BN, S, strlen(S)));
 }
 
 /*************************************************************************/
@@ -590,7 +590,7 @@ void DefSyntaxError(String Msg)
     }
 
     Error(BADDEF1, RestOfText, Msg);
-    PreviousError = true;
+    PreviousError = bintrue;
   }
 }
 
@@ -677,7 +677,7 @@ void DefSemanticsError(int Fi, String Msg, int OpCode)
 
     sprintf(XMsg, "%s with '%s'", Msg, Op);
     Error(BADDEF2, Exp, XMsg);
-    PreviousError = true;
+    PreviousError = bintrue;
   }
 }
 
@@ -811,7 +811,7 @@ Boolean UpdateTStack(char OpCode, ContValue F, String S, int Fi)
   TStack[TSN].Li = BN - 1;
   TSN++;
 
-  return true;
+  return bintrue;
 }
 
 /*************************************************************************/

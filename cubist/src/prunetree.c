@@ -78,7 +78,7 @@ void Prune(Tree T)
       yielding simpler models.  In the final stage, pruning continues
       until the number of leaves does not exceed MAXRULES  */
 
-  while (true) {
+  while (bintrue) {
     TotalParams = T->Params;
     TotalErr = T->TreeErr;
 
@@ -414,13 +414,13 @@ void FindErrors(Tree T, CaseNo Fp, CaseNo Lp)
 Boolean FindWeakestSubtree(Tree T)
 /*      ------------------  */
 {
-  Boolean Found = false;
+  Boolean Found = binfalse;
   double ThisExtraErr, ThisAdjErr;
   float ThisExtraParams;
   DiscrValue v;
 
   if (!T->NodeType)
-    return false;
+    return binfalse;
 
   /*  Is this the weakest so far?  */
 
@@ -436,7 +436,7 @@ Boolean FindWeakestSubtree(Tree T)
     ExtraErr = ThisExtraErr;
     ExtraParams = ThisExtraParams;
     NewAdjErr = ThisAdjErr;
-    Found = true;
+    Found = bintrue;
   }
 
   /*  Check subtrees that could be weaker than current best  */
