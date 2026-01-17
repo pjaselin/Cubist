@@ -10,7 +10,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "cubist"
-version = "1.2.0"
+version = "1.2.1"
 requires-python = ">= 3.10"
 authors = [
   {name = "Ross Quinlan"},
@@ -22,6 +22,8 @@ maintainers = [
 ]
 description="A Python package for fitting Ross Quinlan's Cubist regression model."
 readme = {file = "README.md", content-type = "text/markdown"}
+license = "GPL-3.0"
+license-files = ["LICENSE"]
 classifiers = [
   "Development Status :: 5 - Production/Stable",
   "Intended Audience :: Developers",

@@ -192,6 +192,10 @@ void setglobals(int unbiased, char *composite, int neighbors, int committees,
   KRInit = seed;
   MAXRULES = rules;
   EXTRAP = extrapolation;
+  FOLDS = cv;
+  if (FOLDS > 0){
+    XVAL = bintrue;
+  }
 }
 
 void setOf(void) {
