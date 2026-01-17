@@ -173,7 +173,7 @@ void setglobals(int unbiased, char *composite, int neighbors, int committees,
                 double sample, int seed, int rules, double extrapolation,
                 int cv) {
 
-  UNBIASED = unbiased != 0 ? true : binfalse;
+  UNBIASED = unbiased != 0 ? bintrue : binfalse;
 
   if (strcmp(composite, "yes") == 0) {
     USEINSTANCES = bintrue;
