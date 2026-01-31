@@ -29,7 +29,7 @@
 /*                                                                       */
 /*************************************************************************/
 #define _CRT_SECURE_NO_WARNINGS
-#include <time.h>
+#include <sys/time.h>
 
 #include "defns.h"
 #include "extern.h"
