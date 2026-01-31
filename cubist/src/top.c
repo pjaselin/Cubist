@@ -66,9 +66,6 @@ static void cubist(char **namesv, char **datav, int *unbiased,
       // I think the previous value of *modelv will be garbage collected
       *modelv = model;
     }
-
-    // I think the previous value of *modelv will be garbage collected
-    *modelv = model;
   }
 
   // Close file object "Of", and return its contents via argument outputv
