@@ -29,7 +29,7 @@
 /*                                                                       */
 /*************************************************************************/
 #define _CRT_SECURE_NO_WARNINGS
-#include <sys/time.h>
+#include <time.h>
 
 #include "defns.h"
 #include "extern.h"
@@ -471,7 +471,7 @@ FILE *GetFile(String Extension, String RW)
 /*                                                                       */
 /*************************************************************************/
 
-#include <sys/time.h>
+#include <time.h>
 
 double ExecTime(void)
 /*      --------  */

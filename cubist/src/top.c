@@ -115,7 +115,9 @@ static void predictions(char **casev, char **namesv, char **datav,
   if ((val = setjmp(rbm_buf)) == 0) {
     // Real work is done here
     samplemain(predv);
-  }
+  } //else {
+    // printf("prediction code called exit with value %d\n", val - JMP_OFFSET);
+  // }
 
   // Close file object "Of", and return its contents via argument outputv
   char *outputString = closeOf();
