@@ -23,7 +23,7 @@ static void cubist(char **namesv, char **datav, int *unbiased,
   // Set globals based on the arguments.  This is analogous
   // to parsing the command line in the cubist program.
   setglobals(*unbiased, *compositev, *neighbors, *committees, *sample, *seed,
-             *rules, *extrapolation);
+             *rules, *extrapolation, *cv);
 
   // Handles the strbufv data structure
   rbm_removeall();
