@@ -170,7 +170,8 @@ void initglobals(void)
  * Set global variables in preparation for creating a model
  */
 void setglobals(int unbiased, char *composite, int neighbors, int committees,
-                double sample, int seed, int rules, double extrapolation) {
+                double sample, int seed, int rules, double extrapolation,
+                int cv) {
   /* XXX What about setting FOLDS? */
 
   UNBIASED = unbiased != 0 ? bintrue : binfalse;
