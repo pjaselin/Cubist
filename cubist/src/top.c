@@ -1,7 +1,6 @@
 #define PY_SSIZE_T_CLEAN
 #include <Python.h>
 #include <setjmp.h>
-
 #include "redefine.h"
 #include "rulebasedmodels.h"
 #include "strbuf.h"
