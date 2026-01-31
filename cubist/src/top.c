@@ -57,10 +57,15 @@ static void cubist(char **namesv, char **datav, int *unbiased,
     // Real work is done here
     cubistmain();
 
-    // Get the contents of the the model file
-    char *modelString = strbuf_getall(rbm_lookup("undefined.model"));
-    char *model = PyMem_Calloc(strlen(modelString) + 1, 1);
-    strcpy(model, modelString);
+    // Get the contents of the the model file if not using cross-validation
+    if (*cv == 0){
+      char *modelString = strbuf_getall(rbm_lookup("undefined.model"));
+      char *model = PyMem_Calloc(strlen(modelString) + 1, 1);
+      strcpy(model, modelString);
+
+      // I think the previous value of *modelv will be garbage collected
+      *modelv = model;
+    }
 
     // I think the previous value of *modelv will be garbage collected
     *modelv = model;
