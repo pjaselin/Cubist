@@ -56,7 +56,7 @@ def _make_data_string(x, y=None, w=None):
         x.columns = column_names
 
     # convert all columns to strings
-    for col in x:
+    for col in x.columns:
         if is_numeric_dtype(x[col]):
             x[col] = x[col].apply(_format)
         x[col] = x[col].astype(str)
