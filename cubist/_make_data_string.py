@@ -59,8 +59,7 @@ def _make_data_string(x, y=None, w=None):
     for col in x:
         if is_numeric_dtype(x[col]):
             x[col] = x[col].apply(_format)
-        else:
-            x[col] = x[col].astype(str)
+        x[col] = x[col].astype(str)
 
     # remove leading whitespace from all elements
     x = x.map(lambda a: a.lstrip())
