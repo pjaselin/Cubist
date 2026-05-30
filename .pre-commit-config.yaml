@@ -1,6 +1,6 @@
 ---
 default_language_version:
-  node: 22.9.0
+  node: 22.22.3
 
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
@@ -16,7 +16,7 @@ repos:
         args: [--pytest-test-first]
   - repo: https://github.com/astral-sh/ruff-pre-commit
     # Ruff version.
-    rev: v0.14.4
+    rev: v0.15.15
     hooks:
       # Run the linter.
       - id: ruff
@@ -24,25 +24,25 @@ repos:
       - id: ruff-format
         exclude: ^cubist/src
   - repo: https://github.com/DavidAnson/markdownlint-cli2
-    rev: v0.18.1
+    rev: v0.22.1
     hooks:
       - id: markdownlint-cli2
   - repo: https://github.com/thlorenz/doctoc
-    rev: v2.2.0
+    rev: v2.4.1
     hooks:
       - id: doctoc
   - repo: https://github.com/crate-ci/typos
-    rev: v1.39.0
+    rev: v1.47.0
     hooks:
       - id: typos
         exclude: ^cubist/src
         args: []
   - repo: https://github.com/pycqa/isort
-    rev: 7.0.0
+    rev: 9.0.0a3
     hooks:
       - id: isort
   - repo: https://github.com/commitizen-tools/commitizen
-    rev: v4.9.1
+    rev: v4.16.3
     hooks:
       - id: commitizen
   - repo: https://github.com/PyCQA/doc8
@@ -59,3 +59,10 @@ repos:
         # From the docs it is not clear the difference between `language: python` VS `language: system`
         language: system
         types: [ python ]
+      - id: semgrep
+        name: semgrep
+        entry: uv run semgrep
+        language: system
+        args: ["--disable-version-check", "--quiet", "--skip-unknown-extensions"]
+        types: [python]  # or remove to scan all files
+        pass_filenames: true
