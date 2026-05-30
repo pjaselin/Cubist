@@ -68,6 +68,7 @@ jobs:
         run: uv sync --extra viz
 
       - name: Run pre-commit hooks over repo
+        if: matrix.os == 'ubuntu-latest'
         uses: pre-commit/action@v3.0.1
 
       - name: Lint with Ruff
