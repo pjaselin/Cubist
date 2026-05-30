@@ -55,14 +55,12 @@ def _make_data_string(x, y=None, w=None):
         x = x.assign(w=w)
         x.columns = column_names
 
-    # convert all columns to strings
+    # convert all columns to strings and remove leading whitespace from all
+    # elements
     for col in x.columns:
         if is_numeric_dtype(x[col]):
             x[col] = x[col].apply(_format)
-        x[col] = x[col].astype(str)
-
-    # remove leading whitespace from all elements
-    x = x.map(lambda a: a.lstrip())
+        x[col] = x[col].astype(str).str.lstrip()
 
     # replace missing values with ?
     x = x.fillna("?")

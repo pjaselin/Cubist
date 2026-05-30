@@ -83,7 +83,6 @@ packages = [
 
 [tool.pytest.ini_options]
 addopts = "-v -s"
-filterwarnings = "ignore:np.asscalar:DeprecationWarning"
 
 [tool.coverage.run]
 branch = true
