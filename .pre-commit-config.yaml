@@ -49,6 +49,15 @@ repos:
     rev: v2.0.0
     hooks:
       - id: doc8
+  - repo: https://github.com/semgrep/pre-commit
+    rev: v1.164.0
+    hooks:
+      - id: semgrep-docker
+        name: semgrep
+        description: This hook runs semgrep (a.k.a. semgrep:latest)
+        language: docker_image
+        # See the comment above for why we set those SEMGREP_XXX variables
+        entry: -e SEMGREP_LOG_FILE=/tmp/out.log -e SEMGREP_VERSION_CACHE_PATH=/tmp/cache semgrep/semgrep:latest semgrep
   - repo: local
     hooks:
       - id: mypy
@@ -59,10 +68,3 @@ repos:
         # From the docs it is not clear the difference between `language: python` VS `language: system`
         language: system
         types: [ python ]
-      - id: semgrep
-        name: semgrep
-        entry: uv run semgrep
-        language: system
-        args: ["--disable-version-check", "--quiet", "--skip-unknown-extensions"]
-        types: [python]  # or remove to scan all files
-        pass_filenames: true
