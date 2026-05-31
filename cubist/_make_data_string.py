@@ -1,6 +1,5 @@
 """Function to create the Cubist datav_ input"""
 
-import numpy as np
 import pandas as pd
 from pandas.api.types import is_numeric_dtype, is_string_dtype
 
@@ -35,9 +34,9 @@ def _make_data_string(x, y=None, w=None):
             x[col] = _escapes(x[col].astype(str))
 
     # if y is None for model predictions, set y as a column of NaN values,
-    # # which will become ?'s later
+    # which will become ?'s later
     if y is None:
-        y = [np.nan] * x.shape[0]
+        y = ["?"] * x.shape[0]
         y = pd.Series(y)
     else:
         y = y.copy(deep=True)
@@ -55,15 +54,12 @@ def _make_data_string(x, y=None, w=None):
         x = x.assign(w=w)
         x.columns = column_names
 
-    # convert all columns to strings
-    for col in x:
+    # convert all columns to strings and remove leading whitespace from all
+    # elements
+    for col in x.columns:
         if is_numeric_dtype(x[col]):
             x[col] = x[col].apply(_format)
-        else:
-            x[col] = x[col].astype(str)
-
-    # remove leading whitespace from all elements
-    x = x.map(lambda a: a.lstrip())
+        x[col] = x[col].astype(str).str.lstrip()
 
     # replace missing values with ?
     x = x.fillna("?")

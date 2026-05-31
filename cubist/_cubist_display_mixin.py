@@ -126,10 +126,10 @@ class _CubistDisplayMixin:
                 axis=1,
             )
         # get the distinct ordered labels
-        y_label_map = df.label.drop_duplicates().reset_index(drop=True).to_dict()
+        y_label_map = df["label"].drop_duplicates().reset_index(drop=True).to_dict()
         # get the labels as a list
         y_labels = list(y_label_map.values())
         # replace the dataframe label column values with the index of the
         # same value in y_labels
-        df.label = df.label.apply(y_labels.index)
+        df["label"] = df["label"].apply(y_labels.index)
         return df, y_axis_label, y_label_map

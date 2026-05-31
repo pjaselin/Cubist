@@ -8,20 +8,32 @@
 [![PyPI - Downloads](https://img.shields.io/pypi/dm/cubist)](https://pypi.org/project/cubist)
 [![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit)](https://github.com/pre-commit/pre-commit)
 
-`cubist` is a Python package and wrapper for [Ross Quinlan](https://www.rulequest.com/Personal/)'s [Cubist](https://www.rulequest.com/cubist-unix.html) v2.07 regression model with additional utilities for visualizing the model. The package is both inspired by and a translation of the [R wrapper for Cubist](https://github.com/topepo/Cubist). This implementation of the model is compatible with and the visualization utilities are designed after those in [scikit-learn](https://scikit-learn.org/stable/).
+`cubist` is a Python package and wrapper for [Ross Quinlan](https://www.rulequest.com/Personal/)'s [Cubist](https://www.rulequest.com/cubist-unix.html) v2.07 rule-based regression model with additional utilities for visualizing a trained model. The package is both inspired by and a translation of the [R wrapper for Cubist](https://github.com/topepo/Cubist). This implementation of the model is compatible with and the visualization utilities are designed after those in [scikit-learn](https://scikit-learn.org/stable/).
 
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 **Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
 
+- [Model Features](#model-features)
 - [Installation](#installation)
   - [Model-Only](#model-only)
   - [Enable Visualization Utilities](#enable-visualization-utilities)
-- [Usage](#usage)
-- [Cubist Model Features](#cubist-model-features)
+- [Usage with Verbose Output](#usage-with-verbose-output)
 - [Package Contents](#package-contents)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
+## Model Features
+
+The Cubist model has the following distinguishing features, though not all are fully enabled in this package:
+
+- Generates a piecewise model formulated as a collection of conditional rules with corresponding linear regressors (optionally allowing for nearest-neighbor correction).
+- High interpretability due to piecewise rules and linear regressors.
+- Handles missing values.
+- Handles continuous, date, time, timestamp, and discrete values. Additionally can ignore columns and add labels to training rows. Columns can also be defined by formulas. N.B. Not all of these are supported in this package.
+- Natively performs cross-validation and sampling.
+- Error can be further reduced by using multiple models (committees).
+- Allows for extrapolation beyond the original training target values (sets a minimum of zero for predicted output if all training target values are greater than zero).
 
 ## Installation
 
@@ -49,7 +61,7 @@ or
 uv add cubist --extra viz
 ```
 
-## Usage
+## Usage with Verbose Output
 
 ```python
 >>> from sklearn.datasets import load_iris
@@ -62,7 +74,7 @@ uv add cubist --extra viz
 >>> X_train, X_test, y_train, y_test = train_test_split(
         X, y, test_size=0.05
     )
->>> model = Cubist()
+>>> model = Cubist(n_rules=2, verbose=True)
 >>> model.fit(X_train, y_train)
 
 Cubist [Release 2.07 GPL Edition]  Sat Dec 28 19:52:49 2024
@@ -114,18 +126,6 @@ array([1.1257    , 0.        , 2.04999995, 1.25449991, 1.30480003,
 >>> model.score(X_test, y_test)
 0.9543285583162371
 ```
-
-## Cubist Model Features
-
-The Cubist model has the following distinguishing features, although not all are fully enabled in this package:
-
-- Generates a piecewise model formulated as a collection of conditional rules with corresponding linear regressors (optionally allowing for nearest-neighbor correction).
-- High interpretability due to piecewise rules and linear regressors.
-- Handles missing values.
-- Handles continuous, date, time, timestamp, and discrete values. Additionally can ignore columns and add labels to training rows. Columns can also be defined by formulas. N.B. Not all of these are supported in this package.
-- Natively performs cross-validation and sampling.
-- Error can be further reduced by using multiple models (committees).
-- Allows for extrapolation beyond the original training target values (sets a minimum of zero for predicted output if all training target values are greater than zero).
 
 ## Package Contents
 
