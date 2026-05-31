@@ -43,6 +43,19 @@ This makes it straightforward to understand the model's predictive decisions. To
 
    ::
 
+      >>> from sklearn.datasets import load_iris
+      >>> from sklearn.model_selection import train_test_split
+      >>> from cubist import Cubist
+      >>> X, y = load_iris(return_X_y=True, as_frame=True)
+      >>> X_train, X_test, y_train, y_test = train_test_split(
+              X, y, test_size=0.05
+          )
+      >>> X_train, X_test, y_train, y_test = train_test_split(
+              X, y, test_size=0.05
+          )
+      >>> model = Cubist(verbose=True)
+      >>> model.fit(X_train, y_train)
+
       Cubist [Release 2.07 GPL Edition]  Sat Dec 28 19:52:49 2024
       ---------------------------------
 
@@ -91,7 +104,7 @@ Like XGBoost, Cubist can perform boosting by the addition of more models (called
 
 In addition to boosting, the model supports instance-based (nearest-neighbor) corrections to create composite models, combining the advantages of these two methods. Note that with instance-based correction, model accuracy may be improved at the expense of compute time as this extra step takes longer and somewhat reduced interpretability as the linear models are no longer completely followed. It should be noted that enabling instance-based correction requires saving the entire training dataset with the model if disk space is a consideration. Of not is that Cubist can be allowed to decide whether to take advantage of composite models with the appropriate settings and will report it's choice to the user.
 
-A final difference with other models is that Cubist natively supports missing and categorical values. This means users are not required to introduce encodings and may exlore more patterns in the dataset (e.g. around missingness).
+A final difference with other models is that Cubist natively supports missing and categorical values. This means users are not required to introduce encodings and may explore more patterns in the dataset (e.g. around missingness).
 
 
 Considerations

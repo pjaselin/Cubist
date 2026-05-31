@@ -200,10 +200,10 @@ def test_training_errors(ames_housing_dataset):
     model = Cubist().fit(*ames_housing_dataset)
     check_is_fitted(model)
     X, y = deepcopy(ames_housing_dataset)
-    # set the Sale_Condition column as a string
-    X.Sale_Condition = X.Sale_Condition.astype(str)
+    # set the Sale Condition column as a string
+    X["Sale Condition"] = X["Sale Condition"].astype(str)
     # add a bad string
-    X.loc[0, "Sale_Condition"] = "test. bad, string"
+    X.loc[0, "Sale Condition"] = "test. bad, string"
     # training should now fail
     with pytest.raises(CubistError):
         model = Cubist().fit(X, y)

@@ -12,7 +12,7 @@ def test_coverage_display(ames_housing_dataset):
     CubistCoverageDisplay.from_estimator(model, ames_housing_dataset[0])
     plt.savefig("coverage_display_test_ames.png")
     CubistCoverageDisplay.from_estimator(
-        model, ames_housing_dataset[0], feature_names=["Gr_Liv_Area"]
+        model, ames_housing_dataset[0], feature_names=["Gr Liv Area"]
     )
     plt.savefig("coverage_display_test_ames_subselect.png")
 

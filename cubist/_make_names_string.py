@@ -3,6 +3,7 @@
 import re
 import sys
 from datetime import datetime
+from typing import Any
 
 from ._quinlan_attributes import _quinlan_attributes
 
@@ -64,12 +65,12 @@ def _make_names_string(x, w=None, label="outcome"):
     return out
 
 
-def _escapes(x):
+def _escapes(x: list[Any]) -> list[str]:
     """Double escape reserved and special characters in x."""
     # set custom reserved characters list
     chars = [":", ";", "|"]
     # apply first escaping
     for i in chars:
-        x = [c.replace(i, f"\\{i}") for c in x]
+        x = [str(c).replace(i, f"\\{i}") for c in x]
     # apply second escaping
     return [re.escape(c) for c in x]
