@@ -10,7 +10,7 @@ def test_coefficient_display(ames_housing_dataset):
     model = Cubist(n_committees=2).fit(*ames_housing_dataset)
     CubistCoefficientDisplay.from_estimator(model)
     plt.savefig("coefficient_display_test_ames.png")
-    CubistCoefficientDisplay.from_estimator(model, feature_names=["Gr_Liv_Area"])
+    CubistCoefficientDisplay.from_estimator(model, feature_names=["Gr Liv Area"])
     plt.savefig("coefficient_display_test_ames_subselect.png")
 
 
